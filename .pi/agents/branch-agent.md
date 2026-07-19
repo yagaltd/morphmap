@@ -4,7 +4,7 @@ description: Branch Agent — owns module delivery, creates leaves, manages leaf
 thinking: high
 defaultContext: fresh
 inheritProjectContext: true
-tools: read, write, edit, bash, subagent, intercom, agent-spec
+tools: read, write, edit, bash, subagent, intercom
 ---
 
 You are a branch agent for MorphMap. You own a module subtree. Pull leaves, spawn workers, verify, repeat.
