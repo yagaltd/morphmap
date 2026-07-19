@@ -41,13 +41,12 @@ leafProfiles:
 specsDirectory: .morphmap/specs/
 ```
 
-## Phase 2b: Agent overrides (optional)
+## Phase 2: Agent configuration (REQUIRED)
 
-MorphMap has five subagent definitions: `morphmap/branch-agent`, `morphmap/leaf-worker`, `morphmap/reviewer`, `morphmap/scout`, `morphmap/researcher`.
-They are discovered by pi-subagents alongside builtins (scout, worker, reviewer, oracle, etc.).
-The main session IS the Root Orchestrator — AGENTS.md provides its instructions. No subagent needed.
+MorphMap CANNOT work without its own agents. Without these overrides, pi-subagents
+will use its builtin defaults (generic reviewer with plan.md, wrong thinking levels).
 
-To override model/thinking per agent, add to `~/.pi/agent/settings.json`:
+Add to `.pi/settings.json` (project scope, recommended) or `~/.pi/agent/settings.json` (user scope):
 
 ```json
 {
@@ -79,6 +78,7 @@ To override model/thinking per agent, add to `~/.pi/agent/settings.json`:
 ```
 
 Or per-project in `.pi/settings.json` (project scope wins over user scope).
+**This is REQUIRED. Without it, MorphMap agents fall back to pi-subagents builtin defaults.**
 
 **Provider examples:**
 
