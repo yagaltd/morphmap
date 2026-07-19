@@ -1,5 +1,7 @@
 # MorphMap
 
+![MorphMap](cover.png)
+
 AI-native project management for [pi](https://github.com/earendil-works/pi-coding-agent). Mindmap-based, agent-delegated, contract-verified.
 
 **Describe what you want. Agents plan the tree. Branch agents pull leaves, build, verify, report.**
