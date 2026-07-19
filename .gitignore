@@ -1,3 +1,20 @@
-.old/
-*.html
+# Dependencies
 node_modules/
+
+# Generated renders
+*.html
+
+# npm package
+*.tgz
+
+# OS
+.DS_Store
+
+# Dogfooding — not part of the extension
+morphmap.mindmap.md
+morphmap.mindmap.html
+index.md
+.morphmap/
+.old/
+nanobanana-output/
+cover-v*.png
