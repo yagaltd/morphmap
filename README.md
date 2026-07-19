@@ -9,14 +9,14 @@ AI-native project management for [pi](https://github.com/earendil-works/pi-codin
 ## Install
 
 ```bash
-pi install git:github.com/<user>/morphmap
+pi install https://github.com/yagaltd/morphmap
 ```
 
 Requires:
 - [pi-subagents](https://github.com/nicobailon/pi-subagents) >= 0.17.2
 - [pi-prompt-template-model](https://github.com/nicobailon/pi-prompt-template-model) >= 0.9.2
 - [pi-intercom](https://github.com/nicobailon/pi-intercom) (branch communication)
-- context-mode (triage classification, knowledge indexing)
+- [context-mode](https://github.com/mksglu/context-mode) (triage classification, knowledge indexing)
 - [agent-spec](https://github.com/yagaltd/agent-spec) (CLI, contract verification)
 
 Required for rendering:
@@ -93,20 +93,15 @@ All decisions logged. Status always current. Context managed by pi auto-compacti
 
 `.mindmap.md` — markmap-compatible markdown. `#` root, `##` branches, `###` sub-branches, `-` bullet leaves. YAML frontmatter for posture, rendering config. Render with `npx markmap-cli`.
 
-Full spec: [docs/format-spec.md](docs/format-spec.md)
+Render with `npx markmap-cli`.
 
 ## Project Structure
 
 ```
-morphmap.mindmap.md        ← kanban board (markmap-renderable)
-index.md                   ← OKF knowledge index
-package.json               ← pi package manifest
 agents/                    ← pi-subagents agent definitions
 prompts/                   ← slash command templates
 skills/                    ← skill definitions
-.morphmap/config           ← project configuration
-docs/                      ← reference specifications
-examples/                  ← MorphEditor example mindmap
+package.json               ← pi package manifest
 ```
 
 ## License
