@@ -1,13 +1,19 @@
 ---
 name: morphmap-improve
-description: Improvement loop. Analyze patterns across sessions (decisions, git, WORKER_BLOCKER history). Propose concrete improvements. Human approves. PDCA cycle.
+description: PDSA Study loop. Analyze patterns across sessions (decisions, git, WORKER_BLOCKER history). Learn from deviations. Propose concrete improvements. Human approves.
 user-invocable: true
 argument-hint: "[--since <date> or --branch <name> or empty for full review]"
 ---
 
-# MorphMap Improve — PDCA Improvement Loop
+# MorphMap Improve — PDSA Study Loop
 
-Plan → Do → Check → Act. Driven by data, approved by human.
+Plan → Do → Study → Act.
+- Plan: tree (morphmap-plan)
+- Do: execution (morphmap-delegate)
+- Study: learn from patterns (morphmap-improve) ← THIS
+- Act: apply learnings (edit prompts, config, logs)
+
+Driven by data. Human approves.
 
 ## Phase 1: GATHER DATA
 
@@ -36,9 +42,15 @@ ctx_search("WORKER_BLOCKER|failure|retry|fixed|drift")
 ```
 Cross-reference with indexed decisions.
 
-## Phase 2: DETECT PATTERNS
+## Phase 2: STUDY PATTERNS
 
-Group findings by type:
+Don't just list failures. Understand WHY.
+
+For each pattern found, ask:
+- Why did this work? (reinforce good)
+- Why did this fail? (root cause, not symptom)
+- What can we learn from deviations? (plan vs actual)
+- Is this a one-off or a systemic issue? (frequency)
 
 | Pattern | Look for | Threshold |
 |---------|----------|-----------|

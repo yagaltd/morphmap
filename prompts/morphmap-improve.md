@@ -1,5 +1,5 @@
 ---
-description: "MorphMap Improve — analyze patterns across sessions, propose improvements, human approves"
+description: "MorphMap Improve — PDSA Study loop. Learn from patterns across sessions. Propose improvements. Human approves."
 thinking: high
 skill: morphmap-improve
 restore: true
