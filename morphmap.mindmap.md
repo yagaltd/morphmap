@@ -66,3 +66,4 @@ resource: index.md
 - 2026-07-19: verified actual installed stack — pi-workflows NOT installed, corrected hallucination
 - 2026-07-19: pi-dynamic-workflows removed from stack (pi-subagents handles all orchestration)
 - 2026-07-19: renamed project to MorphMap
+- 2026-07-19: git init, first commit (15 files, 1580 lines)
