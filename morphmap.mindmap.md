@@ -30,14 +30,16 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ⬜ verify all docs pass OKF conformance check
 
-## commands ⬜ — scope: slash command implementations · 0/7 leaves
-- ⬜ /mindmap-plan — Root Orchestrator Hat 1 (Planner: scout → tree → approve)
-- ⬜ /mindmap-delegate — spawn branch agents for all ready branches or one specific
-- ⬜ /mindmap-review — fresh subagent walks tree, flags blockers, human triages
-- ⬜ /mindmap-amend — Root Orchestrator Hat 2 (Intake: classify → route to branch)
-- ⬜ /mindmap-triage — Root Orchestrator Hat 3 (Triage: external input → route)
-- ⬜ /mindmap — render .mindmap.md to interactive HTML via markmap-cli
-- ⬜ /mindmap-status — text summary, cheap, no render
+## commands 🔄 — scope: slash command implementations · 1/8 leaves
+- ✅ prompts/ + skills/ — 8 prompt files + 7 skill files → 483 lines
+- ⬜ /morphmap-init — scaffold new project
+- ⬜ /morphmap-plan — Root Orchestrator Hat 1 (Planner: scout → tree → approve)
+- ⬜ /morphmap-delegate — spawn branch agents for all ready branches or one specific
+- ⬜ /morphmap-review — fresh subagent walks tree, flags blockers, human triages
+- ⬜ /morphmap-amend — Root Orchestrator Hat 2 (Intake: classify → route to branch)
+- ⬜ /morphmap-triage — Root Orchestrator Hat 3 (Triage: external input → route)
+- ⬜ /morphmap — render .mindmap.md to interactive HTML via markmap-cli
+- ⬜ /morphmap-status — text summary, cheap, no render
 
 ## agents ⬜ — scope: agent definition files for pi-subagents · 0/3 leaves
 - ⬜ root-orchestrator agent → agents/root-orchestrator.md [🔴 BLOCKING: gates all execution]
