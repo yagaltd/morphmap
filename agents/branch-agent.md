@@ -1,7 +1,6 @@
 ---
 name: morphmap/branch-agent
 description: Branch Agent — owns module delivery, creates leaves, manages leaf workers. Pull-based execution with risk-priority ordering.
-model: deepseek/deepseek-v4-flash
 thinking: high
 defaultContext: fresh
 inheritProjectContext: true
