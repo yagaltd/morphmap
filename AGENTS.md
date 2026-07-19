@@ -56,4 +56,24 @@ Clarity × Risk → build, verify, or escalate.
 
 ## Context
 
+This is a MorphMap project. Use MorphMap skills for all project management.
+
 Map in prompt, always current. Pi auto-compacts. vcc_recall for history.
+
+## Skill Routing
+
+Match user intent to skill. If intent matches, load the skill.
+
+| User says | Load skill |
+|-----------|-----------|
+| "plan X" "design X" "break down X" "create tree for X" | morphmap-plan |
+| "delegate" "execute" "start work" "run branch X" | morphmap-delegate |
+| "review" "status" "blockers" "how's it going" "what's blocked" | morphmap-review |
+| "add X" "create task X" "new feature X" | morphmap-amend |
+| "triage" "check GitHub" "check issues" "what's new" | morphmap-triage |
+| "init" "scaffold" "start project" "setup morphmap" | morphmap-init |
+| "render" "show map" "visualize" "view mindmap" | morphmap-render |
+| "status" "progress" "summary" | morphmap-status |
+
+Slash commands (`/morphmap-plan`, etc.) are guaranteed to load the right skill.
+Natural language uses this routing table. If intent unclear, ask.
