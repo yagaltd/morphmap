@@ -30,17 +30,17 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 — scope: slash command implementations · 3/9 leaves
-- ✅ prompts/ + skills/ — 9 prompt files + 8 skill files
+## commands 🔄 — scope: slash commands written, 9/9 prompts + 8/8 skills · tested: 2/9
 - ✅ /morphmap-init — scaffold logic verified (test project created + git init)
-- ✅ /morphmap-improve — PDCA improvement loop (Phase 1-4), human approves
-- ⬜ /morphmap-plan — Root Orchestrator Hat 1 (Planner: scout → tree → approve)
-- ⬜ /morphmap-delegate — spawn branch agents for all ready branches or one specific
-- ⬜ /morphmap-review — fresh subagent walks tree, flags blockers, human triages
-- ⬜ /morphmap-amend — Root Orchestrator Hat 2 (Intake: classify → route to branch)
-- ⬜ /morphmap-triage — Root Orchestrator Hat 3 (Triage: external input → route)
-- ⬜ /morphmap — render .mindmap.md to interactive HTML via markmap-cli
-- ⬜ /morphmap-status — text summary, cheap, no render
+- ✅ /morphmap-improve — PDSA Study loop written
+- ✅ /morphmap-plan — prompt + skill written
+- ✅ /morphmap-delegate — prompt + skill written
+- ✅ /morphmap-review — prompt + skill written
+- ✅ /morphmap-amend — prompt + skill written
+- ✅ /morphmap-triage — prompt + skill written
+- ✅ /morphmap — render via markmap-cli, prompt + skill written
+- ✅ /morphmap-status — text summary, prompt + skill written
+- ⬜ test all commands in pi session [BLOCKED: needs pi install morphmap]
 
 ## agents ✅ — scope: agent definitions · 5/5 leaves
 - ✅ branch-agent → agents/branch-agent.md
