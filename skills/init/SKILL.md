@@ -43,7 +43,7 @@ specsDirectory: .morphmap/specs/
 
 ## Phase 2b: Agent overrides (optional)
 
-MorphMap has two subagent definitions: `morphmap/branch-agent` and `morphmap/leaf-worker`.
+MorphMap has three subagent definitions: `morphmap/branch-agent`, `morphmap/leaf-worker`, `morphmap/reviewer`.
 They are discovered by pi-subagents alongside builtins (scout, worker, reviewer, oracle, etc.).
 The main session IS the Root Orchestrator — AGENTS.md provides its instructions. No subagent needed.
 
@@ -60,6 +60,10 @@ To override model/thinking per agent, add to `~/.pi/agent/settings.json`:
       "morphmap/leaf-worker": {
         "model": "deepseek/deepseek-v4-flash",
         "thinking": "low"
+      },
+      "morphmap/reviewer": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking": "low"
       }
     }
   }
@@ -73,19 +77,22 @@ Or per-project in `.pi/settings.json` (project scope wins over user scope).
 DeepSeek only:
 ```json
 "morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" }
+"morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" }
 ```
 
 Anthropic only:
 ```json
 "morphmap/branch-agent": { "model": "anthropic/claude-sonnet-4", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "anthropic/claude-haiku-4-5", "thinking": "low" }
+"morphmap/leaf-worker":  { "model": "anthropic/claude-haiku-4-5", "thinking": "low" },
+"morphmap/reviewer":     { "model": "anthropic/claude-haiku-4-5", "thinking": "low" }
 ```
 
 OpenAI only:
 ```json
 "morphmap/branch-agent": { "model": "openai/gpt-5.2", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "openai/gpt-5-mini", "thinking": "low" }
+"morphmap/leaf-worker":  { "model": "openai/gpt-5-mini", "thinking": "low" },
+"morphmap/reviewer":     { "model": "openai/gpt-5-mini", "thinking": "low" }
 ```
 
 ## Phase 3: Create blank mindmap

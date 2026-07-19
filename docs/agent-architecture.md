@@ -24,8 +24,10 @@ MorphMap (new pi extension)
 ```
 
 **Subagents spawned on demand:**
-- `morphmap/branch-agent` — owns module subtree, pulls leaves, spawns leaf workers
+- `morphmap/branch-agent` — owns module subtree, pulls leaves, spawns leaf workers + reviewers
 - `morphmap/leaf-worker` — implements against .spec, TDD, self-verifies
+- `morphmap/reviewer` — mechanical per-leaf verification (thinking: low) or cross-leaf integration review (thinking: high). Read-only.
+- pi-subagents `scout` and `researcher` used as-is (generic, low risk)
 
 **Concepts borrowed from pi-workflows** (not installed — we write our own prompts):
 - `.spec` contract format (Intent, Decisions, Boundaries, Completion Criteria)
@@ -72,6 +74,19 @@ System prompt says "search indexed knowledge" — agent uses whatever search too
 System prompt says "run code over data without reading into context" — agent uses whatever sandbox tool is available.
 The agent definition file maps capability → concrete tool. No prompt changes needed on backend swap.
 
+## pi-subagents Builtins — Use vs Replace
+
+| Builtin | MorphMap | Why |
+|---------|----------|-----|
+| scout | ✅ Use | Generic codebase recon. Structured output. Low risk of breaking changes. |
+| researcher | ✅ Use | Generic web research. Solid methodology. Low risk. |
+| planner | ⚠️ Optional | Main session plans directly. Spawn only for isolation on large plans. |
+| worker | ❌ Replaced | `morphmap/leaf-worker` is .spec-aware, TDD per BDD, WORKER_BLOCKER. |
+| reviewer | ❌ Replaced | Builtin assumes plan.md. `morphmap/reviewer` reads morphmap.mindmap.md, two modes. |
+| context-builder | ⚠️ Optional | For complex pre-planning context gathering. |
+| oracle | ⚠️ Optional | For risky structural decisions (v2). |
+| delegate | ❌ Not used | Too generic. Branch-agent + leaf-worker cover execution. |
+
 ## Agent Roles
 
 | Agent | Role | Model | Thinking | Tools | Session |
@@ -79,7 +94,7 @@ The agent definition file maps capability → concrete tool. No prompt changes n
 | **Root Orchestrator** | Architect — structure, routing, triage | Strong | High | subagent, intercom, ctx_search, ctx_index, read, write | Persistent (user session) |
 | **Branch Agent** | Tech Lead — owns module, creates leaves, manages workers | Strong | High | subagent, intercom, ctx_search, read, write, edit | Fresh per /morphmap-delegate |
 | **Leaf Worker** | Developer — implements .spec, self-verifies | Assigned per tag | Assigned per tag | read, edit, bash, agent-spec | Fresh per leaf |
-| **Reviewer** | QA — mechanical verification | Cheap | Low | read, bash, agent-spec | Fresh per review |
+| **Reviewer** (MorphMap) | QA — mechanical verification + integration | low/high per mode | Assigned per mode | read, bash, intercom | Fresh per review |
 | **Triage** | Same as Root Orchestrator (Hat 3) — no separate agent | — | — | — | — |
 
 ## Root Orchestrator — Three Hats
