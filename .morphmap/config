@@ -1,0 +1,21 @@
+# MorphMap Project Configuration
+# Human-maintained. Agents read at startup. Do not hallucinate tools not listed here.
+
+available:
+  extensions: [pi-subagents, pi-intercom, context-mode, pi-codex-goal]
+  cli: [agent-spec, markmap-cli]
+  builtin: [/goal, vcc_recall]
+  verified-at: 2026-07-19
+
+leafProfiles:
+  standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+  blocking:    { model: "anthropic/claude-sonnet-4",  thinking: "xhigh" }
+  time:        { model: "deepseek/deepseek-v4-flash", thinking: "medium" }
+  verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+
+# Agent definitions live in project agents/ directory (pi-subagents convention)
+# morphmap/root-orchestrator → agents/root-orchestrator.md
+# morphmap/branch-agent      → agents/branch-agent.md
+# morphmap/leaf-worker       → agents/leaf-worker.md
+specsDirectory: .morphmap/specs/

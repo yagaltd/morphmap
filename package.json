@@ -1,0 +1,20 @@
+{
+  "name": "morphmap",
+  "version": "0.1.0",
+  "description": "AI-native project management for pi. Mindmap-based, agent-delegated, contract-verified. Push/pull execution with Theory of Constraints.",
+  "keywords": ["pi-package"],
+  "license": "MIT",
+  "pi": {
+    "skills": ["./skills"],
+    "prompts": ["./prompts"]
+  },
+  "peerDependencies": {
+    "pi-subagents": ">=0.17.2",
+    "pi-prompt-template-model": ">=0.9.2"
+  },
+  "optionalPeerDependencies": {
+    "agent-spec": ">=0.1.0",
+    "pi-intercom": ">=0.1.0",
+    "context-mode": ">=0.1.0"
+  }
+}
