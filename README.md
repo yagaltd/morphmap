@@ -1,0 +1,111 @@
+# MorphMap
+
+AI-native project management for [pi](https://github.com/earendil-works/pi-coding-agent). Mindmap-based, agent-delegated, contract-verified.
+
+**Describe what you want. Agents plan the tree. Branch agents pull leaves, build, verify, report.**
+
+## Install
+
+```bash
+pi install git:github.com/<user>/morphmap
+```
+
+Requires:
+- [pi-subagents](https://github.com/nicobailon/pi-subagents) >= 0.17.2
+- [pi-prompt-template-model](https://github.com/nicobailon/pi-prompt-template-model) >= 0.9.2
+- [agent-spec](https://github.com/yagaltd/agent-spec) (CLI)
+
+Optional:
+- [pi-intercom](https://github.com/nicobailon/pi-intercom) (branch communication)
+- context-mode (knowledge indexing)
+
+## Quick Start
+
+```
+/morphmap-plan "Add auth module"
+  → scout → decompose → propose tree → you approve
+
+/morphmap-delegate
+  → spawns branch agents → pull leaves → build → verify → report
+
+/morphmap
+  → renders interactive mindmap with status colors
+
+/morphmap-review
+  → triage blockers, review status
+```
+
+## How It Works
+
+```
+PUSH (planning)                    PULL (execution)
+─────────────────                  ─────────────────
+Directive                          Branch agents pull
+  ↓                                leaves in risk-priority
+Root Orchestrator                    order. Build against
+  ↓                                .spec contracts.
+Tree (morphmap.mindmap.md)           Self-verify. Report.
+  ↓                                 Kanban signals via
+Human approves                       intercom.
+```
+
+**Push/Pull system inspired by Toyota's production method and the Theory of Constraints.**
+
+- Root mindmap = git main branch
+- Branches = modules (auth, editor, deployment)
+- Leaves = atomic tasks → `.spec` files (agent-spec contracts)
+- Status visible at a glance: ⬜ 🔄 ✅ ❌ 🔴
+- Cross-branch dependencies: `[needs: branch/leaf]`
+- Risk-priority pull: 🔴 BLOCKING → 🟡 RISKY → 🔵 TIME → ⚪ STANDARD
+- Bottleneck detection, ETA tracking, budget tracking
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `/morphmap-plan <directive>` | Push phase: scout → tree → approve |
+| `/morphmap-delegate [branch]` | Pull phase: spawn branch agents |
+| `/morphmap-review [branch]` | Triage blockers, review status |
+| `/morphmap-amend <addition>` | Add work to existing branch |
+| `/morphmap-triage` | Classify external input (GitHub, email) |
+| `/morphmap` | Render interactive mindmap |
+| `/morphmap-status` | Text summary |
+
+## Agent Architecture
+
+| Agent | Role | Model |
+|-------|------|-------|
+| Root Orchestrator | Architect — structure, routing, triage | Strong, high thinking |
+| Branch Agent | Tech Lead — owns module, pulls leaves | Strong, high thinking |
+| Leaf Worker | Developer — implements .spec | Assigned per bottleneck tag |
+
+Agents use three decision matrices:
+- **Urgency × Importance** (Eisenhower) — which leaf to pull
+- **Value × Impact** — leaf or sub-branch?
+- **Clarity × Risk** — build, verify, or escalate?
+
+All decisions logged. Status always current. Context managed by pi auto-compaction.
+
+## Format
+
+`.mindmap.md` — markmap-compatible markdown. `#` root, `##` branches, `###` sub-branches, `-` bullet leaves. YAML frontmatter for posture, rendering config. Render with `npx markmap-cli`.
+
+Full spec: [docs/format-spec.md](docs/format-spec.md)
+
+## Project Structure
+
+```
+morphmap.mindmap.md        ← kanban board (markmap-renderable)
+index.md                   ← OKF knowledge index
+package.json               ← pi package manifest
+agents/                    ← pi-subagents agent definitions
+prompts/                   ← slash command templates
+skills/                    ← skill definitions
+.morphmap/config           ← project configuration
+docs/                      ← reference specifications
+examples/                  ← MorphEditor example mindmap
+```
+
+## License
+
+MIT
