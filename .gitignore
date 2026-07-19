@@ -22,3 +22,4 @@ cover-v*.png
 # Reference docs (built repo, not part of extension)
 docs/
 examples/
+AGENTS.md
