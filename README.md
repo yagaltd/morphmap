@@ -13,11 +13,12 @@ pi install git:github.com/<user>/morphmap
 Requires:
 - [pi-subagents](https://github.com/nicobailon/pi-subagents) >= 0.17.2
 - [pi-prompt-template-model](https://github.com/nicobailon/pi-prompt-template-model) >= 0.9.2
-- [agent-spec](https://github.com/yagaltd/agent-spec) (CLI)
-
-Optional:
 - [pi-intercom](https://github.com/nicobailon/pi-intercom) (branch communication)
-- context-mode (knowledge indexing)
+- context-mode (triage classification, knowledge indexing)
+- [agent-spec](https://github.com/yagaltd/agent-spec) (CLI, contract verification)
+
+Required for rendering:
+- [Node.js](https://nodejs.org) (markmap-cli via npx)
 
 ## Quick Start
 
