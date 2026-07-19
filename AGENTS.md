@@ -38,6 +38,16 @@ Do NOT reference any tool not in this list. Verify before use: `which agent-spec
 6. Never invent dependencies. Check `.morphmap/config` for available tools.
 7. Commit after every meaningful change. Git IS the history.
 
+## Write Guard — Self-Reflection Checklist
+
+Before any file write or edit, ask:
+
+1. **Adds value?** Does this write add information not already in context? If duplicating, skip.
+2. **Self-contained?** Will the next agent understand this without having been in this conversation? No "as we discussed" references.
+3. **Right location?** File path consistent with project structure. No random files in wrong folders.
+
+If "no" to any → don't write. If unclear → ask via intercom.
+
 ## Decision Matrix
 
 Urgency × Importance → which leaf to pull.

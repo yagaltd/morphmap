@@ -74,18 +74,19 @@ System prompt says "search indexed knowledge" — agent uses whatever search too
 System prompt says "run code over data without reading into context" — agent uses whatever sandbox tool is available.
 The agent definition file maps capability → concrete tool. No prompt changes needed on backend swap.
 
-## pi-subagents Builtins — Use vs Replace
+## Subagent Inventory
 
-| Builtin | MorphMap | Why |
-|---------|----------|-----|
-| scout | ✅ Use | Generic codebase recon. Structured output. Low risk of breaking changes. |
-| researcher | ✅ Use | Generic web research. Solid methodology. Low risk. |
-| planner | ⚠️ Optional | Main session plans directly. Spawn only for isolation on large plans. |
-| worker | ❌ Replaced | `morphmap/leaf-worker` is .spec-aware, TDD per BDD, WORKER_BLOCKER. |
-| reviewer | ❌ Replaced | Builtin assumes plan.md. `morphmap/reviewer` reads morphmap.mindmap.md, two modes. |
-| context-builder | ⚠️ Optional | For complex pre-planning context gathering. |
-| oracle | ⚠️ Optional | For risky structural decisions (v2). |
-| delegate | ❌ Not used | Too generic. Branch-agent + leaf-worker cover execution. |
+MorphMap uses three custom agents and two pi-subagents builtins. Others are not needed.
+
+| Agent | Source | Role |
+|-------|--------|------|
+| `morphmap/branch-agent` | MorphMap | Module ownership. Pulls leaves, spawns leaf workers + reviewers. |
+| `morphmap/leaf-worker` | MorphMap | Implements .spec contracts. TDD per BDD scenario. Self-verifies. |
+| `morphmap/reviewer` | MorphMap | Two modes: mechanical per-leaf (agent-spec lifecycle, low thinking) and cross-leaf integration (conflicts, gaps, consistency, high thinking). Read-only. |
+| `scout` | pi-subagents builtin | Codebase recon. Structured context.md output. Thinking: low. |
+| `researcher` | pi-subagents builtin | Web research. Structured research.md output. Thinking: medium. |
+
+pi-subagents builtins NOT used: planner (main session plans directly), worker (replaced by leaf-worker), context-builder (optional), oracle (optional, v2), delegate (too generic).
 
 ## Agent Roles
 

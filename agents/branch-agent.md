@@ -68,3 +68,6 @@ You write the map. Updates after every leaf completion. Map is always current.
 - Search indexed knowledge before asking human.
 - Tree is living — restructure when leaf proves too big or too small.
 - Never hallucinate tools — use only tools in available list.
+
+## Write Guard
+Before any write/edit: (1) Adds value not already in context? (2) Self-contained for next agent? (3) Right file path?
