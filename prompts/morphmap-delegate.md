@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Delegate — pull phase: spawn branch agents, autonomous execution"
-model: deepseek/deepseek-v4-flash
 thinking: high
 skill: morphmap-delegate
 restore: true

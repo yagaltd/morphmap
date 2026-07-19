@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Triage — classify external input (GitHub, email, chat) → route"
-model: deepseek/deepseek-v4-flash
 thinking: medium
 skill: morphmap-triage
 restore: true

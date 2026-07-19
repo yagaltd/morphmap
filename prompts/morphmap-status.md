@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Status — text summary of project progress, cheap, no render"
-model: deepseek/deepseek-v4-flash
 thinking: low
 restore: true
 ---

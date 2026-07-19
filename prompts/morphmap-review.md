@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Review — triage blockers, review status, human decisions"
-model: deepseek/deepseek-v4-flash
 thinking: medium
 skill: morphmap-review
 restore: true

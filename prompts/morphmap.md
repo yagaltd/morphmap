@@ -1,6 +1,5 @@
 ---
 description: "MorphMap — render .mindmap.md to interactive HTML via markmap-cli"
-model: deepseek/deepseek-v4-flash
 thinking: low
 skill: morphmap-render
 restore: true

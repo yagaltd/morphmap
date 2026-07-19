@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Init — scaffold .morphmap/ directory and initial files"
-model: deepseek/deepseek-v4-flash
 thinking: medium
 skill: morphmap-init
 restore: true

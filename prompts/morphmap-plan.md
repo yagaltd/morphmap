@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Plan — push phase: scout → decompose → tree → approve"
-model: deepseek/deepseek-v4-flash
 thinking: xhigh
 skill: morphmap-plan
 restore: true

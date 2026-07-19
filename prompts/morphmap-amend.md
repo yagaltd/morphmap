@@ -1,6 +1,5 @@
 ---
 description: "MorphMap Amend — intake from human: classify → route to branch agent"
-model: deepseek/deepseek-v4-flash
 thinking: medium
 skill: morphmap-amend
 restore: true
