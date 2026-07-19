@@ -28,10 +28,14 @@ Do NOT reference any tool not in this list. Verify before use: `which agent-spec
 - docs/ — reference specifications.
 - examples/ — MorphEditor example.
 
-## Rules
+## Map Rules
 
 1. The map is always current. Update after every leaf completion.
-2. `## decisions` logs all routing and architectural decisions.
+2. Status markers are not decoration:
+   - ⬜ pending · 🔄 in progress · ✅ done (verified) · ❌ failed · 🔴 blocked
+3. Before marking ✅: file exists? content matches description? no contradictions?
+4. Never mark ✅ from memory. Read the file to verify.
+5. `## decisions` logs all routing and architectural decisions.
 3. Agent files carry their own system prompts — don't duplicate logic across files.
 4. All docs carry OKF frontmatter (`type`, `timestamp`, `tags`).
 5. Before any structural change, update morphmap.mindmap.md first — kanban drives code.

@@ -120,15 +120,46 @@ markmap:
 
 ## Status Markers
 
+These are not decoration. They are the project's single source of truth. Agents and humans MUST follow transition rules. Never mark ✅ from memory — verify.
+
 | Marker | Meaning | Sets parent to |
 |--------|---------|---------------|
-| ⬜ | Pending | (no change) |
-| 🔄 | In progress | 🔄 |
-| ✅ | Done | (worst of siblings) |
-| ❌ | Failed | ❌ |
-| 🔴 | Blocked | 🔴 |
+| ⬜ | Pending — not started | (no change) |
+| 🔄 | In progress — actively being worked | 🔄 |
+| ✅ | Done — completion criteria met (see below) | (worst of siblings) |
+| ❌ | Failed — criteria not met after retries | ❌ |
+| 🔴 | Blocked — cannot proceed (dep unmet, decision needed) | 🔴 |
 
 Parent status = worst status of all children + inter-branch flags.
+
+## Status Transitions
+
+### Agent-executed leaves (leaf worker spawned)
+
+| From | To | Trigger |
+|------|----|---------|
+| ⬜ | 🔄 | Leaf worker spawned |
+| 🔄 | ✅ | agent-spec lifecycle passed + branch agent confirmed |
+| 🔄 | ❌ | Failed after 3 retries |
+| 🔄 | 🔴 | WORKER_BLOCKER escalated to human |
+| 🔴 | 🔄 | Blocker resolved |
+
+### Human-managed leaves (docs, config, tests, decisions)
+
+| From | To | Trigger |
+|------|----|---------|
+| ⬜ | 🔄 | Work started |
+| 🔄 | ✅ | File exists + content verified complete |
+| 🔄 | 🔴 | Waiting on external input |
+
+### ✅ Completion criteria
+
+Before marking any leaf ✅:
+1. File exists (if leaf links to a file)
+2. Content matches leaf description (read the file, confirm)
+3. No contradiction with sibling leaves
+
+Do not mark ✅ from memory. Verify by reading what was produced.
 
 ## Tags
 
