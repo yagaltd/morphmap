@@ -55,11 +55,11 @@ resource: index.md
 
 ## staging ⬜
 ### test-2026-07-25
-- ⬜ test /mindmap-plan on MorphEditor project [needs: commands ⬜]
-- ⬜ test /mindmap-delegate with 2 branches [needs: agents ⬜, commands ⬜]
-- ⬜ test intercom routing between branches [needs: agents ⬜, intercom-protocol ✅]
+- ⬜ test /morphmap-plan on MorphEditor project [needs: commands 🔄]
+- ⬜ test /morphmap-delegate with 2 branches [needs: commands 🔄]
+- ⬜ test intercom routing between branches [needs: commands ⬜]
 
-## production 🔴 [BLOCKED: commands not built]
+## production 🔴 [BLOCKED: commands not fully tested]
 ### release-v0.1
 - 🔴 publish pi extension → `pi install npm:morphmap`
 - 🔴 MorphEditor dogfooding: manage own development with MorphMap
