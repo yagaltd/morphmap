@@ -11,14 +11,29 @@ Productize a directive into a morphmap tree. Evidence → decisions → tree →
 
 ## Phase 1: EXPLORE FIRST
 
-Gather evidence before asking questions.
+Gather evidence before asking questions. Use pi-subagents for parallel recon:
 
 1. Read existing morphmap.mindmap.md for current structure and decisions
-2. Scout the repo: find/grep relevant files, read key files, inspect dependencies
-3. Check git log for recent related changes
-4. Scout external inputs if provided (URLs, repos)
+2. Spawn scout subagent for codebase recon:
+   ```
+   subagent({ agent: "scout", task: "Recon <area>. Map files, dependencies, patterns.", context: "fresh" })
+   ```
+3. If external URLs/docs needed, spawn researcher subagent:
+   ```
+   subagent({ agent: "researcher", task: "Research <topic>. Find official docs, specs, benchmarks.", context: "fresh" })
+   ```
+4. If both needed, run in parallel:
+   ```
+   subagent({ tasks: [
+     { agent: "scout", task: "Recon <area>..." },
+     { agent: "researcher", task: "Research <topic>..." }
+   ], concurrency: 2 })
+   ```
+5. Check git log for recent related changes
+6. For small/simple projects (<50 files), you may do scouting directly with find/grep/read instead of spawning scout
 
 **Rule:** If a question can be answered from evidence, answer it. Do not ask the human.
+**Rule:** Scout and researcher are pi-subagents builtins. Always available. Spawn them with fresh context for parallel recon.
 
 ## Phase 2: DECISION TREE
 

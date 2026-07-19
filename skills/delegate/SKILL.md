@@ -7,7 +7,9 @@ argument-hint: "[branch name, or empty for all ready]"
 
 # MorphMap Delegate — Pull Phase
 
-Spawn branch agents for autonomous leaf execution.
+Spawn branch agents via pi-subagents for autonomous leaf execution.
+Uses pi's `subagent()` tool with `agent: "morphmap/branch-agent"`.
+NOT the pi-subagents `delegate` builtin — that's a different, generic agent.
 
 ## Phase 1: READ MAP
 

@@ -11,7 +11,13 @@ Fresh subagent walks the tree, flags issues, reports to human.
 
 ## Phase 1: READ MAP
 
-Read morphmap.mindmap.md. If branch specified, read only that subtree.
+Spawn a fresh reviewer subagent to walk the tree (avoids context pollution):
+
+```
+subagent({ agent: "reviewer", task: "Read morphmap.mindmap.md. Walk every ## branch. Flag issues.", context: "fresh" })
+```
+
+If branch specified, review only that subtree.
 
 ## Phase 2: TRIAGE
 
@@ -48,6 +54,6 @@ Compact summary:
 
 ## Rules
 
-- Fresh subagent, not the root agent. Avoid context pollution.
+- Spawn reviewer subagent via pi-subagents. Fresh context, no pollution.
 - Read only branch headers. Don't read leaf details unless triaging a specific blocker.
 - Present options, not decisions. Human decides.
