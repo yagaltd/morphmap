@@ -20,12 +20,17 @@ mkdir -p .morphmap/specs
 Write `.morphmap/config` with default settings:
 
 ```yaml
+# MorphMap project configuration
+# Human-maintained. Agents read at startup.
+
 available:
   extensions: [pi-subagents, pi-intercom, context-mode, pi-codex-goal]
   cli: [agent-spec, markmap-cli]
   builtin: [/goal, vcc_recall]
   verified-at: <today>
 
+# Leaf agent model assignment per bottleneck tag.
+# Edit to match your available providers (deepseek, anthropic, openai, etc.)
 leafProfiles:
   standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
   risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
@@ -34,6 +39,59 @@ leafProfiles:
   verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
 
 specsDirectory: .morphmap/specs/
+```
+
+## Phase 2b: Agent overrides (optional)
+
+MorphMap agents are named `morphmap/root-orchestrator`, `morphmap/branch-agent`, `morphmap/leaf-worker`.
+They are discovered by pi-subagents alongside builtins (scout, worker, reviewer, oracle, etc.).
+
+To override model/thinking per agent, add to `~/.pi/agent/settings.json`:
+
+```json
+{
+  "subagents": {
+    "agentOverrides": {
+      "morphmap/root-orchestrator": {
+        "model": "deepseek/deepseek-v4-pro",
+        "thinking": "xhigh"
+      },
+      "morphmap/branch-agent": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking": "high"
+      },
+      "morphmap/leaf-worker": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking": "low"
+      }
+    }
+  }
+}
+```
+
+Or per-project in `.pi/settings.json` (project scope wins over user scope).
+
+**Provider examples:**
+
+DeepSeek only:
+```json
+"morphmap/root-orchestrator": { "model": "deepseek/deepseek-v4-pro", "thinking": "xhigh" },
+"morphmap/branch-agent":    { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+"morphmap/leaf-worker":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" }
+```
+
+Anthropic only:
+```json
+"morphmap/root-orchestrator": { "model": "anthropic/claude-sonnet-4", "thinking": "xhigh" },
+"morphmap/branch-agent":    { "model": "anthropic/claude-sonnet-4", "thinking": "high" },
+"morphmap/leaf-worker":     { "model": "anthropic/claude-haiku-4-5", "thinking": "low" }
+```
+
+OpenAI only:
+```json
+"morphmap/root-orchestrator": { "model": "openai/gpt-5.2", "thinking": "xhigh" },
+"morphmap/branch-agent":    { "model": "openai/gpt-5.2", "thinking": "high" },
+"morphmap/leaf-worker":     { "model": "openai/gpt-5-mini", "thinking": "low" }
 ```
 
 ## Phase 3: Create blank mindmap
