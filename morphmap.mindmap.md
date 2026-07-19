@@ -26,13 +26,13 @@ resource: index.md
 - ✅ triage flow + classification logic → docs/triage-flow.md
 - ✅ design decisions audit trail → docs/design-decisions.md
 
-## examples 🔄 — scope: MorphEditor mindmap, OKF conformance
+## examples ✅ — scope: MorphEditor mindmap, OKF conformance · 2/2 leaves
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
-- ⬜ verify all docs pass OKF conformance check
+- ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 — scope: slash command implementations · 1/8 leaves
+## commands 🔄 — scope: slash command implementations · 2/8 leaves
 - ✅ prompts/ + skills/ — 8 prompt files + 7 skill files → 483 lines
-- ⬜ /morphmap-init — scaffold new project
+- ✅ /morphmap-init — scaffold logic verified (test project created + git init)
 - ⬜ /morphmap-plan — Root Orchestrator Hat 1 (Planner: scout → tree → approve)
 - ⬜ /morphmap-delegate — spawn branch agents for all ready branches or one specific
 - ⬜ /morphmap-review — fresh subagent walks tree, flags blockers, human triages
