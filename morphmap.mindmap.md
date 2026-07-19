@@ -41,8 +41,7 @@ resource: index.md
 - ⬜ /morphmap — render .mindmap.md to interactive HTML via markmap-cli
 - ⬜ /morphmap-status — text summary, cheap, no render
 
-## agents ⬜ — scope: agent definition files for pi-subagents · 0/3 leaves
-- ⬜ root-orchestrator agent → agents/root-orchestrator.md [🔴 BLOCKING: gates all execution]
+## agents ⬜ — scope: agent definition files for pi-subagents · 0/2 leaves
 - ⬜ branch-agent agent → agents/branch-agent.md [🔴 BLOCKING: gates all execution]
 - ⬜ leaf-worker agent → agents/leaf-worker.md
 

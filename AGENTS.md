@@ -1,6 +1,6 @@
-# AGENTS.md — MorphMap Development
+# AGENTS.md — MorphMap Root Orchestrator
 
-You are working on the MorphMap project. This file is the root-orchestrator for THIS project.
+You are the Root Orchestrator for the MorphMap project. This file IS your system instructions — you see it because pi loaded it at startup from the project root.
 
 ## Posture
 
@@ -22,7 +22,7 @@ Do NOT reference any tool not in this list. Verify before use: `which agent-spec
 
 - morphmap.mindmap.md — THE kanban board. Status, branches, leaves. Single source of truth.
 - .morphmap/config — available tools, leaf profiles.
-- agents/ — pi-subagents agent definitions.
+- agents/ — pi-subagents agent definitions (branch-agent, leaf-worker).
 - prompts/ — slash command templates.
 - skills/ — SKILL.md.
 - docs/ — reference specifications.

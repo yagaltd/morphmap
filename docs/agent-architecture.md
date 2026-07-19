@@ -10,15 +10,22 @@ tags: [agents, system-prompt, decision-matrix, branch-agent, leaf-worker]
 ## Agent Stack — Verified Dependencies
 
 ```
-MorphMap (new pi extension — coordination layer)
+MorphMap (new pi extension)
   │
-  ├── pi-subagents       ✅ installed (orchestration: spawn, chain, parallel, async, intercom)
-  ├── pi-intercom         ✅ installed (branch ↔ branch, branch ↔ root messages)
-  ├── context-mode        ✅ installed (ctx_search, ctx_index, ctx_execute, ctx_batch_execute)
-  ├── pi-codex-goal       ✅ installed (/goal for 5-why, long-running tasks)
-  ├── agent-spec CLI      ✅ installed v0.2.7 (lifecycle, guard, plan-check)
-  └── markmap-cli         ✅ available via npx (render .mindmap.md to HTML)
+  ├── Main session = Root Orchestrator
+  │     AGENTS.md loaded at startup. Three hats: Planner, Intake, Triage.
+  │
+  ├── pi-subagents       ✅ (orchestration: spawn, chain, parallel, async, intercom)
+  ├── pi-intercom         ✅ (branch ↔ branch, branch ↔ root messages)
+  ├── context-mode        ✅ (ctx_search, ctx_index, ctx_execute)
+  ├── pi-codex-goal       ✅ (/goal for 5-why, long-running tasks)
+  ├── agent-spec CLI      ✅ v0.2.7 (lifecycle, guard, plan-check)
+  └── markmap-cli         ✅ (npx — render .mindmap.md to HTML)
 ```
+
+**Subagents spawned on demand:**
+- `morphmap/branch-agent` — owns module subtree, pulls leaves, spawns leaf workers
+- `morphmap/leaf-worker` — implements against .spec, TDD, self-verifies
 
 **Concepts borrowed from pi-workflows** (not installed — we write our own prompts):
 - `.spec` contract format (Intent, Decisions, Boundaries, Completion Criteria)
@@ -70,12 +77,10 @@ The agent definition file maps capability → concrete tool. No prompt changes n
 | Agent | Role | Model | Thinking | Tools | Session |
 |-------|------|-------|----------|-------|---------|
 | **Root Orchestrator** | Architect — structure, routing, triage | Strong | High | subagent, intercom, ctx_search, ctx_index, read, write | Persistent (user session) |
-| **Branch Agent** | Tech Lead — owns module, creates leaves, manages workers | Strong | High | subagent, intercom, ctx_search, read, write, edit | Fresh per `/mindmap-delegate` |
-| **Sub-Branch Agent** | Senior Dev — feature decomposition | Medium | Medium | subagent, ctx_search, read, write | Fresh per sub-branch |
+| **Branch Agent** | Tech Lead — owns module, creates leaves, manages workers | Strong | High | subagent, intercom, ctx_search, read, write, edit | Fresh per /morphmap-delegate |
 | **Leaf Worker** | Developer — implements .spec, self-verifies | Assigned per tag | Assigned per tag | read, edit, bash, agent-spec | Fresh per leaf |
 | **Reviewer** | QA — mechanical verification | Cheap | Low | read, bash, agent-spec | Fresh per review |
-| **Quality Reviewer** | Staff Engineer — judgment review | Medium | High | read, bash | Fresh per review |
-| **Triage** | Same as Root Orchestrator (Hat 3) | — | — | — | — |
+| **Triage** | Same as Root Orchestrator (Hat 3) — no separate agent | — | — | — | — |
 
 ## Root Orchestrator — Three Hats
 
