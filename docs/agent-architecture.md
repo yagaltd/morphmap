@@ -27,7 +27,10 @@ MorphMap (new pi extension)
 - `morphmap/branch-agent` — owns module subtree, pulls leaves, spawns leaf workers + reviewers
 - `morphmap/leaf-worker` — implements against .spec, TDD, self-verifies
 - `morphmap/reviewer` — mechanical per-leaf verification (thinking: low) or cross-leaf integration review (thinking: high). Read-only.
-- pi-subagents `scout` and `researcher` used as-is (generic, low risk)
+- `morphmap/scout` — codebase recon (thinking: low). Structured context.md.
+- `morphmap/researcher` — web research (thinking: medium). Structured research.md.
+
+All agents are MorphMap-owned. No dependency on pi-subagents builtins (scout, researcher, worker, reviewer replaced).
 
 **Concepts borrowed from pi-workflows** (not installed — we write our own prompts):
 - `.spec` contract format (Intent, Decisions, Boundaries, Completion Criteria)
@@ -76,17 +79,17 @@ The agent definition file maps capability → concrete tool. No prompt changes n
 
 ## Subagent Inventory
 
-MorphMap uses three custom agents and two pi-subagents builtins. Others are not needed.
+MorphMap uses five custom agents. No pi-subagents builtins needed.
 
-| Agent | Source | Role |
-|-------|--------|------|
-| `morphmap/branch-agent` | MorphMap | Module ownership. Pulls leaves, spawns leaf workers + reviewers. |
-| `morphmap/leaf-worker` | MorphMap | Implements .spec contracts. TDD per BDD scenario. Self-verifies. |
-| `morphmap/reviewer` | MorphMap | Two modes: mechanical per-leaf (agent-spec lifecycle, low thinking) and cross-leaf integration (conflicts, gaps, consistency, high thinking). Read-only. |
-| `scout` | pi-subagents builtin | Codebase recon. Structured context.md output. Thinking: low. |
-| `researcher` | pi-subagents builtin | Web research. Structured research.md output. Thinking: medium. |
+| Agent | Role | Thinking |
+|-------|------|----------|
+| `morphmap/branch-agent` | Module ownership. Pulls leaves, spawns leaf workers + reviewers. | high |
+| `morphmap/leaf-worker` | Implements .spec contracts. TDD per BDD. Self-verifies. | assigned |
+| `morphmap/reviewer` | Two modes: mechanical (agent-spec lifecycle) and integration (cross-leaf). Read-only. | low / high |
+| `morphmap/scout` | Codebase recon. Structured context.md. Knows MorphMap conventions. | low |
+| `morphmap/researcher` | Web research. Structured research.md. Primary sources. | medium |
 
-pi-subagents builtins NOT used: planner (main session plans directly), worker (replaced by leaf-worker), context-builder (optional), oracle (optional, v2), delegate (too generic).
+pi-subagents builtins NOT used: scout, researcher (replaced by MorphMap versions), worker (replaced by leaf-worker), reviewer (replaced by MorphMap reviewer), planner, context-builder, oracle, delegate.
 
 ## Agent Roles
 

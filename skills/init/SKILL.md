@@ -43,7 +43,7 @@ specsDirectory: .morphmap/specs/
 
 ## Phase 2b: Agent overrides (optional)
 
-MorphMap has three subagent definitions: `morphmap/branch-agent`, `morphmap/leaf-worker`, `morphmap/reviewer`.
+MorphMap has five subagent definitions: `morphmap/branch-agent`, `morphmap/leaf-worker`, `morphmap/reviewer`, `morphmap/scout`, `morphmap/researcher`.
 They are discovered by pi-subagents alongside builtins (scout, worker, reviewer, oracle, etc.).
 The main session IS the Root Orchestrator — AGENTS.md provides its instructions. No subagent needed.
 
@@ -64,6 +64,14 @@ To override model/thinking per agent, add to `~/.pi/agent/settings.json`:
       "morphmap/reviewer": {
         "model": "deepseek/deepseek-v4-flash",
         "thinking": "low"
+      },
+      "morphmap/scout": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking": "low"
+      },
+      "morphmap/researcher": {
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking": "medium"
       }
     }
   }
@@ -78,21 +86,27 @@ DeepSeek only:
 ```json
 "morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
 "morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" }
+"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
 ```
 
 Anthropic only:
 ```json
 "morphmap/branch-agent": { "model": "anthropic/claude-sonnet-4", "thinking": "high" },
 "morphmap/leaf-worker":  { "model": "anthropic/claude-haiku-4-5", "thinking": "low" },
-"morphmap/reviewer":     { "model": "anthropic/claude-haiku-4-5", "thinking": "low" }
+"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
 ```
 
 OpenAI only:
 ```json
 "morphmap/branch-agent": { "model": "openai/gpt-5.2", "thinking": "high" },
 "morphmap/leaf-worker":  { "model": "openai/gpt-5-mini", "thinking": "low" },
-"morphmap/reviewer":     { "model": "openai/gpt-5-mini", "thinking": "low" }
+"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
 ```
 
 ## Phase 3: Create blank mindmap
