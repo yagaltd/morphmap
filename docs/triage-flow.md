@@ -11,7 +11,7 @@ tags: [triage, intake, classification, routing, scope-matching]
 
 | Source | Trigger | Input format |
 |--------|---------|-------------|
-| Human | `/mindmap-amend "add rate limiting"` | Free text |
+| Human | `/morphmap-amend "add rate limiting"` | Free text |
 | GitHub issue | Webhook or `/mindmap-triage` | Issue title + body |
 | GitHub PR | Webhook or `/mindmap-triage` | PR title + description |
 | Email | CRON or `/mindmap-triage` | Subject + body |
@@ -30,28 +30,31 @@ Parse `.mindmap.md` for all `##` branch headers with `scope:`:
 ## theming ⬜ — scope: themes, colors, dark mode, light mode, CSS, syntax highlight
 ```
 
-### Step 2: Search for match
+### Step 2: Classify with 4-Tier Forced Choice
 
-```
-ctx_search("<incoming task text>")
-  → search against indexed .mindmap.md
-  → returns top match with confidence score
-```
+Compare input against each branch's scope keywords. No confidence numbers. No middle ground.
+
+| Tier | Meaning | Action |
+|------|---------|--------|
+| **very good** | Input clearly matches scope | Auto-route to branch agent |
+| **good** | Input likely matches | Route with validation note — branch agent confirms or rejects |
+| **bad** | Input unlikely to match | Flag for human: best candidate shown, human decides |
+| **very bad** | Input outside all scopes | Flag for human: new domain, create branch or skip |
 
 ### Step 3: Route or flag
 
 ```
-confidence >0.8 → auto-route to matching branch
+very good → auto-route:
   intercom(branch, { type: "new:leaf", leaf: "<summary>", source: "GitHub #132" })
-  log: "2026-07-19: routed #132 to auth/jwt [confidence: 0.91]"
+  log: "2026-07-19: routed #132 to auth/jwt [very-good]"
 
-confidence 0.5-0.8 → route with lower confidence
-  intercom(branch, { type: "new:leaf", ..., confidence: 0.7 })
-  branch agent validates match, accepts or rejects
+good → route with validation:
+  intercom(branch, { type: "new:leaf", ..., note: "validate match" })
+  log: "2026-07-19: routed #132 to auth [good, branch validates]"
 
-confidence <0.5 → flag for human
-  log: "2026-07-19: 'PDF export broken' — no matching branch [best: editor-core 0.42]"
-  flag for /mindmap-review
+bad/very bad → flag for human:
+  log: "2026-07-19: 'PDF export broken' — no match [best: editor-core, bad]"
+  flag for /morphmap-review
 ```
 
 ## Scope Declaration Format
@@ -81,17 +84,17 @@ All routing decisions logged to `## decisions`:
 
 ```markdown
 ## decisions ⬜ — log, not work
-- 2026-07-19 14:32: routed GitHub #132 "Login 500 on + email" to auth/jwt [confidence: 0.91]
+- 2026-07-19 14:32: routed GitHub #132 "Login 500 on + email" to auth/jwt [very-good]
 - 2026-07-19 14:35: GitHub PR #47 linked to auth/login-endpoint [exact match]
-- 2026-07-19 14:40: "PDF export broken" — no match, flagged for human review [best: editor-core 0.42]
-- 2026-07-19 14:45: human created new branch "export" via /mindmap-amend
+- 2026-07-19 14:40: "PDF export broken" — no match, flagged for human review [best: editor-core, bad]
+- 2026-07-19 14:45: human created new branch "export" via /morphmap-amend
 ```
 
 ## Triggers
 
 | Trigger | v1 | v2 |
 |---------|----|----|
-| Human addition | `/mindmap-amend` (manual) | Same |
+| Human addition | `/morphmap-amend` (manual) | Same |
 | GitHub issue | `/mindmap-triage` (manual or CRON) | Webhook auto |
 | GitHub PR | `/mindmap-triage` (manual or CRON) | Webhook auto |
 | Email | `/mindmap-triage` (manual) | IMAP/API polling |

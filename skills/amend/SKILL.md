@@ -9,30 +9,21 @@ argument-hint: "<addition description, or issue/PR reference>"
 
 Classify and route human additions to the right branch agent.
 
-## Phase 1: CLASSIFY
+## Phase 2: CLASSIFY
 
 Read morphmap.mindmap.md. Extract all `##` branch scope declarations.
-Search for match:
+Compare the addition against each branch's scope keywords.
 
-```
-ctx_search("<addition text>")
-  → against indexed morphmap.mindmap.md
-  → returns top match with confidence
-```
+Forced 4-tier classification (no middle ground):
 
-## Phase 2: ROUTE
+| Tier | Meaning | Action |
+|------|---------|--------|
+| **very good** | Addition clearly matches this branch's scope | Route to branch agent. Log: confidence=very-good |
+| **good** | Addition likely matches | Route to branch agent with note: "validate match". Branch agent confirms or rejects |
+| **bad** | Addition unlikely to match | Flag for human: "No clear match. Best candidate: <branch>. Proceed or create new branch?" |
+| **very bad** | Addition clearly outside all branches | Flag for human: "New domain. Create branch?" or ask human to expand scope of nearest branch |
 
-Confidence >0.8 → route to matching branch:
-```
-intercom branch: { type: "new:leaf", leaf: "<summary>", source: "human /morphmap-amend" }
-Log: "routed '<addition>' to <branch> [confidence: 0.XX]"
-```
-
-Confidence 0.5-0.8 → route with lower confidence, branch agent validates.
-
-Confidence <0.5 → ask human: "No matching branch. Create new branch or expand scope of existing?"
-
-## Phase 3: PASS POSTURE
+No confidence numbers. No 0.5 middle ground. Force a decision.
 
 Include in every route: "Context from orchestrator: phase=X, compat=Y, scope=Z, quality=W, budget=V"
 

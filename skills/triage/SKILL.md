@@ -26,21 +26,28 @@ If PR description mentions a leaf path or .spec file:
 ## Phase 3: CLASSIFY
 
 Extract scope from morphmap.mindmap.md branch headers.
-ctx_search("<input text>") against indexed map.
-Confidence score from search result.
+Compare the input against each branch's scope keywords.
+
+Forced 4-tier classification (no middle ground):
+
+| Tier | Meaning | Action |
+|------|---------|--------|
+| **very good** | Input clearly matches scope | Auto-route to branch agent. Log: confidence=very-good |
+| **good** | Input likely matches | Route to branch agent with note: "validate match" |
+| **bad** | Input unlikely to match | Flag for human: "Best candidate: <branch>. Route or skip?" |
+| **very bad** | Input outside all scopes | Flag for human: "New domain. No matching branch." |
+
+No confidence numbers. No middle. Force a decision.
 
 ## Phase 4: ROUTE OR FLAG
 
-Confidence >0.8 → auto-route:
+very good → auto-route:
 ```
 intercom branch: { type: "new:leaf", leaf: "<summary>", source: "GitHub #<N>" }
 ```
 
-Confidence <0.8 → flag for human:
-```
-No match for "<input>". Best: <branch> (0.XX). 
-Create leaf anyway or skip?
-```
+good → route with validation note.
+bad / very bad → flag for human review.
 
 ## Phase 5: LOG
 

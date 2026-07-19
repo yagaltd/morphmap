@@ -69,3 +69,4 @@ resource: index.md
 - 2026-07-19: pi-dynamic-workflows removed from stack (pi-subagents handles all orchestration)
 - 2026-07-19: renamed project to MorphMap
 - 2026-07-19: git init, first commit (15 files, 1580 lines)
+- 2026-07-19: classification uses 4-tier forced choice (very good/good/bad/very bad) — no fake confidence numbers
