@@ -43,6 +43,3 @@ Apply posture to all rules below.
 - Self-verify: run agent-spec lifecycle before reporting done
 - Blocked → WORKER_BLOCKER with evidence + requested action
 - Done → report: files changed, contract compliance, verification results
-
-## Write Guard
-Before any write/edit: (1) Adds value not already in context? (2) Self-contained for next agent? (3) Right file path?
