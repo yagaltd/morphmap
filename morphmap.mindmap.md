@@ -30,9 +30,10 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 — scope: slash command implementations · 2/8 leaves
-- ✅ prompts/ + skills/ — 8 prompt files + 7 skill files → 483 lines
+## commands 🔄 — scope: slash command implementations · 3/9 leaves
+- ✅ prompts/ + skills/ — 9 prompt files + 8 skill files
 - ✅ /morphmap-init — scaffold logic verified (test project created + git init)
+- ✅ /morphmap-improve — PDCA improvement loop (Phase 1-4), human approves
 - ⬜ /morphmap-plan — Root Orchestrator Hat 1 (Planner: scout → tree → approve)
 - ⬜ /morphmap-delegate — spawn branch agents for all ready branches or one specific
 - ⬜ /morphmap-review — fresh subagent walks tree, flags blockers, human triages

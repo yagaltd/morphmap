@@ -74,6 +74,7 @@ Match user intent to skill. If intent matches, load the skill.
 | "init" "scaffold" "start project" "setup morphmap" | morphmap-init |
 | "render" "show map" "visualize" "view mindmap" | morphmap-render |
 | "status" "progress" "summary" | morphmap-status |
+| "improve" "kaizen" "optimize" "fix patterns" "lessons" | morphmap-improve |
 
 Slash commands (`/morphmap-plan`, etc.) are guaranteed to load the right skill.
 Natural language uses this routing table. If intent unclear, ask.
