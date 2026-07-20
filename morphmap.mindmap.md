@@ -73,7 +73,7 @@ resource: index.md
 - ⬜ init MorphEditor as MorphMap project
 - ⬜ plan from real MorphEditor features
 
-## production 🔴 [phase] [BLOCKED: review + triage not tested]
+## production 🔴 [phase] [BLOCKED: MorphEditor dogfooding not done]
 ### release-v0.1
 - 🔴 publish pi extension → already published (https://github.com/yagaltd/morphmap)
 - 🔴 MorphEditor dogfooding: manage own development with MorphMap
