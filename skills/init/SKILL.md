@@ -105,6 +105,9 @@ posture:
 
 # <Project Name>
 
+## context ⬜
+- Domain glossary → .morphmap/CONTEXT.md
+
 ## decisions ⬜
 - <today>: project initialized with MorphMap
 ```
@@ -166,8 +169,14 @@ source: --scan <path> on <today>
 
 # <Project Name>
 
+## context ⬜
+- scout-001: brownfield scan → .morphmap/scout-001-<date>-<slug>.md
+- Mechanical data → .morphmap/tokei-stats.json
+- Domain glossary → .morphmap/CONTEXT.md
+
 ## decisions ⬜
-- <today>: brownfield scan of <path> — see .morphmap/tokei-stats.json
+- <today>: brownfield scan of <path>
+- scout-001: initial reconnaissance → .morphmap/scout-001-<date>-<slug>.md
 
 ## <dir-1> ⬜ [module]
 - ⬜ <entry-point> → .morphmap/specs/<dir-1>-entry.spec

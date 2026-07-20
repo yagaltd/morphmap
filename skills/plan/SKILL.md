@@ -13,24 +13,36 @@ Productize a directive into a morphmap tree. Evidence → decisions → tree →
 
 Gather evidence before asking questions. Use pi-subagents for parallel recon:
 
-1. Read existing .morphmap/morphmap.mindmap.md for current structure and decisions
-2. Spawn scout subagent for codebase recon:
+1. Read existing .morphmap/morphmap.mindmap.md for current structure, decisions, and existing handoff IDs
+2. **Assign IDs:** count existing handoff files in .morphmap/ per agent type to determine next ID:
+   ```bash
+   ls .morphmap/scout-*.md 2>/dev/null | wc -l  # → next scout ID = count + 1
+   ls .morphmap/researcher-*.md 2>/dev/null | wc -l  # → next researcher ID = count + 1
    ```
-   subagent({ agent: "morphmap/scout", task: "Recon <area>. Map files, dependencies, patterns.", context: "fresh" })
+   Format: `<agent>-<NNN>-<YYYYMMDD>-<slug>.md`
+
+3. Spawn scout subagent with assigned output path:
    ```
-3. If external URLs/docs needed, spawn researcher subagent:
+   subagent({ agent: "morphmap/scout",
+     task: "Recon <area>. Map files, dependencies, patterns. Write to .morphmap/scout-001-20260720-<slug>.md with OKF frontmatter.",
+     context: "fresh" })
    ```
-   subagent({ agent: "morphmap/researcher", task: "Research <topic>. Find official docs, specs, benchmarks.", context: "fresh" })
+4. If external URLs/docs needed, spawn researcher with assigned output path:
    ```
-4. If both needed, run in parallel:
+   subagent({ agent: "morphmap/researcher",
+     task: "Research <topic>. Find official docs, specs, benchmarks. Write to .morphmap/researcher-001-20260720-<slug>.md with OKF frontmatter.",
+     context: "fresh" })
+   ```
+5. If both needed, run in parallel:
    ```
    subagent({ tasks: [
-     { agent: "morphmap/scout", task: "Recon <area>..." },
-     { agent: "morphmap/researcher", task: "Research <topic>..." }
+     { agent: "morphmap/scout", task: "Recon <area>... Write to .morphmap/scout-001-20260720-<slug>.md" },
+     { agent: "morphmap/researcher", task: "Research <topic>... Write to .morphmap/researcher-001-20260720-<slug>.md" }
    ], concurrency: 2 })
    ```
-5. Check git log for recent related changes
-6. For small/simple projects (<50 files), you may do scouting directly with find/grep/read instead of spawning scout
+6. After agents complete, update map's `## context` branch with their file references
+7. Check git log for recent related changes
+8. For small/simple projects (<50 files), you may do scouting directly with find/grep/read instead of spawning scout
 
 **Rule:** If a question can be answered from evidence, answer it. Do not ask the human.
 **Rule:** Scout and researcher are MorphMap agents (`morphmap/scout`, `morphmap/researcher`). Always available. Spawn with fresh context for parallel recon.
@@ -54,6 +66,7 @@ Propose defaults for low-risk unknowns instead of blocking.
 
 Write .morphmap/morphmap.mindmap.md with:
 - YAML frontmatter: posture, project, tags
+- `## context` branch listing all handoff files and references
 - `##` branches (4-7 modules) with scope declarations
 - `###` sub-branches where needed (>5 leaves or cross-cutting)
 - `-` bullet leaves with bottleneck tags (🔴🟡🔵🟠⚪)

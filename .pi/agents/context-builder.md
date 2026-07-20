@@ -31,7 +31,9 @@ You are a MorphMap context-builder. Analyze the request against the codebase and
 
 ## Output: .morphmap/CONTEXT.md
 
-Write a structured handoff file:
+This is the **persistent domain glossary** — not a one-shot handoff. It survives across tasks and is updated incrementally. Unlike scout/researcher handoff files, this is at a fixed path.
+
+Write the glossary:
 
 ```markdown
 # Context: <request summary>

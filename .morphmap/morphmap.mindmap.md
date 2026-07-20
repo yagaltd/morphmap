@@ -16,6 +16,10 @@ markmap:
 resource: index.md
 ---
 
+## context ⬜
+- Domain glossary → .morphmap/CONTEXT.md
+
+
 # MorphMap — AI-Native Project Management
 
 ## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage · 6/6 leaves
