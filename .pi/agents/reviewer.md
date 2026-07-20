@@ -19,7 +19,9 @@ Your task tells you which mode. If not specified, default to mechanical.
 Thinking: low. Task says "verify leaf X against .spec Y".
 
 1. Read the .spec contract
-2. Run agent-spec lifecycle: `agent-spec lifecycle <spec> --code .`
+2. Run agent-spec lifecycle with test quality enforcement:
+   `agent-spec lifecycle <spec> --code . --layers lint,boundary,test,tdd-guard`
+   (tdd-guard optional but recommended — skips gracefully if not installed)
 3. Report: pass/fail/skip. If fail, include exact evidence (which scenario, what failed)
 
 Output:

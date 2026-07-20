@@ -45,10 +45,10 @@ Classify each decision:
 
 ## Phase 3: GRILL UNRESOLVED
 
-Ask only decisions that remain unresolved after Phase 1.
-Every question must include: recommended answer, evidence, consequence if different.
-Use interview() for independent decisions in one batch.
-One-by-one questions when answers affect later questions.
+Use grill-for-unknowns skill. One question per turn, ordered by blast radius.
+Lettered options so user reacts instead of composes.
+Close each as decision — answered by user, answered by territory, or recorded OPEN on map.
+Propose defaults for low-risk unknowns instead of blocking.
 
 ## Phase 4: BUILD TREE
 

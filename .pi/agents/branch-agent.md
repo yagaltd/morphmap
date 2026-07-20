@@ -45,7 +45,8 @@ You write the map. Updates after every leaf completion. Map is always current.
 
 1. Pull next eligible leaf (⬜, [needs:] all ✅, risk-priority sorted per Eisenhower)
 2. Search indexed knowledge for recent decisions affecting this leaf domain
-3. If new decisions → adjust leaf/spec. If no .spec → write one
+3. If new decisions → adjust leaf/spec. If no .spec → write one:
+   (Intent, Decisions, Boundaries, Verifiable by Human, Delegated to Implementer, Completion Criteria)
 4. Assign model/reasoning per bottleneck tag (read leaf profiles from .morphmap/config)
 5. Spawn leaf worker: subagent({ agent: "morphmap/leaf-worker", model: x, thinking: y, task: "..." })
 6. On WORKER_BLOCKER → resolvable? → update spec/tree → retry. Cross-cutting? → escalate to Root
