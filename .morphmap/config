@@ -1,0 +1,34 @@
+# MorphMap Project Configuration
+# Human-maintained. Agents read at startup. Do not hallucinate tools not listed here.
+
+available:
+  extensions: [pi-subagents, pi-intercom, context-mode, pi-codex-goal]
+  cli: [agent-spec, markmap-cli]
+  builtin: [/goal, vcc_recall]
+  verified-at: 2026-07-19
+
+leafProfiles:
+  standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+  blocking:    { model: "anthropic/claude-sonnet-4",  thinking: "xhigh" }
+  time:        { model: "deepseek/deepseek-v4-flash", thinking: "medium" }
+  verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+
+# taskProfiles — per agent+domain+task type when spawning subagents
+# branch-agent reads bottleneck tag + domain + task type → picks profile
+# passes model/thinking inline in subagent() call
+taskProfiles:
+  plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "xhigh" }
+  build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+  build-frontend:      { model: "zai/glm-5.2",              thinking: "medium" }
+  build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+  review-mechanical:   { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  review-judgment:     { model: "anthropic/claude-sonnet-4",  thinking: "high" }
+  review-frontend:     { model: "zai/glm-5.2",              thinking: "high" }
+  research-pass:       { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  research-verify:     { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+
+# Agent definitions at ~/.pi/agent/agents/morphmap/ (user scope)
+# morphmap/branch-agent, morphmap/leaf-worker, morphmap/reviewer, morphmap/scout, morphmap/researcher
+specsDirectory: .morphmap/specs/

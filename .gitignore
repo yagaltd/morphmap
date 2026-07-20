@@ -10,16 +10,13 @@ node_modules/
 # OS
 .DS_Store
 
-# Dogfooding — not part of the extension
-morphmap.mindmap.md
-morphmap.mindmap.html
-index.md
-.morphmap/
+# Artifacts (not project state)
 .old/
 nanobanana-output/
 cover-v*.png
 
-# Reference docs (built repo, not part of extension)
+# Extension build docs (not project state)
 docs/
 examples/
 AGENTS.md
+index.md
