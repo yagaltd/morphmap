@@ -1,6 +1,6 @@
 ---
 name: morphmap-init
-description: Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield: auto-survey existing codebase.
+description: "Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield — auto-survey existing codebase."
 user-invocable: true
 argument-hint: "[project name] [--scan]"
 ---
