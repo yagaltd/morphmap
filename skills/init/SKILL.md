@@ -15,49 +15,16 @@ Scaffold a new MorphMap project structure.
 mkdir -p .morphmap/specs
 ```
 
-## Phase 1b: Brownfield scan (optional, with --scan [path])
-
-If `--scan` flag is present, spawn morphmap/scout to survey existing codebase.
-If `path` is given (e.g. `--scan v4-dom`), scan only that directory.
-If no path, scan entire repository root.
-
-```
-subagent({
-  agent: "morphmap/scout",
-  task: "Recon <path-or-root>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md. Write detailed findings to .morphmap/scout-recon.md.",
-  context: "fresh"
-})
-```
-
-After scout completes:
-- Copy scout's detailed findings into `.morphmap/scout-recon.md` if not already written there
-- Reference it from decisions: `- <today>: scout recon complete → .morphmap/scout-recon.md`
-- Each sub-directory → `## <name> ⬜ [module]`
-- Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
-- Complexity heuristics from .morphmap/config can guide bottleneck tags
-
-Skip this phase if `--scan` is not present.
-
-## Phase 2: Create config
+## Phase 2: Create config (REQUIRED — do before any subagent spawn)
 
 Write `.morphmap/config` with default settings:
 
 ```yaml
-# MorphMap project configuration
-# Human-maintained. Agents read at startup.
-
 available:
   extensions: [pi-subagents, pi-intercom, context-mode, pi-codex-goal]
   cli: [agent-spec, markmap-cli]
   builtin: [/goal, vcc_recall]
   verified-at: <today>
-
-# Leaf agent model assignment per bottleneck tag.
-# Edit to match your available providers (deepseek, anthropic, openai, etc.)
-# Model strength hierarchy
-# Orchestrator: medium (routing, delegation) — cheaper model, pattern matching
-# Branch-agent: strong (spec writing, integration) — technical reasoning
-# Leaf-worker: per bottleneck tag
 
 orchestratorProfile:
   model: "deepseek/deepseek-v4-pro"
@@ -70,8 +37,6 @@ leafProfiles:
   time:        { model: "deepseek/deepseek-v4-flash", thinking: "medium" }
   verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
 
-# taskProfiles — per agent+domain+task type for dynamic model assignment
-# branch-agent passes model/thinking inline in subagent() call
 taskProfiles:
   plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "low" }
   plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "xhigh" }
@@ -87,75 +52,70 @@ taskProfiles:
 specsDirectory: .morphmap/specs/
 ```
 
-## Phase 2: Agent configuration (REQUIRED)
+This config is REQUIRED before spawning any subagents — ensures correct model/thinking per task type.
+
+## Phase 2b: Agent configuration (REQUIRED for pi-subagents)
 
 MorphMap CANNOT work without its own agents. Without these overrides, pi-subagents
-will use its builtin defaults (generic reviewer with plan.md, wrong thinking levels).
+will use its builtin defaults (wrong prompts, wrong thinking, wrong assumptions).
 
-Add to `.pi/settings.json` (project scope, recommended) or `~/.pi/agent/settings.json` (user scope):
+Add to `.pi/settings.json` (project scope):
 
 ```json
 {
   "subagents": {
     "agentOverrides": {
-      "morphmap/branch-agent": {
-        "model": "deepseek/deepseek-v4-flash",
-        "thinking": "high"
-      },
-      "morphmap/leaf-worker": {
-        "model": "deepseek/deepseek-v4-flash",
-        "thinking": "low"
-      },
-      "morphmap/reviewer": {
-        "model": "deepseek/deepseek-v4-flash",
-        "thinking": "low"
-      },
-      "morphmap/scout": {
-        "model": "deepseek/deepseek-v4-flash",
-        "thinking": "low"
-      },
-      "morphmap/researcher": {
-        "model": "deepseek/deepseek-v4-flash",
-        "thinking": "medium"
-      }
+      "morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+      "morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+      "morphmap/reviewer":    { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+      "morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
+      "morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
     }
   }
 }
 ```
 
-Or per-project in `.pi/settings.json` (project scope wins over user scope).
-**This is REQUIRED. Without it, MorphMap agents fall back to pi-subagents builtin defaults.**
+**This is REQUIRED.** Without it, MorphMap agents won't work correctly.
 
-**Provider examples:**
+## Phase 3: Brownfield scan (optional, with --scan [path])
 
-DeepSeek only:
-```json
-"morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
+Only proceed if `--scan` flag is present.
+
+### Step 3a: Validate path
+
+```bash
+ls -d <path> 2>/dev/null
 ```
 
-Anthropic only:
-```json
-"morphmap/branch-agent": { "model": "anthropic/claude-sonnet-4", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "anthropic/claude-haiku-4-5", "thinking": "low" },
-"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
+If path does NOT exist:
+- List available directories with `ls -d */`
+- Report: "Path '<path>' not found. Available: <list>. Confirm or retry?"
+- Do NOT continue until user confirms correct path
+- Do NOT silently accept a nonexistent directory
+
+### Step 3b: Spawn scout
+
+Read `.morphmap/config` to get taskProfiles, then spawn with correct model/thinking:
+
+```
+subagent({
+  agent: "morphmap/scout",
+  model: "<from taskProfiles.plan-scout.model>",
+  thinking: "<from taskProfiles.plan-scout.thinking>",
+  task: "Recon <path>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree. Write detailed findings to .morphmap/scout-recon.md.",
+  context: "fresh"
+})
 ```
 
-OpenAI only:
-```json
-"morphmap/branch-agent": { "model": "openai/gpt-5.2", "thinking": "high" },
-"morphmap/leaf-worker":  { "model": "openai/gpt-5-mini", "thinking": "low" },
-"morphmap/reviewer":     { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-"morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
-```
+### Step 3c: Merge findings
 
-## Phase 3: Create blank mindmap
+After scout completes:
+- Scout writes detailed findings to `.morphmap/scout-recon.md`
+- Add to decisions: `- <today>: scout recon complete → .morphmap/scout-recon.md`
+- Each sub-directory → `## <name> ⬜ [module]` in map
+- Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
+
+## Phase 4: Create blank mindmap
 
 Write `.morphmap/morphmap.mindmap.md`:
 
@@ -180,15 +140,15 @@ posture:
 - <today>: project initialized with MorphMap
 ```
 
-## Phase 4: Create index
+## Phase 5: Create index
 
 Write `.morphmap/index.md` with OKF frontmatter pointing to .morphmap/morphmap.mindmap.md.
 
-## Phase 5: Git init
+## Phase 6: Git init
 
 If no git repo exists: `git init`.
 
-## Phase 6: Render + Report
+## Phase 7: Render + Report
 
 ```bash
 npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open
