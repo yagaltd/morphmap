@@ -93,7 +93,17 @@ If path does NOT exist:
 - Do NOT continue until user confirms correct path
 - Do NOT silently accept a nonexistent directory
 
-### Step 3b: Spawn scout
+### Step 3b: Mechanical inventory (deterministic)
+
+Before spawning scout, build a mechanical file inventory:
+
+```bash
+find <path> -type f -not -path '*/node_modules/*' -not -path '*/.git/*' | head -300 > .morphmap/file-inventory.txt
+```
+
+This constrains the scout to ONLY files inside the target directory.
+
+### Step 3c: Spawn scout (constrained)
 
 Read `.morphmap/config` to get taskProfiles, then spawn with correct model/thinking:
 
@@ -102,12 +112,12 @@ subagent({
   agent: "morphmap/scout",
   model: "<from taskProfiles.plan-scout.model>",
   thinking: "<from taskProfiles.plan-scout.thinking>",
-  task: "Recon <path>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree. Write detailed findings to .morphmap/scout-recon.md.",
+  task: "Recon ONLY the directory <path>. Do NOT scan sibling directories. Do NOT scan parent directories. Only map files and sub-directories inside <path>. For each sub-directory, identify key files, entry points, dependencies. Suggest bottleneck tags. Output as structured tree. Write detailed findings to .morphmap/scout-recon.md.",
   context: "fresh"
 })
 ```
 
-### Step 3c: Merge findings
+### Step 3d: Merge findings (constrained by file inventory)
 
 After scout completes:
 - Scout writes detailed findings to `.morphmap/scout-recon.md`
