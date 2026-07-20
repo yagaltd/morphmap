@@ -40,6 +40,7 @@ leafProfiles:
 taskProfiles:
   plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "off" }
   plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "max" }
+  plan-context:        { model: "deepseek/deepseek-v4-flash", thinking: "high" }
   build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
   build-frontend:      { model: "zai/glm-5.2",              thinking: "high" }
   build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
@@ -65,11 +66,13 @@ Add to `.pi/settings.json` (project scope):
 {
   "subagents": {
     "agentOverrides": {
-      "morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
-      "morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
-      "morphmap/reviewer":    { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
-      "morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
-      "morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "high" }
+      "morphmap/branch-agent":    { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+      "morphmap/leaf-worker":     { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/reviewer":       { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/scout":          { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/researcher":     { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+      "morphmap/context-builder": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+      "morphmap/quality-reviewer": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" }
     }
   }
 }
@@ -77,9 +80,9 @@ Add to `.pi/settings.json` (project scope):
 
 **This is REQUIRED.** Without it, MorphMap agents won't work correctly.
 
-## Phase 3: Create mindmap
+## Phase 3: Create mindmap and domain context
 
-Two paths: greenfield (blank) or brownfield (populated from mechanical scan).
+Two paths: greenfield (blank) or brownfield (populated from mechanical scan). Both write `.morphmap/CONTEXT.md`.
 
 ### Greenfield: Create blank mindmap
 
@@ -181,9 +184,30 @@ Rules:
 - `decisions` branch records scan date + reference to raw data files
 - Mechanical data files (.tokei-stats, .dirs.txt, .entry-points.txt) stay in .morphmap/ for plan phase reference
 
-## Phase 4: Create index
+## Phase 4: Create index and domain context
 
 Write `.morphmap/index.md` with OKF frontmatter pointing to .morphmap/morphmap.mindmap.md.
+
+Also write `.morphmap/CONTEXT.md` domain glossary template:
+
+```markdown
+# Context
+
+Shared domain language for this project. Keep meaningful to domain experts; avoid implementation trivia.
+
+## Glossary
+
+| Term | Meaning | Notes |
+|---|---|---|
+
+## Domain Rules
+
+- Durable rule or invariant that should guide specs, tests, and reviews.
+
+## Open Questions
+
+- Unresolved domain question, owner, and why it matters.
+```
 
 ## Phase 5: Git init
 
