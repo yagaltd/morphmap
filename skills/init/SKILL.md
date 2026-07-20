@@ -1,8 +1,8 @@
 ---
 name: morphmap-init
-description: Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank .morphmap/morphmap.mindmap.md, and index.md. Run this first in any project.
+description: Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield: auto-survey existing codebase.
 user-invocable: true
-argument-hint: "[project name]"
+argument-hint: "[project name] [--scan]"
 ---
 
 # MorphMap Init
@@ -14,6 +14,25 @@ Scaffold a new MorphMap project structure.
 ```bash
 mkdir -p .morphmap/specs
 ```
+
+## Phase 1b: Brownfield scan (optional, with --scan)
+
+If `--scan` flag is present, spawn morphmap/scout to survey existing codebase:
+
+```
+subagent({
+  agent: "morphmap/scout",
+  task: "Recon this project. Map top-level directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md.",
+  context: "fresh"
+})
+```
+
+Merge scout findings into the blank mindmap:
+- Each top-level directory → `## <name> ⬜ [module]`
+- Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
+- Complexity heuristics from .morphmap/config can guide bottleneck tags
+
+Skip this phase if `--scan` is not present.
 
 ## Phase 2: Create config
 
