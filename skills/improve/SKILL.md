@@ -61,6 +61,16 @@ For each pattern found, ask:
 | **User correction** | Human corrected agent behavior | Update agent prompt to prevent repeat |
 | **Orphan decisions** | Decisions with no follow-up | Surface for human |
 
+### Product-level patterns (the thing being built)
+
+| Pattern | Look for | Threshold |
+|---------|----------|-----------|
+| **Bug hotspots** | Repeated fix commits in same module | Flag for refactor leaf |
+| **ETA systemic drift** | Features consistently over estimate | Adjust planning heuristic |
+| **Spec divergence** | Implementation differs from .spec | Flag for spec quality review |
+| **Code churn** | High churn files from git log | Flag for architecture decision |
+| **Test gaps** | Files with high churn but no test changes | Flag for test coverage leaf |
+
 ## Phase 3: PROPOSE IMPROVEMENTS
 
 For each pattern found, propose ONE of:
@@ -70,6 +80,8 @@ For each pattern found, propose ONE of:
 - **Expand scope** — suggest adding keywords to a branch scope declaration
 - **Update profile** — change leafProfiles in .morphmap/config
 - **Rewrite spec template** — improve the .spec contract format
+- **Propose refactor** — create leaf for bug hotspot or churn area
+- **Adjust ETA** — update planning heuristic for systematically late features
 
 Present as compact table:
 
