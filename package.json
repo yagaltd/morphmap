@@ -1,6 +1,6 @@
 {
   "name": "morphmap",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "AI-native project management for pi. Mindmap-based, agent-delegated, contract-verified. Push/pull execution with Theory of Constraints.",
   "keywords": ["pi-package"],
   "license": "MIT",

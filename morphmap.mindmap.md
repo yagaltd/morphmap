@@ -78,6 +78,16 @@ resource: index.md
 - 🔴 publish pi extension → already published (https://github.com/yagaltd/morphmap)
 - 🔴 MorphEditor dogfooding: manage own development with MorphMap
 
+## releases — version history (semver for packages, date-based for non-code)
+- 0.2.0 (2026-07-20): 5 agents spawn-verified, 9 commands, taskProfiles, PDSA improve, Write Guard
+- 0.1.0 (2026-07-19): initial release — format spec, agent architecture, 6 reference docs
+
+### versioning rules
+- semver (major.minor.patch) for code projects
+- date-based (YYYY-MM-DD) for marketing, operations, non-code
+- releases branch updated on every push/publish
+- CHANGELOG.md for full details
+
 ## skills ⬜ — what each skill does (map-self-documenting)
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
 - morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent()
