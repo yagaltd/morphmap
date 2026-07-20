@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Plan — push phase: scout → decompose → tree → approve"
-thinking: xhigh
+thinking: max
 skill: morphmap-plan
 restore: true
 ---

@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Init — scaffold .morphmap/ directory and initial files"
-thinking: medium
+thinking: high
 skill: morphmap-init
 restore: true
 ---

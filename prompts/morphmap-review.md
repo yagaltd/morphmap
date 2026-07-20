@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Review — triage blockers, review status, human decisions"
-thinking: medium
+thinking: high
 skill: morphmap-review
 restore: true
 ---

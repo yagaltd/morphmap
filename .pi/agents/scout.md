@@ -2,7 +2,7 @@
 name: morphmap/scout
 description: MorphMap codebase recon. Maps files, dependencies, patterns. Returns structured context for handoff. Knows .morphmap/morphmap.mindmap.md conventions.
 tools: read, grep, find, ls, bash, write
-thinking: low
+thinking: off
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false

@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Amend — intake from human: classify → route to branch agent"
-thinking: medium
+thinking: high
 skill: morphmap-amend
 restore: true
 ---

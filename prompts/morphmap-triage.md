@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Triage — classify external input (GitHub, email, chat) → route"
-thinking: medium
+thinking: high
 skill: morphmap-triage
 restore: true
 ---

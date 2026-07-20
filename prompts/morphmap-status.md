@@ -1,6 +1,6 @@
 ---
 description: "MorphMap Status — text summary of project progress, cheap, no render"
-thinking: low
+thinking: off
 restore: true
 ---
 

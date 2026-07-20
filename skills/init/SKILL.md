@@ -28,26 +28,26 @@ available:
 
 orchestratorProfile:
   model: "deepseek/deepseek-v4-pro"
-  thinking: "medium"
+  thinking: "high"
 
 leafProfiles:
-  standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  standard:    { model: "deepseek/deepseek-v4-flash", thinking: "off" }
   risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  blocking:    { model: "anthropic/claude-sonnet-4",  thinking: "xhigh" }
-  time:        { model: "deepseek/deepseek-v4-flash", thinking: "medium" }
+  blocking:    { model: "anthropic/claude-sonnet-4",  thinking: "max" }
+  time:        { model: "deepseek/deepseek-v4-flash", thinking: "high" }
   verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
 
 taskProfiles:
-  plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "low" }
-  plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "xhigh" }
-  build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
-  build-frontend:      { model: "zai/glm-5.2",              thinking: "medium" }
-  build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
-  review-mechanical:   { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "off" }
+  plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "max" }
+  build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+  build-frontend:      { model: "zai/glm-5.2",              thinking: "high" }
+  build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+  review-mechanical:   { model: "deepseek/deepseek-v4-flash", thinking: "off" }
   review-judgment:     { model: "anthropic/claude-sonnet-4",  thinking: "high" }
   review-frontend:     { model: "zai/glm-5.2",              thinking: "high" }
-  research-pass:       { model: "deepseek/deepseek-v4-flash", thinking: "low" }
-  research-verify:     { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+  research-pass:       { model: "deepseek/deepseek-v4-flash", thinking: "off" }
+  research-verify:     { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
 
 specsDirectory: .morphmap/specs/
 ```
@@ -66,10 +66,10 @@ Add to `.pi/settings.json` (project scope):
   "subagents": {
     "agentOverrides": {
       "morphmap/branch-agent": { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
-      "morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-      "morphmap/reviewer":    { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-      "morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "low" },
-      "morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "medium" }
+      "morphmap/leaf-worker":  { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/reviewer":    { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/scout":       { "model": "deepseek/deepseek-v4-flash", "thinking": "off" },
+      "morphmap/researcher":  { "model": "deepseek/deepseek-v4-flash", "thinking": "high" }
     }
   }
 }

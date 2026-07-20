@@ -1,6 +1,6 @@
 ---
 description: "MorphMap — render .mindmap.md to interactive HTML via markmap-cli"
-thinking: low
+thinking: off
 skill: morphmap-render
 restore: true
 ---

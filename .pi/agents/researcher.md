@@ -2,7 +2,7 @@
 name: morphmap/researcher
 description: MorphMap web researcher — searches, evaluates, synthesizes focused research briefs. Knows MorphMap conventions.
 tools: read, write, bash
-thinking: medium
+thinking: high
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
