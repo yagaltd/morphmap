@@ -19,6 +19,7 @@ All notable changes to MorphMap.
 
 ### Changed
 - Root Orchestrator = main session (AGENTS.md loaded at startup), not a subagent
+- Orchestrator model: flash → pro (needs medium-high reasoning for intent understanding + synthesis)
 - Agent discovery: `.pi/agents/` convention (pi-subagents standard)
 - Reviewer: two modes (mechanical with tdd-guard layer, integration for cross-leaf)
 - Plan Phase 3: uses grill-for-unknowns skill (one question/turn, blast radius order)

@@ -37,7 +37,7 @@ available:
 # Leaf-worker: per bottleneck tag
 
 orchestratorProfile:
-  model: "deepseek/deepseek-v4-flash"
+  model: "deepseek/deepseek-v4-pro"
   thinking: "medium"
 
 leafProfiles:

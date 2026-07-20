@@ -80,7 +80,7 @@ Human approves                       intercom.
 
 | Agent | Role | Model |
 |-------|------|-------|
-| Root Orchestrator | Architect — structure, routing, triage | Session default (AGENTS.md loaded) |
+| Root Orchestrator | Architect — intent, delegation, synthesis | pro/medium (AGENTS.md loaded) |
 | Branch Agent | Tech Lead — owns module, pulls leaves, spawns workers | Configured via settings.json |
 | Leaf Worker | Developer — implements .spec | Assigned per bottleneck tag |
 | Reviewer | QA — mechanical (agent-spec + tdd-guard) or integration | Assigned per mode |
