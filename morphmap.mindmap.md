@@ -114,6 +114,12 @@ resource: index.md
 - [log] → documentation (decisions, skills, releases) — read-only
 - unknown tag → default to human-managed
 
+### telemetry (for cross-project improvement)
+- [telemetry] entries in ## decisions are machine-readable, anonymized
+- Categories: leaf-result, spec-quality, model-fit, classification, eta-drift
+- Format: [telemetry] <category>: retries=<N> model=<X> thinking=<Y> result=<Z>
+- Feeds /morphmap-improve cross-project analysis
+
 ## decisions ⬜ [log]
 
 ### 2026-07-20

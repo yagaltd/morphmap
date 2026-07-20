@@ -73,6 +73,9 @@ Only process branches tagged [module] or [feature]. Skip [phase], [log], or unkn
 - Never hallucinate tools — use only tools in available list.
 - Log skill usage: after spawning leaf-worker or reviewer, add to `## decisions`:
   `- <today>: [skill] morphmap/<agent> used for <leaf> · outcome: ✅/❌/🔄`
+- Log telemetry: after leaf completion or WORKER_BLOCKER, add machine-readable entry:
+  `- <today>: [telemetry] <category>: retries=<N> model=<X> thinking=<Y> result=<Z>`
+  Categories: leaf-result, spec-quality, model-fit, classification, eta-drift
 
 ## Write Guard
 Before any write/edit: (1) Adds value not already in context? (2) Self-contained for next agent? (3) Right file path?

@@ -27,7 +27,7 @@ Look for: fix commits (pattern of breakage), revert commits, commits tagged with
 
 **From decisions log:**
 Read `## decisions` in morphmap.mindmap.md.
-Parse dated entries. Extract: WORKER_BLOCKER mentions, spec retries, ETA drifts, classification misses, model changes, user corrections.
+Parse dated entries. Extract: WORKER_BLOCKER mentions, spec retries, ETA drifts, classification misses, model changes, user corrections, AND `[telemetry]` entries for machine-readable patterns.
 
 **From session history:**
 Use vcc_recall to search across session compactions:
