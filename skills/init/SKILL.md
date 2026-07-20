@@ -24,12 +24,14 @@ If no path, scan entire repository root.
 ```
 subagent({
   agent: "morphmap/scout",
-  task: "Recon <path-or-root>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md.",
+  task: "Recon <path-or-root>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md. Write detailed findings to .morphmap/scout-recon.md.",
   context: "fresh"
 })
 ```
 
-Merge scout findings into the blank mindmap:
+After scout completes:
+- Copy scout's detailed findings into `.morphmap/scout-recon.md` if not already written there
+- Reference it from decisions: `- <today>: scout recon complete → .morphmap/scout-recon.md`
 - Each sub-directory → `## <name> ⬜ [module]`
 - Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
 - Complexity heuristics from .morphmap/config can guide bottleneck tags
