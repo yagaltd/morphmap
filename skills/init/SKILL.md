@@ -2,7 +2,7 @@
 name: morphmap-init
 description: "Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield — auto-survey existing codebase."
 user-invocable: true
-argument-hint: "[project name] [--scan]"
+argument-hint: "[project name] [--scan] [path]"
 ---
 
 # MorphMap Init
@@ -15,20 +15,22 @@ Scaffold a new MorphMap project structure.
 mkdir -p .morphmap/specs
 ```
 
-## Phase 1b: Brownfield scan (optional, with --scan)
+## Phase 1b: Brownfield scan (optional, with --scan [path])
 
-If `--scan` flag is present, spawn morphmap/scout to survey existing codebase:
+If `--scan` flag is present, spawn morphmap/scout to survey existing codebase.
+If `path` is given (e.g. `--scan v4-dom`), scan only that directory.
+If no path, scan entire repository root.
 
 ```
 subagent({
   agent: "morphmap/scout",
-  task: "Recon this project. Map top-level directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md.",
+  task: "Recon <path-or-root>. Map sub-directories as ## branches. For each directory, identify key files, entry points, dependencies. Suggest bottleneck tags for risky areas. Output as structured tree ready to append to .morphmap/morphmap.mindmap.md.",
   context: "fresh"
 })
 ```
 
 Merge scout findings into the blank mindmap:
-- Each top-level directory → `## <name> ⬜ [module]`
+- Each sub-directory → `## <name> ⬜ [module]`
 - Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
 - Complexity heuristics from .morphmap/config can guide bottleneck tags
 
@@ -184,12 +186,17 @@ Write `.morphmap/index.md` with OKF frontmatter pointing to .morphmap/morphmap.m
 
 If no git repo exists: `git init`.
 
-## Phase 6: Report
+## Phase 6: Render + Report
+
+```bash
+npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open
+```
 
 ```
 MorphMap project scaffolded:
   .morphmap/config
   .morphmap/morphmap.mindmap.md
+  .morphmap/morphmap.mindmap.html
   .morphmap/index.md
   
 Next: /morphmap-plan "your directive"
