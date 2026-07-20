@@ -79,7 +79,7 @@ Add to `.pi/settings.json` (project scope):
 
 ## Phase 3: Brownfield scan (optional, with --scan [path])
 
-Only proceed if `--scan` flag is present.
+Only proceed if `--scan` flag is present. Uses deterministic analysis FIRST, then targeted scouts.
 
 ### Step 3a: Validate path
 
@@ -90,40 +90,77 @@ ls -d <path> 2>/dev/null
 If path does NOT exist:
 - List available directories with `ls -d */`
 - Report: "Path '<path>' not found. Available: <list>. Confirm or retry?"
-- Do NOT continue until user confirms correct path
-- Do NOT silently accept a nonexistent directory
 
-### Step 3b: Mechanical inventory (deterministic)
-
-Before spawning scout, build a mechanical file inventory:
+### Step 3b: Deterministic analysis (mechanical, $0, instant)
 
 ```bash
-find <path> -type f -not -path '*/node_modules/*' -not -path '*/.git/*' | head -300 > .morphmap/file-inventory.txt
+# 1. Language stats (use tokei if installed, else fall back to find + wc)
+if command -v tokei &> /dev/null; then
+  tokei <path> --files --sort code --output json > .morphmap/tokei-stats.json
+else
+  find <path> -name "*.js" -o -name "*.ts" -o -name "*.py" -o -name "*.rs" -o -name "*.go" |     xargs wc -l | sort -rn | head -50 > .morphmap/file-sizes.txt
+fi
+
+# 2. Top 10 largest files (mechanical, no LLM)
+find <path> -type f -not -path '*/node_modules/*' -not -path '*/.git/*'   -not -path '*/dist/*' -not -path '*/build/*'   -exec wc -l {} + 2>/dev/null | sort -rn | head -12 > .morphmap/top-files.txt
+
+# 3. Entry points (package.json main, index files, app entry)
+find <path> -name 'main.js' -o -name 'index.js' -o -name 'app.js' -o -name 'App.jsx' -o -name 'server.js'   -not -path '*/node_modules/*' | head -10 > .morphmap/entry-points.txt
 ```
 
-This constrains the scout to ONLY files inside the target directory.
+### Step 3c: Targeted scout (judgment, only on key files)
 
-### Step 3c: Spawn scout (constrained)
+Read `.morphmap/top-files.txt` for the 5 largest files.
+Read `.morphmap/entry-points.txt` for entry points.
 
-Read `.morphmap/config` to get taskProfiles, then spawn with correct model/thinking:
+Spawn MULTIPLE targeted scouts in parallel (NOT one big scout):
+
+```
+subagent({
+  tasks: [
+    { agent: "morphmap/scout",
+      task: "Read ONLY: <largest-file-1>. Identify: purpose, responsibilities, refactoring risk. Output 3-sentence summary + bottleneck tag.",
+      context: "fresh" },
+    { agent: "morphmap/scout",
+      task: "Read ONLY: <largest-file-2>. Same format.",
+      context: "fresh" },
+    { agent: "morphmap/scout",
+      task: "Read ONLY: <entry-point>. Identify loaded modules, dependency graph shape. Output 3-sentence summary.",
+      context: "fresh" }
+  ],
+  concurrency: 3
+})
+```
+
+If repo has >200 source files, also spawn a structure scout:
 
 ```
 subagent({
   agent: "morphmap/scout",
-  model: "<from taskProfiles.plan-scout.model>",
-  thinking: "<from taskProfiles.plan-scout.thinking>",
-  task: "Recon ONLY the directory <path>. Do NOT scan sibling directories. Do NOT scan parent directories. Only map files and sub-directories inside <path>. For each sub-directory, identify key files, entry points, dependencies. Suggest bottleneck tags. Output as structured tree. Write detailed findings to .morphmap/scout-recon.md.",
+  task: "Read .morphmap/top-files.txt and .morphmap/entry-points.txt. Output a concise architecture summary: 5-8 branches for the morphmap.mindmap.md tree. Each branch = one module. Max 3 leaves per branch.",
   context: "fresh"
 })
 ```
 
-### Step 3d: Merge findings (constrained by file inventory)
+### Step 3d: Build tree from mechanical data + scout insights
 
-After scout completes:
-- Scout writes detailed findings to `.morphmap/scout-recon.md`
-- Add to decisions: `- <today>: scout recon complete → .morphmap/scout-recon.md`
-- Each sub-directory → `## <name> ⬜ [module]` in map
-- Key source files → `- ⬜ <description> → .morphmap/specs/<name>.spec`
+Combine:
+- `.morphmap/tokei-stats.json` → language distribution, file counts
+- `.morphmap/top-files.txt` → largest files with line counts
+- Scout summaries → architecture insights, bottleneck tags
+
+Write to `.morphmap/morphmap.mindmap.md`:
+
+```markdown
+## <module-name> ⬜ [module]
+- ⬜ <largest-file> (N lines) → .morphmap/specs/<name>-refactor.spec 🔴
+- ⬜ <entry-point> wiring → .morphmap/specs/<name>-entry.spec
+```
+
+Rules:
+- Every branch MUST have specific leaves (no empty branches)
+- Bottleneck tags from scout insights (🔴 for files >2000 lines, 🟡 for test gaps)
+- Reference .morphmap/scout-recon.md for full findings
 
 ## Phase 4: Create blank mindmap
 
