@@ -26,6 +26,9 @@ All notable changes to MorphMap.
 - .spec template: added Verifiable by Human + Delegated to Implementer sections
 - Classification: 4-tier forced choice (very good/good/bad/very bad) replaces fake confidence numbers
 - Status markers now have defined transition rules (⬜→🔄→✅)
+- All 9 commands e2e tested + documented
+- Tool procedures documented: when to use agent-spec, tdd-guard, evalt
+- .evalt/ test suite added (3 tests for scout, researcher, branch-agent)
 
 ### Fixed
 - Researcher: web_search unavailable → uses bash+curl
