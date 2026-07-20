@@ -7,6 +7,15 @@ available:
   builtin: [/goal, vcc_recall]
   verified-at: 2026-07-19
 
+# Model strength hierarchy (higher = smarter, more expensive)
+# Orchestrator: medium (routing, classification, delegation — pattern matching)
+# Branch-agent: strong (spec authoring, integration, bottleneck decisions — technical reasoning)
+# Leaf-worker: per bottleneck tag (standard=cheap, blocking=strongest)
+
+orchestratorProfile:
+  model: "deepseek/deepseek-v4-flash"
+  thinking: "medium"
+
 leafProfiles:
   standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
   risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }

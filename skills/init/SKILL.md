@@ -31,6 +31,15 @@ available:
 
 # Leaf agent model assignment per bottleneck tag.
 # Edit to match your available providers (deepseek, anthropic, openai, etc.)
+# Model strength hierarchy
+# Orchestrator: medium (routing, delegation) — cheaper model, pattern matching
+# Branch-agent: strong (spec writing, integration) — technical reasoning
+# Leaf-worker: per bottleneck tag
+
+orchestratorProfile:
+  model: "deepseek/deepseek-v4-flash"
+  thinking: "medium"
+
 leafProfiles:
   standard:    { model: "deepseek/deepseek-v4-flash", thinking: "low" }
   risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
