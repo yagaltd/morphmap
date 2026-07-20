@@ -19,6 +19,10 @@ Requires:
 - [context-mode](https://github.com/mksglu/context-mode) (triage classification, knowledge indexing)
 - [agent-spec](https://github.com/yagaltd/agent-spec) (CLI, contract verification)
 
+Optional:
+- [tdd-guard](https://github.com/yagaltd/tdd-guard) (test quality enforcement)
+- [evalt](https://github.com/evalt) (agent regression testing)
+
 Required for rendering:
 - [Node.js](https://nodejs.org) (markmap-cli via npx)
 
