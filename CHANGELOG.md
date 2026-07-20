@@ -5,6 +5,7 @@ All notable changes to MorphMap.
 ## [0.2.0] — 2026-07-20
 
 ### Added
+- Roadmap: v1.0 (now), v2.0 (brownfield, multi-repo, evalt), v3.0 (CognitiveOS, telemetry)
 - 5 MorphMap-owned subagents: branch-agent, leaf-worker, reviewer, scout, researcher
 - 9 slash commands with 8 skills: plan, delegate, review, amend, triage, improve, init, render, status
 - Task profiles for dynamic model assignment per domain (build-backend, build-frontend, etc.)

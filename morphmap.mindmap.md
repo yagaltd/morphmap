@@ -135,6 +135,7 @@ resource: index.md
 - [discuss] Cortex conflicts with context-mode. Not needed. v3 with CognitiveOS.
 - [discuss] OpenSpace: quality tracking covered by /morphmap-improve
 - [discuss] taskProfiles: deferred to v2
+- [discuss] roadmap: v2=brownfield+multi-repo, v3=CognitiveOS+cross-project telemetry
 
 ### 2026-07-19
 - v1 design decisions finalized

@@ -112,3 +112,26 @@ CHANGELOG.md               ← version history
 ## License
 
 MIT
+
+## Roadmap
+
+### v1.0 (now)
+- Greenfield projects (blank → plan → delegate)
+- 5 agent definitions (branch-agent, leaf-worker, reviewer, scout, researcher)
+- 9 slash commands, 8 skills
+- Push/Pull execution with Theory of Constraints
+- PDSA improvement loop (/morphmap-improve)
+- GitHub install
+
+### v2.0 (planned)
+- Brownfield support: `/morphmap-init --scan` — auto-survey existing codebase
+- Multi-repo orchestration: sub-orchestrator agents in sub-trees
+- Evalt integration: automated agent regression tests
+- Compact protocol: collapse done leaves, keep summaries
+- Per-leaf context files: research notes stored per leaf
+
+### v3.0 (planned)
+- CognitiveOS (MoMi) integration: source_ingest for instant deep scanning
+- Cross-project telemetry: aggregate [telemetry] from N projects
+- OpenSpace integration: skill quality tracking
+- Cortex integration: context packet generation
