@@ -38,6 +38,20 @@ leafProfiles:
   time:        { model: "deepseek/deepseek-v4-flash", thinking: "medium" }
   verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
 
+# taskProfiles — per agent+domain+task type for dynamic model assignment
+# branch-agent passes model/thinking inline in subagent() call
+taskProfiles:
+  plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "xhigh" }
+  build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+  build-frontend:      { model: "zai/glm-5.2",              thinking: "medium" }
+  build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+  review-mechanical:   { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  review-judgment:     { model: "anthropic/claude-sonnet-4",  thinking: "high" }
+  review-frontend:     { model: "zai/glm-5.2",              thinking: "high" }
+  research-pass:       { model: "deepseek/deepseek-v4-flash", thinking: "low" }
+  research-verify:     { model: "deepseek/deepseek-v4-pro",  thinking: "medium" }
+
 specsDirectory: .morphmap/specs/
 ```
 
