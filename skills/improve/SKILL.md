@@ -82,6 +82,7 @@ For each pattern found, propose ONE of:
 - **Rewrite spec template** — improve the .spec contract format
 - **Propose refactor** — create leaf for bug hotspot or churn area
 - **Adjust ETA** — update planning heuristic for systematically late features
+- **Create evalt test** — add regression test to `.evalt/` for repeated agent failures (3+ times)
 
 Present as compact table:
 
