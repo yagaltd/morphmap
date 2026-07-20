@@ -100,21 +100,30 @@ resource: index.md
 - morphmap-status: read branch headers → text summary
 
 ## decisions ⬜
-- 2026-07-19: v1 design decisions finalized → docs/design-decisions.md
-- 2026-07-19: adopted OKF format for all knowledge documents
-- 2026-07-19: verified actual installed stack — pi-workflows NOT installed, corrected hallucination
-- 2026-07-19: pi-dynamic-workflows removed from stack (pi-subagents handles all orchestration)
-- 2026-07-19: renamed project to MorphMap
-- 2026-07-19: git init, first commit (15 files, 1580 lines)
-- 2026-07-19: end-to-end test: scout + researcher + branch-agent + leaf-worker all spawned + executed successfully
-- 2026-07-19: [discuss] taskProfiles — domain+task-type model routing (DeepSeek/GLM/Anthropic split). Deferred to v2. v1 uses leafProfiles only.
-- 2026-07-19: [discuss] "grill" = plan skill Phase 3 (see skills/plan/SKILL.md). Main session with xhigh thinking. Not a separate agent.
-- 2026-07-19: [discuss] for MorphEditor dogfooding — pick one small feature (1 leaf) to test full loop. Dark theme toggle or keyboard shortcut fix.
-- 2026-07-19: [discuss] branch-agent needs explicit config-read step: read .morphmap/config for leafProfiles on startup
-- 2026-07-19: [discuss] model assignment: subagent({ model: ..., thinking: ... }) inline overrides agent frontmatter. Verified working.\n- 2026-07-20: [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally, skipped map update. Root cause: no pre-action refresh.\n- 2026-07-20: [fix] Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits\n- 2026-07-20: [fix] Context Budget: check ctx_stats every 10 turns, compact if >40%\n- 2026-07-20: [fix] Write Guard added \"Discussed?\" check + violation logging\n- 2026-07-20: [fix] `## skills` branch added to map — documents each skill's phases\n- 2026-07-20: [fix] skill usage logging: Root Orchestrator + branch-agent log `[skill] <name>` entries to decisions. Feeds /morphmap-improve Phase 2 automatically.
-- 2026-07-20: [learn] reviewer mechanical mode: added tdd-guard layer for test trustworthiness
-- 2026-07-20: [learn] plan Phase 3: use grill-for-unknowns skill (one question/turn, blast radius)
-- 2026-07-20: [learn] .spec template: add Verifiable by Human + Delegated to Implementer sections
-- 2026-07-20: [discuss] Cortex conflicts with context-mode (overwrites AGENTS.md). Not needed.
-- 2026-07-20: [discuss] CognitiveOS v3: VCS checkpoints + agent decisions. v3 material.
-- 2026-07-20: [discuss] OpenSpace patterns (quality tracking, skill IDs) — /morphmap-improve already covers this
+
+### 2026-07-20
+- [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
+- [fix] Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits
+- [fix] Context Budget: check ctx_stats every 10 turns, compact if >40%
+- [fix] Write Guard added "Discussed?" check + violation logging
+- [fix] ## skills branch added to map — documents each skill's phases
+- [fix] skill usage logging: [skill] entries feed /morphmap-improve Phase 2
+- [learn] reviewer: added tdd-guard layer for test trustworthiness
+- [learn] plan Phase 3: use grill-for-unknowns skill
+- [learn] .spec template: add Verifiable by Human + Delegated to Implementer
+- [discuss] Cortex conflicts with context-mode. Not needed. v3 with CognitiveOS.
+- [discuss] OpenSpace: quality tracking covered by /morphmap-improve
+- [discuss] taskProfiles: deferred to v2
+
+### 2026-07-19
+- v1 design decisions finalized
+- adopted OKF format for all knowledge documents
+- verified stack: pi-workflows NOT installed, pi-dynamic-wf removed
+- renamed project to MorphMap
+- git init, first commit
+- 4-tier forced choice replaces fake confidence numbers
+- end-to-end test: all 5 agents spawned + executed
+- [discuss] grill = plan Phase 3 with xhigh thinking, not separate agent
+- [discuss] MorphEditor dogfooding: pick one small feature
+- [discuss] branch-agent needs config-read step for leafProfiles
+- [discuss] model assignment: subagent() inline overrides
