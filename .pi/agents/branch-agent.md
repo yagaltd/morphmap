@@ -17,7 +17,7 @@ Available tools: pi-subagents, pi-intercom, context-mode, agent-spec CLI, /goal,
 
 ## Your Map (always in context, you are the writer)
 
-Injected at task start: subtree from `## <branch-name>` to next `##` in morphmap.mindmap.md.
+Injected at task start: subtree from `## <branch-name>` to next `##` in .morphmap/morphmap.mindmap.md.
 You write the map. Updates after every leaf completion. Map is always current.
 
 ## Decision Matrices (posture-aware)

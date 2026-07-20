@@ -51,7 +51,7 @@ Directive                          Branch agents pull
   ↓                                leaves in risk-priority
 Root Orchestrator                    order. Build against
   ↓                                .spec contracts.
-Tree (morphmap.mindmap.md)           Self-verify. Report.
+Tree (.morphmap/morphmap.mindmap.md)           Self-verify. Report.
   ↓                                 Kanban signals via
 Human approves                       intercom.
 ```

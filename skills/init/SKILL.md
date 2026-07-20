@@ -1,6 +1,6 @@
 ---
 name: morphmap-init
-description: Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank morphmap.mindmap.md, and index.md. Run this first in any project.
+description: Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank .morphmap/morphmap.mindmap.md, and index.md. Run this first in any project.
 user-invocable: true
 argument-hint: "[project name]"
 ---
@@ -134,7 +134,7 @@ OpenAI only:
 
 ## Phase 3: Create blank mindmap
 
-Write `morphmap.mindmap.md`:
+Write `.morphmap/morphmap.mindmap.md`:
 
 ```markdown
 ---
@@ -159,7 +159,7 @@ posture:
 
 ## Phase 4: Create index
 
-Write `index.md` with OKF frontmatter pointing to morphmap.mindmap.md.
+Write `.morphmap/index.md` with OKF frontmatter pointing to .morphmap/morphmap.mindmap.md.
 
 ## Phase 5: Git init
 
@@ -170,8 +170,8 @@ If no git repo exists: `git init`.
 ```
 MorphMap project scaffolded:
   .morphmap/config
-  morphmap.mindmap.md
-  index.md
+  .morphmap/morphmap.mindmap.md
+  .morphmap/index.md
   
 Next: /morphmap-plan "your directive"
 ```

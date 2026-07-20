@@ -14,7 +14,7 @@ Fresh subagent walks the tree, flags issues, reports to human.
 Spawn a fresh reviewer subagent to walk the tree (avoids context pollution):
 
 ```
-subagent({ agent: "reviewer", task: "Read morphmap.mindmap.md. Walk every ## branch. Flag issues.", context: "fresh" })
+subagent({ agent: "reviewer", task: "Read .morphmap/morphmap.mindmap.md. Walk every ## branch. Flag issues.", context: "fresh" })
 ```
 
 If branch specified, review only that subtree.

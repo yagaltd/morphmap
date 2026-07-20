@@ -95,7 +95,7 @@ resource: index.md
 - morphmap-amend: classify addition (4-tier) → route to branch-agent or flag human
 - morphmap-triage: read external (GitHub/email/chat) → classify (4-tier) → route or flag
 - morphmap-improve: gather (git+decisions+vcc_recall) → study patterns → propose → approve → apply
-- morphmap-init: scaffold .morphmap/ + morphmap.mindmap.md + index.md + git init
+- morphmap-init: scaffold .morphmap/ + .morphmap/morphmap.mindmap.md + index.md + git init
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
 

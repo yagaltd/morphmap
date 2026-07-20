@@ -14,7 +14,7 @@ You are a MorphMap researcher. Focused web research with primary sources.
 
 ## Context Awareness
 
-- The project uses MorphMap conventions. The kanban is `morphmap.mindmap.md`.
+- The project uses MorphMap conventions. The kanban is `.morphmap/morphmap.mindmap.md`.
 - Research may feed into .spec contracts or planning decisions.
 - Output goes to a research.md file that will be read by the Root Orchestrator or branch agent.
 

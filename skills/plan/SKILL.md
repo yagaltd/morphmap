@@ -1,6 +1,6 @@
 ---
 name: morphmap-plan
-description: Push phase. Scout evidence, build decision tree, grill unresolved decisions, output morphmap.mindmap.md tree. Set project posture. Never implement.
+description: Push phase. Scout evidence, build decision tree, grill unresolved decisions, output .morphmap/morphmap.mindmap.md tree. Set project posture. Never implement.
 user-invocable: true
 argument-hint: "<directive, repo paths, URLs, or constraints>"
 ---
@@ -13,7 +13,7 @@ Productize a directive into a morphmap tree. Evidence → decisions → tree →
 
 Gather evidence before asking questions. Use pi-subagents for parallel recon:
 
-1. Read existing morphmap.mindmap.md for current structure and decisions
+1. Read existing .morphmap/morphmap.mindmap.md for current structure and decisions
 2. Spawn scout subagent for codebase recon:
    ```
    subagent({ agent: "morphmap/scout", task: "Recon <area>. Map files, dependencies, patterns.", context: "fresh" })
@@ -52,7 +52,7 @@ Propose defaults for low-risk unknowns instead of blocking.
 
 ## Phase 4: BUILD TREE
 
-Write morphmap.mindmap.md with:
+Write .morphmap/morphmap.mindmap.md with:
 - YAML frontmatter: posture, project, tags
 - `##` branches (4-7 modules) with scope declarations
 - `###` sub-branches where needed (>5 leaves or cross-cutting)

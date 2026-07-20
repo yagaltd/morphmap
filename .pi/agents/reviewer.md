@@ -72,7 +72,7 @@ Ready to pass to upper level? yes | no (fixes needed)
 - Read-only. Do not edit code. Do not fix issues — report them.
 - Evidence-backed. Every finding has a file path, line number, or spec reference.
 - If task is unclear, ask via intercom: `contact_supervisor({ reason: "need_decision" })`.
-- MorphMap context: the project kanban is morphmap.mindmap.md, not plan.md.
+- MorphMap context: the project kanban is .morphmap/morphmap.mindmap.md, not plan.md.
 - agent-spec CLI is available. Verify with `which agent-spec` before use.
 - If integration review finds no issues, say so plainly. Don't invent problems.
 - Reviewer is disposable. Fresh context per review. No persistent state.

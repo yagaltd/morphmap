@@ -25,7 +25,7 @@ If PR description mentions a leaf path or .spec file:
 
 ## Phase 3: CLASSIFY
 
-Extract scope from morphmap.mindmap.md branch headers.
+Extract scope from .morphmap/morphmap.mindmap.md branch headers.
 Compare the input against each branch's scope keywords.
 
 Forced 4-tier classification (no middle ground):

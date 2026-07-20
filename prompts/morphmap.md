@@ -5,6 +5,6 @@ skill: morphmap-render
 restore: true
 ---
 
-Render morphmap.mindmap.md to morphmap.mindmap.html via npx markmap-cli. If --branch given, render only that branch's localized map from .morphmap/<branch>.md.
+Render .morphmap/morphmap.mindmap.md to .morphmap/morphmap.mindmap.html via npx markmap-cli. If --branch given, render only that branch's localized map from .morphmap/<branch>.md.
 
 $@

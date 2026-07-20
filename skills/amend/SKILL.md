@@ -11,7 +11,7 @@ Classify and route human additions to the right branch agent.
 
 ## Phase 2: CLASSIFY
 
-Read morphmap.mindmap.md. Extract all `##` branch scope declarations.
+Read .morphmap/morphmap.mindmap.md. Extract all `##` branch scope declarations.
 Compare the addition against each branch's scope keywords.
 
 Forced 4-tier classification (no middle ground):
@@ -29,6 +29,6 @@ Include in every route: "Context from orchestrator: phase=X, compat=Y, scope=Z, 
 
 ## Rules
 
-- Log all routing decisions to ## decisions in morphmap.mindmap.md
+- Log all routing decisions to ## decisions in .morphmap/morphmap.mindmap.md
 - Branch agent creates the leaf — you only route
 - If human asks to restructure tree (new branch, merge, split) → switch to morphmap-plan hat
