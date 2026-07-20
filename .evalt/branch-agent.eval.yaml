@@ -1,0 +1,28 @@
+version: 1
+config:
+  profiles:
+    main:
+      harness: pi
+  profile: main
+tests:
+  - name: branch-agent-executes-leaf
+    desc: Branch-agent pulls first leaf, spawns worker, updates map.
+    input:
+      prompt: |
+        Own the greeting-api branch at /tmp/morphmap-test-e2e.
+
+        Your map subtree:
+        ## greeting-api ⬜ — scope: HTTP server, API endpoint, hello world · 0/2 leaves
+        - ⬜ bare http server implementation → .morphmap/specs/greeting-api.spec
+
+        Context: phase=prototype, compat=break, scope=narrow, quality=fast, budget=balanced.
+        Pull the first leaf. Write spec if missing. Spawn leaf worker. Update map.
+
+        Do NOT wait for user confirmation. Execute autonomously.
+    assertions:
+      - left: output
+        op: contains
+        right: "✅"
+      - left: output
+        op: contains
+        right: "server"

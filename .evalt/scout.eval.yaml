@@ -1,0 +1,20 @@
+version: 1
+config:
+  profiles:
+    main:
+      harness: pi
+  profile: main
+tests:
+  - name: scout-finds-project-structure
+    desc: MorphMap scout recon on test project. Should identify the morphmap.mindmap.md file.
+    input:
+      prompt: |
+        Recon /tmp/morphmap-test-e2e.
+        Read morphmap.mindmap.md. Map file structure. Write context.md.
+    assertions:
+      - left: output
+        op: contains
+        right: "morphmap.mindmap.md"
+      - left: output
+        op: contains
+        right: "E2ETest"

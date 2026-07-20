@@ -1,0 +1,20 @@
+version: 1
+config:
+  profiles:
+    main:
+      harness: pi
+  profile: main
+tests:
+  - name: researcher-finds-nodejs-http
+    desc: MorphMap researcher on HTTP server options. Should recommend bare http module.
+    input:
+      prompt: |
+        Research: compare Node.js bare http module vs Express for a single-route hello-world API.
+        What is simplest? Write research.md with recommendation.
+    assertions:
+      - left: output
+        op: contains
+        right: "http"
+      - review:
+          prompt: "Does the research correctly identify bare http module as simplest for a single-route API and provide a clear recommendation with reasoning?"
+          pass_threshold: 0.7
