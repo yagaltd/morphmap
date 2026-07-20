@@ -18,7 +18,7 @@ resource: index.md
 
 # MorphMap — AI-Native Project Management
 
-## docs ✅ — scope: format spec, agent architecture, protocols, execution, triage · 6/6 leaves
+## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage · 6/6 leaves
 - ✅ format specification → docs/format-spec.md
 - ✅ agent architecture + system prompts + hallucination prevention → docs/agent-architecture.md
 - ✅ intercom protocol specification → docs/intercom-protocol.md
@@ -26,11 +26,11 @@ resource: index.md
 - ✅ triage flow + classification logic → docs/triage-flow.md
 - ✅ design decisions audit trail → docs/design-decisions.md
 
-## examples ✅ — scope: MorphEditor mindmap, OKF conformance · 2/2 leaves
+## examples ✅ [log] — scope: MorphEditor mindmap, OKF conformance · 2/2 leaves
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 — scope: slash commands · 9/9 prompts + 8/8 skills · e2e tested: 4/9
+## commands 🔄 [module] — scope: slash commands · 9/9 prompts + 8/8 skills · e2e tested: 4/9
 - ✅ /morphmap-init — scaffold verified
 - ✅ /morphmap-plan — scout + researcher + tree + .spec verified
 - ✅ /morphmap-delegate — branch-agent + leaf-worker verified
@@ -42,7 +42,7 @@ resource: index.md
 - ⬜ /morphmap-status — text summary, warm
 - ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
 
-## agents ✅ — scope: agent definitions · 5/5 leaves · all spawn-verified
+## agents ✅ [module] — scope: agent definitions · 5/5 leaves · all spawn-verified
 - ✅ branch-agent → .pi/agents/branch-agent.md · spawned + executed
 - ✅ leaf-worker → .pi/agents/leaf-worker.md · spawned + implemented
 - ✅ reviewer → .pi/agents/reviewer.md (two modes)
@@ -54,12 +54,12 @@ resource: index.md
 - ✅ branch-agent: agent-spec→bash (CLI needs shell, not tool name)
 - ✅ agent install: ~/.pi/agent/agents/morphmap/ for pi-subagents discovery
 
-## extension 🔄 — scope: pi extension package · 2/3 leaves
+## extension 🔄 [module] — scope: pi extension package · 2/3 leaves
 - ✅ package.json + install from GitHub (pi install works)
 - ✅ agent discovery fixed (.pi/agents/ → ~/.pi/agent/agents/morphmap/)
 - ⬜ npm packaging (not needed — GitHub install works)
 
-## staging 🔄
+## staging 🔄 [phase]
 ### e2e-test
 - ✅ init + plan + delegate flow verified on E2ETest project
 - ✅ scout: recon, context.md
@@ -73,12 +73,12 @@ resource: index.md
 - ⬜ init MorphEditor as MorphMap project
 - ⬜ plan from real MorphEditor features
 
-## production 🔴 [BLOCKED: review + triage not tested]
+## production 🔴 [phase] [BLOCKED: review + triage not tested]
 ### release-v0.1
 - 🔴 publish pi extension → already published (https://github.com/yagaltd/morphmap)
 - 🔴 MorphEditor dogfooding: manage own development with MorphMap
 
-## releases — version history (semver for packages, date-based for non-code)
+## releases [log] — version history (semver for packages, date-based for non-code)
 - 0.2.0 (2026-07-20): 5 agents spawn-verified, 9 commands, taskProfiles, PDSA improve, Write Guard
 - 0.1.0 (2026-07-19): initial release — format spec, agent architecture, 6 reference docs
 
@@ -88,7 +88,7 @@ resource: index.md
 - releases branch updated on every push/publish
 - CHANGELOG.md for full details
 
-## skills ⬜ — what each skill does + format tags
+## skills ⬜ [log] — what each skill does + format tags
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
 - morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent()
 - morphmap-review: spawn reviewer subagent → walk tree → flag blockers → report
@@ -107,7 +107,14 @@ resource: index.md
 - [core] → always visible in rendered view
 - [rich] → collapsible detail
 
-## decisions ⬜
+### branch tags (for agent routing)
+- [module] → code module — branch-agent manages
+- [feature] → feature concern — branch-agent manages
+- [phase] → lifecycle (staging, production) — human-managed
+- [log] → documentation (decisions, skills, releases) — read-only
+- unknown tag → default to human-managed
+
+## decisions ⬜ [log]
 
 ### 2026-07-20
 - [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally

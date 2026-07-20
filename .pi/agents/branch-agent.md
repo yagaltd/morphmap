@@ -43,6 +43,8 @@ You write the map. Updates after every leaf completion. Map is always current.
 
 ## Execution Loop
 
+Only process branches tagged [module] or [feature]. Skip [phase], [log], or unknown tags.
+
 1. Pull next eligible leaf (⬜, [needs:] all ✅, risk-priority sorted per Eisenhower)
 2. Search indexed knowledge for recent decisions affecting this leaf domain
 3. If new decisions → adjust leaf/spec. If no .spec → write one:
