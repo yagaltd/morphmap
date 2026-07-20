@@ -88,7 +88,7 @@ resource: index.md
 - releases branch updated on every push/publish
 - CHANGELOG.md for full details
 
-## skills ⬜ — what each skill does (map-self-documenting)
+## skills ⬜ — what each skill does + format tags
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
 - morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent()
 - morphmap-review: spawn reviewer subagent → walk tree → flag blockers → report
@@ -98,6 +98,14 @@ resource: index.md
 - morphmap-init: scaffold .morphmap/ + morphmap.mindmap.md + index.md + git init
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
+
+### leaf format tags (for markmap rendering)
+- [link] → leaf points to a file (spec, doc, ADR)
+- [table] → leaf produces tabular data
+- [code] → leaf is a code block
+- [checkbox] → leaf is a task/checklist
+- [core] → always visible in rendered view
+- [rich] → collapsible detail
 
 ## decisions ⬜
 
