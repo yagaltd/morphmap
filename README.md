@@ -66,11 +66,13 @@ Human approves                       intercom.
 
 | Command | Purpose |
 |---------|---------|
+| `/morphmap-init` | Scaffold new MorphMap project |
 | `/morphmap-plan <directive>` | Push phase: scout → tree → approve |
 | `/morphmap-delegate [branch]` | Pull phase: spawn branch agents |
 | `/morphmap-review [branch]` | Triage blockers, review status |
 | `/morphmap-amend <addition>` | Add work to existing branch |
 | `/morphmap-triage` | Classify external input (GitHub, email) |
+| `/morphmap-improve` | PDSA Study loop: learn from patterns |
 | `/morphmap` | Render interactive mindmap |
 | `/morphmap-status` | Text summary |
 
@@ -78,16 +80,14 @@ Human approves                       intercom.
 
 | Agent | Role | Model |
 |-------|------|-------|
-| Root Orchestrator | Architect — structure, routing, triage | Strong, high thinking |
-| Branch Agent | Tech Lead — owns module, pulls leaves | Strong, high thinking |
+| Root Orchestrator | Architect — structure, routing, triage | Session default (AGENTS.md loaded) |
+| Branch Agent | Tech Lead — owns module, pulls leaves, spawns workers | Configured via settings.json |
 | Leaf Worker | Developer — implements .spec | Assigned per bottleneck tag |
+| Reviewer | QA — mechanical (agent-spec + tdd-guard) or integration | Assigned per mode |
+| Scout | Recon — codebase mapping, MorphMap-aware | Thinking: low |
+| Researcher | Web research — bash+curl, MorphMap-aware | Thinking: medium |
 
-Agents use three decision matrices:
-- **Urgency × Importance** (Eisenhower) — which leaf to pull
-- **Value × Impact** — leaf or sub-branch?
-- **Clarity × Risk** — build, verify, or escalate?
-
-All decisions logged. Status always current. Context managed by pi auto-compaction.
+All agents are MorphMap-owned (zero dependency on pi-subagents builtins).
 
 ## Format
 
@@ -98,10 +98,11 @@ Render with `npx markmap-cli`.
 ## Project Structure
 
 ```
-agents/                    ← pi-subagents agent definitions
-prompts/                   ← slash command templates
-skills/                    ← skill definitions
+.pi/agents/                ← pi-subagents agent definitions (5 agents)
+prompts/                   ← slash command templates (9 commands)
+skills/                    ← skill definitions (8 skills)
 package.json               ← pi package manifest
+CHANGELOG.md               ← version history
 ```
 
 ## License
