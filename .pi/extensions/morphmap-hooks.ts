@@ -71,7 +71,7 @@ const FAILURE_PATTERNS: Record<string, { pattern: RegExp; suggestion: string; se
 
 // ── MAIN ──────────────────────────────────────────────────────
 
-export function activate(pi: ExtensionAPI) {
+export default function (pi: ExtensionAPI) {
 
   // ============================================================
   // PRE-TOOL HOOKS
