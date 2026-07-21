@@ -47,7 +47,21 @@ else
 fi
 ```
 
-**After human approval**, set goal with the approved budget:
+**Before budget, check archive state:**
+
+```bash
+# Count ✅ vs total ## branches
+DONE=$(grep -cE '^## .*✅' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+TOTAL=$(grep -c '^## ' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+CURRENT_SUBJECT=$(head -20 .morphmap/morphmap.mindmap.md | grep '^# ' | head -1)
+```
+
+If ALL `##` branches are ✅ AND new directive is clearly a different subject:
+- "Previous map is fully complete. Archive before planning <new>? (y)es / (n)o — keep as branches and add <new>."
+- If 'y': run `/morphmap-archive --all`. Map collapses to summary lines. Continue to Phase 0 budget.
+- If 'n': continue as-is. New branches added alongside ✅ ones.
+
+**After human approval on BOTH archive + budget**, set goal:
 ```
 create_goal({
   objective: "Plan <directive>. Scout evidence, resolve decisions, produce approved tree with posture set.",
