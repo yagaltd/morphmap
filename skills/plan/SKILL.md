@@ -150,12 +150,14 @@ Write .morphmap/morphmap.mindmap.md with:
 - Cross-branch deps: `[needs: branch/leaf]`
 - `## staging` and `## production` lifecycle branches
 - `## decisions` log branch
+- `## architecture-decisions [adr]` branch — if any decisions logged during this plan are significant (cross-cutting, security, architecture), propose ADR files for them
 
 Rules:
 - Complex concern (>5 leaves) → promote to `###` sub-branch
 - Simple concern (1-5 leaves) → keep as bullets under `##`
 - Every leaf points to a `.spec` file path (even if not written yet)
 - Bottleneck tags: 🔴 BLOCKING, 🟡 RISKY, 🔵 TIME_CONSUMING, 🟠 VERIFICATION_HEAVY, ⚪ STANDARD
+- **ADR rule:** Any decision with security, architectural, or cross-cutting impact → create `docs/adr/NNN-slug.md` with full context + rationale. Add leaf to `## architecture-decisions [adr]` branch linking to it.
 
 ## Phase 5: STOP FOR APPROVAL
 
