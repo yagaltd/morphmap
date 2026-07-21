@@ -210,6 +210,14 @@ export default function (pi: ExtensionAPI) {
             { stdio: "pipe", timeout: 15000 }
           );
 
+          // Inject auto-collapse script (collapse ✅ branches)
+          if (fs.existsSync(".morphmap/markmap-collapse.js")) {
+            const script = await fs.readFile(".morphmap/markmap-collapse.js", "utf8");
+            let html = await fs.readFile(".morphmap/morphmap.mindmap.html", "utf8");
+            html = html.replace("</body>", `<script>${script}</script></body>`);
+            await fs.writeFile(".morphmap/morphmap.mindmap.html", html, "utf8");
+          }
+
           // Generate CHANGELOG.md from map decisions
           const changelog = generateChangelog(mapContent);
           await fs.writeFile("CHANGELOG.md", changelog, "utf8");
