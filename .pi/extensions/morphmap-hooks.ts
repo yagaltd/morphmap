@@ -180,6 +180,16 @@ export default function (pi: ExtensionAPI) {
           const changelog = generateChangelog(mapContent);
           await fs.writeFile("CHANGELOG.md", changelog, "utf8");
 
+          // ADR check: verify referenced ADR files exist
+          const missingAdrs = checkAdrFiles(mapContent);
+          if (missingAdrs.length > 0) {
+            pi.ui?.notify({
+              title: "MorphMap: missing ADR files",
+              body: `ADRs referenced in map but not found: ${missingAdrs.join(", ")}. Create these files in docs/adr/.`,
+              style: "warning",
+            });
+          }
+
           // Stage all generated artifacts
           execSync("git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html CHANGELOG.md", {
             stdio: "pipe",
@@ -477,4 +487,41 @@ function extractDecisions(mapContent: string): DecisionEntry[] {
   }
   
   return decisions;
+}
+
+// ── ADR VERIFICATION ──────────────────────────────────────────────
+
+function checkAdrFiles(mapContent: string): string[] {
+  // Extract ADR references from decisions log and architecture-decisions branch
+  const adrRefs = new Set<string>();
+  const lines = mapContent.split("\n");
+  
+  for (const line of lines) {
+    // Match: ADR-001, adr/001, docs/adr/001-title.md
+    const match = line.match(/ADR-(\d{3})/i);
+    if (match) {
+      adrRefs.add(`ADR-${match[1]}`);
+    }
+  }
+  
+  // Check if each ADR file exists
+  const missing: string[] = [];
+  for (const adr of adrRefs) {
+    try {
+      // Find matching ADR file in docs/adr/
+      const fs = require("node:fs");
+      if (!fs.existsSync("docs/adr")) {
+        // All ADRs missing — directory doesn't exist
+        missing.push(adr);
+        continue;
+      }
+      const files = fs.readdirSync("docs/adr");
+      const found = files.some((f: string) => f.startsWith(adr.toLowerCase().replace("adr-", "")));
+      if (!found) missing.push(adr);
+    } catch {
+      missing.push(adr);
+    }
+  }
+  
+  return missing;
 }

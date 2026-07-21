@@ -136,6 +136,7 @@ resource: index.md
 - [feature] → feature concern — branch-agent manages
 - [phase] → lifecycle (staging, production) — human-managed
 - [log] → documentation (decisions, skills, releases) — read-only
+- [adr] → architecture decision records — human-managed, read-only, linked to docs/adr/
 - unknown tag → default to human-managed
 
 ### telemetry (for cross-project improvement)
@@ -182,6 +183,7 @@ resource: index.md
 - [learn] dogfooding surfaced gap: ">5 → sub-branch" rule existed but didn't apply to [log] branches. Rule now universal. Map write protocol added: commit + render HTML after every map edit.
 - [learn] pi extension hooks: morphmap-hooks.ts for semi-mechanical enforcement (spec guard, goal gate warning, auto-render, telemetry)
 - [learn] dogfooding: pi-interview format bug — recommended for single-select must be string, not object. Fixed in plan Phase 3 with explicit format rules.
+- [learn] ADR support: new [adr] branch tag, ADR template in format spec, hook verifies referenced ADR files exist. Captures decision rationale that survives compaction.
 
 ### 2026-07-20
 #### fixes (5)
