@@ -117,6 +117,11 @@ export default function (pi: ExtensionAPI) {
       const task = event.input?.task as string | undefined;
 
       if (agent === "morphmap/leaf-worker" && task) {
+        // Save token baseline for delta calculation after subagent completes
+        state._preSpawnTokensIn = parseInt(process.env.PI_RUN_TOKENS_IN || "0", 10);
+        state._preSpawnTokensOut = parseInt(process.env.PI_RUN_TOKENS_OUT || "0", 10);
+        state._preSpawnCost = parseFloat(process.env.PI_RUN_ESTIMATED_COST || "0");
+
         const specPath = extractSpecPath(task);
         if (specPath) {
           try {
@@ -255,6 +260,24 @@ export default function (pi: ExtensionAPI) {
         const leafName = extractLeafName(task);
         state.lastLeafCompletion = { turn: state.turnCount, leaf: leafName ?? "unknown" };
         state.pendingIntercomCheck = true;
+
+        // Capture telemetry: token usage + cost from pi runtime (delta from pre-spawn)
+        const model = event.input?.model as string || "unknown";
+        const thinking = event.input?.thinking as string || "off";
+        const postTokensIn = parseInt(process.env.PI_RUN_TOKENS_IN || "0", 10);
+        const postTokensOut = parseInt(process.env.PI_RUN_TOKENS_OUT || "0", 10);
+        const postCost = parseFloat(process.env.PI_RUN_ESTIMATED_COST || "0");
+        const deltaIn = postTokensIn - (state._preSpawnTokensIn || 0);
+        const deltaOut = postTokensOut - (state._preSpawnTokensOut || 0);
+        const deltaCost = (postCost - (state._preSpawnCost || 0)).toFixed(4);
+        
+        try {
+          const { execSync } = await import("node:child_process");
+          const entry = `- ${today()}: [telemetry] leaf-result: agent=morphmap/leaf-worker leaf=${leafName ?? "?"} model=${model} thinking=${thinking} tokens-in=${deltaIn} tokens-out=${deltaOut} cost=\$${deltaCost} result=✅`;
+          execSync(`echo "${entry}" >> .morphmap/morphmap.mindmap.md`, { stdio: "pipe" });
+        } catch {
+          // Silent
+        }
       }
     }
 
