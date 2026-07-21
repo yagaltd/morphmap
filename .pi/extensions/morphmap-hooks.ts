@@ -117,11 +117,7 @@ export default function (pi: ExtensionAPI) {
       const task = event.input?.task as string | undefined;
 
       if (agent === "morphmap/leaf-worker" && task) {
-        // Save token baseline for delta calculation after subagent completes
-        state._preSpawnTokensIn = parseInt(process.env.PI_RUN_TOKENS_IN || "0", 10);
-        state._preSpawnTokensOut = parseInt(process.env.PI_RUN_TOKENS_OUT || "0", 10);
-        state._preSpawnCost = parseFloat(process.env.PI_RUN_ESTIMATED_COST || "0");
-
+        // .spec guard — only for leaf workers
         const specPath = extractSpecPath(task);
         if (specPath) {
           try {
@@ -140,7 +136,7 @@ export default function (pi: ExtensionAPI) {
           }
         }
 
-        // Model enforcement: block flash model for BLOCKING leaves, warn for RISKY
+        // Model enforcement — only for leaf workers (bottleneck-tagged)
         const model = event.input?.model as string | undefined;
         if (model && task) {
           const bottleneck = extractBottleneck(task);
@@ -162,6 +158,15 @@ export default function (pi: ExtensionAPI) {
               style: "warning",
             });
           }
+        }
+
+        // Save token baseline for ALL morphmap agent spawns (telemetry delta)
+        if (agent && (agent as string).startsWith("morphmap/")) {
+          state._preSpawnTokensIn = parseInt(process.env.PI_RUN_TOKENS_IN || "0", 10);
+          state._preSpawnTokensOut = parseInt(process.env.PI_RUN_TOKENS_OUT || "0", 10);
+          state._preSpawnCost = parseFloat(process.env.PI_RUN_ESTIMATED_COST || "0");
+          state._preSpawnAgent = agent;
+          state._preSpawnTask = task || "";
         }
       }
     }
@@ -249,21 +254,26 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
-    // ── 4. Intercom audit: track leaf completions ──────────────
+    // ── 4. Telemetry: track ALL morphmap agent completions ─────
 
     if (event.toolName === "subagent" && !event.isError) {
       const result = event.result as any;
       const agent = event.input?.agent as string | undefined;
       const task = event.input?.task as string | undefined;
+      const model = event.input?.model as string || "unknown";
+      const thinking = event.input?.thinking as string || "off";
 
+      // Intercom audit: track leaf completions specifically
       if (agent === "morphmap/leaf-worker" && result?.ok && task) {
         const leafName = extractLeafName(task);
         state.lastLeafCompletion = { turn: state.turnCount, leaf: leafName ?? "unknown" };
         state.pendingIntercomCheck = true;
+      }
 
-        // Capture telemetry: token usage + cost from pi runtime (delta from pre-spawn)
-        const model = event.input?.model as string || "unknown";
-        const thinking = event.input?.thinking as string || "off";
+      // Telemetry: capture for ALL morphmap agents
+      if (agent && agent.startsWith("morphmap/") && result?.ok) {
+        const agentName = agent.replace("morphmap/", "");
+        const taskLabel = extractTaskLabel(task || "");
         const postTokensIn = parseInt(process.env.PI_RUN_TOKENS_IN || "0", 10);
         const postTokensOut = parseInt(process.env.PI_RUN_TOKENS_OUT || "0", 10);
         const postCost = parseFloat(process.env.PI_RUN_ESTIMATED_COST || "0");
@@ -273,7 +283,7 @@ export default function (pi: ExtensionAPI) {
         
         try {
           const { execSync } = await import("node:child_process");
-          const entry = `- ${today()}: [telemetry] leaf-result: agent=morphmap/leaf-worker leaf=${leafName ?? "?"} model=${model} thinking=${thinking} tokens-in=${deltaIn} tokens-out=${deltaOut} cost=\$${deltaCost} result=✅`;
+          const entry = `- ${today()}: [telemetry] agent-result: agent=morphmap/${agentName} task=${taskLabel} model=${model} thinking=${thinking} tokens-in=${deltaIn} tokens-out=${deltaOut} cost=\$${deltaCost} result=✅`;
           execSync(`echo "${entry}" >> .morphmap/morphmap.mindmap.md`, { stdio: "pipe" });
         } catch {
           // Silent
@@ -372,6 +382,24 @@ function extractLeafName(task: string): string | null {
   // Task format: "Implement <leaf-name> against .spec <path>."
   const match = task.match(/^Implement\s+(.+?)\s+against/i);
   return match ? match[1].trim() : null;
+}
+
+function extractTaskLabel(task: string): string {
+  // Extract a short label from any agent task string
+  // leaf-worker: "Implement <leaf> against .spec <path>"
+  const leafMatch = task.match(/^Implement\s+(.+?)\s+against/i);
+  if (leafMatch) return leafMatch[1].trim();
+  // reviewer: "Mechanical review:" or "Integration review of <name>"
+  const reviewMatch = task.match(/(?:Mechanical review|Integration review|Review|Quality review)[^:]*:\s*(.+)/i);
+  if (reviewMatch) return reviewMatch[1].trim();
+  // branch-agent: "Own <heading> subtree"
+  const branchMatch = task.match(/Own\s+(.+?)\s+subtree/i);
+  if (branchMatch) return branchMatch[1].trim();
+  // scout/researcher: "Recon <area>" or "Research <topic>"
+  const reconMatch = task.match(/(?:Recon|Research|Scout)\s+(.+)/i);
+  if (reconMatch) return reconMatch[1].trim();
+  // Fallback: first 60 chars
+  return task.slice(0, 60).replace(/\n/g, " ");
 }
 
 function extractError(event: any): string {

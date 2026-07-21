@@ -328,9 +328,9 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 - Never hallucinate tools — use only tools in available list.
 - Log skill usage: after spawning leaf-worker, quality-reviewer, reviewer, or sub-branch agent, add to `## decisions`:
   `- <today>: [skill] morphmap/<agent> used for <leaf/sub-branch> · outcome: ✅/❌/🔄/APPROVED/CHANGES_REQUESTED`
-- Log telemetry: after leaf completion or WORKER_BLOCKER, add machine-readable entry:
-  `- <today>: [telemetry] leaf-result: agent=morphmap/<agent> leaf=<leaf-path> model=<X> thinking=<Y> expected-model=<Z> result=<✅❌🔄> duration=<s> retries=<N>`
-  Categories: leaf-result, spec-quality, model-fit, classification, eta-drift
+- Log telemetry: after any subagent completes, add machine-readable entry:
+  `- <today>: [telemetry] agent-result: agent=morphmap/<agent> task=<label> model=<X> thinking=<Y> tokens-in=<N> tokens-out=<N> cost=$<N> result=<✅❌🔄>`
+  Categories: agent-result (all), tool-failure, improve-trigger
 
 ## Write Guard
 Before any write/edit: (1) Adds value not already in context? (2) Self-contained for next agent? (3) Right file path?
