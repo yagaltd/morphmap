@@ -298,6 +298,7 @@ function extractError(event: any): string {
   if (result?.error) return String(result.error);
   if (result?.stderr) return String(result.stderr);
   if (result?.message) return String(result.message);
+  if (result === undefined || result === null) return "unknown error (no result)";
   return JSON.stringify(result).slice(0, 500);
 }
 
