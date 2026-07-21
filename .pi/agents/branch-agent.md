@@ -318,6 +318,13 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 - Prefer sandboxed execution over raw file reads for large outputs.
 - Search indexed knowledge before asking human.
 - Tree is living — restructure when leaf proves too big or too small.
+- **>5 items threshold:** Any heading with >5 direct children must be restructured into sub-branches.
+  Applies to [module], [feature], AND [log] branches (decisions, releases, skills docs).
+  If `## decisions` has >5 entries under one date, group by tag into `####` sub-branches.
+- **Map write protocol:** After EVERY write to .morphmap/morphmap.mindmap.md:
+  1. Run `npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open`
+  2. Run `git add -A && git commit -m "<what changed and why>"`
+  Map edits are always meaningful. Git IS the history. HTML must stay in sync with markdown.
 - Never hallucinate tools — use only tools in available list.
 - Log skill usage: after spawning leaf-worker, quality-reviewer, reviewer, or sub-branch agent, add to `## decisions`:
   `- <today>: [skill] morphmap/<agent> used for <leaf/sub-branch> · outcome: ✅/❌/🔄/APPROVED/CHANGES_REQUESTED`
