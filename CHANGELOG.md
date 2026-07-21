@@ -2,6 +2,24 @@
 
 All notable changes to MorphMap.
 
+## [Unreleased]
+
+### Added
+- Unified OKF handoff format: `type: handoff`, `version`, `timestamp`, `status` lifecycle (raw→distilled→stale)
+- All agent outputs now write versioned OKF handoff files (scout, researcher, quality-reviewer, reviewer/integration)
+- Quality reviewer wired into branch agent execution loop (step 7d)
+- Integration reviewer wired into branch agent execution loop (step 8, quality=strict)
+- Quality pipeline posture gates: fast=self-verify only, standard=+quality-review, strict=+integration-review
+
+### Changed
+- Researcher agent: added OKF frontmatter (was missing entirely)
+- Reviewer agent: integration mode now writes OKF handoff file instead of inline output
+- Quality reviewer agent: output format upgraded to OKF handoff file with versioning
+- Scout agent: frontmatter updated to unified OKF format with type/version/timestamp
+- Branch agent: execution loop expanded from 9 to 10 steps with quality + integration review
+- Execution flow doc: updated quality loop diagram with posture gates and handoff file paths
+- Format spec: expanded handoff file section with agent types table and status lifecycle
+
 ## [0.2.0] — 2026-07-20
 
 ### Added

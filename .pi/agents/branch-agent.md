@@ -53,9 +53,35 @@ Only process branches tagged [module] or [feature]. Skip [phase], [log], or unkn
 4. Assign model/reasoning per bottleneck tag (read leaf profiles from .morphmap/config)
 5. Spawn leaf worker: subagent({ agent: "morphmap/leaf-worker", model: x, thinking: y, task: "..." })
 6. On WORKER_BLOCKER → resolvable? → update spec/tree → retry. Cross-cutting? → escalate to Root
-7. On leaf ✅: update map, signal dependents, index decision. Log cost/duration.
-8. If leaf impacts other branches → notify affected branches via intercom
-9. Repeat until branch done or all leaves blocked
+7. On leaf ✅:
+   a. Update map (status, cost, duration)
+   b. Signal dependents via intercom
+   c. Index domain decision
+   d. **Quality review** (quality=standard or strict): assign quality-review ID and spawn:
+      ```bash
+      ls .morphmap/quality-review-*.md 2>/dev/null | wc -l
+      ```
+      subagent({ agent: "morphmap/quality-reviewer",
+        task: "Review leaf <leaf-path>. Write to .morphmap/quality-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
+        context: "fresh" })
+      If CHANGES_REQUESTED with P0/P1: spawn leaf worker to fix → re-verify.
+      If APPROVED or P2/P3 only: proceed.
+      Update map's ## context branch with file reference.
+      Log: `- <today>: [skill] morphmap/quality-reviewer used for <leaf> · outcome: <APPROVED/CHANGES_REQUESTED>`
+   e. If quality=fast: skip quality reviewer (self-verify only)
+8. After all leaves in sub-branch ✅ AND quality reviews pass:
+   If quality=strict: assign integration-review ID and spawn:
+   ```bash
+   ls .morphmap/integration-review-*.md 2>/dev/null | wc -l
+   ```
+   subagent({ agent: "morphmap/reviewer",
+     task: "Integration review of sub-branch <name> (N leaves: ...). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
+     context: "fresh" })
+   If integration issues: spawn leaf workers to fix → re-verify affected leaves.
+   Update map's ## context branch with file reference.
+   Log: `- <today>: [skill] morphmap/reviewer (integration) used for <sub-branch> · outcome: <pass/fail>`
+9. If leaf impacts other branches → notify via intercom
+10. Repeat until branch done or all leaves blocked
 
 ## On Leaf Failure — 5-Why Root Cause
   create_goal({
@@ -71,8 +97,8 @@ Only process branches tagged [module] or [feature]. Skip [phase], [log], or unkn
 - Search indexed knowledge before asking human.
 - Tree is living — restructure when leaf proves too big or too small.
 - Never hallucinate tools — use only tools in available list.
-- Log skill usage: after spawning leaf-worker or reviewer, add to `## decisions`:
-  `- <today>: [skill] morphmap/<agent> used for <leaf> · outcome: ✅/❌/🔄`
+- Log skill usage: after spawning leaf-worker, quality-reviewer, or reviewer, add to `## decisions`:
+  `- <today>: [skill] morphmap/<agent> used for <leaf/sub-branch> · outcome: ✅/❌/🔄/APPROVED/CHANGES_REQUESTED`
 - Log telemetry: after leaf completion or WORKER_BLOCKER, add machine-readable entry:
   `- <today>: [telemetry] <category>: retries=<N> model=<X> thinking=<Y> result=<Z>`
   Categories: leaf-result, spec-quality, model-fit, classification, eta-drift

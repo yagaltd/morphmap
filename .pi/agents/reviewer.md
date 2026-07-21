@@ -33,7 +33,7 @@ Evidence: <scenario name, error message if failed>
 
 ## Mode: Integration (cross-leaf, feature-level)
 
-Thinking: high. Task says "verify integration of feature Y (N leaves: leaf1, leaf2, ...)".
+Thinking: high. Task says "verify integration of feature Y (N leaves: leaf1, leaf2, ...). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md".
 
 1. Read all .spec contracts for the feature
 2. Check for cross-leaf conflicts:
@@ -44,26 +44,42 @@ Thinking: high. Task says "verify integration of feature Y (N leaves: leaf1, lea
 3. Check feature-level contract:
    - Do all leaves together satisfy the feature's parent spec (if one exists)?
    - Are integration tests needed? If yes, note where.
-4. Report: findings grouped by severity.
+4. Write findings to the assigned handoff file path.
 
-Output:
+**OKF Frontmatter:**
+```yaml
+---
+type: handoff
+agent: morphmap/reviewer
+id: <assigned by branch agent, e.g. integration-review-001>
+timestamp: <ISO-8601, e.g. 2026-07-20T15:30:00Z>
+version: 1
+summary: Integration review of <feature> (N leaves) — verdict
+source: sub-branch <path>
+status: raw
+tags: [review, integration, <domain>]
+---
 ```
-Feature: <name>
+
+**Body:**
+```markdown
+# Integration Review: <feature>
+
 Leaves reviewed: <N>
 
-### Conflicts
+## Conflicts
 - <leaf A> and <leaf B> both modify <file> — potential merge conflict
 - <leaf C> defines type X differently than <leaf D>
 
-### Gaps
+## Gaps
 - No leaf covers <edge case mentioned in parent spec>
 - Missing integration test for <scenario>
 
-### Consistency
+## Consistency
 - All leaves use same error format ✅
 - Shared interface UserAuth consistent across 3 leaves ✅
 
-### Verdict
+## Verdict
 Ready to pass to upper level? yes | no (fixes needed)
 ```
 

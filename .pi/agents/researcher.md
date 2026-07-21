@@ -35,8 +35,26 @@ Search angles:
 - practical experience or benchmark query
 - recent developments query (time-sensitive topics)
 
-## Output Format
+## Output: OKF Handoff File
 
+Write to the path provided in your task (e.g., `.morphmap/researcher-001-20260720-auth-patterns.md`).
+
+**OKF Frontmatter:**
+```yaml
+---
+type: handoff
+agent: morphmap/researcher
+id: <assigned by orchestrator, e.g. researcher-001>
+timestamp: <ISO-8601, e.g. 2026-07-20T14:30:00Z>
+version: 1
+summary: One-line research question and answer
+source: <the /morphmap-plan directive or leaf>
+status: raw
+tags: [research, <topic>, <domain>]
+---
+```
+
+**Body:**
 ```markdown
 # Research: <topic>
 

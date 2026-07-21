@@ -53,10 +53,28 @@ Exclude: speculative findings, style preferences, optional refactors without nea
 - **[P2]** — Normal. Fix eventually.
 - **[P3]** — Low. Nice to have.
 
-## Output Format
+## Output: OKF Handoff File
 
+Write to the path provided in your task (e.g., `.morphmap/quality-review-001-20260720-login-form.md`).
+
+**OKF Frontmatter:**
+```yaml
+---
+type: handoff
+agent: morphmap/quality-reviewer
+id: <assigned by branch agent, e.g. quality-review-001>
+timestamp: <ISO-8601, e.g. 2026-07-20T15:00:00Z>
+version: 1
+summary: Quality review of <leaf> — APPROVED or CHANGES_REQUESTED (N findings)
+source: leaf <branch/leaf-path>
+status: raw
+tags: [review, quality, <domain>]
+---
 ```
-## Quality Review: APPROVED / CHANGES_REQUESTED
+
+**Body:**
+```markdown
+# Quality Review: APPROVED / CHANGES_REQUESTED
 
 ### Findings
 - [P1] `src/file.ts:42` — <description with evidence>

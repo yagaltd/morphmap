@@ -103,6 +103,20 @@ resource: index.md
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
 
+### quality pipeline (per leaf)
+- leaf-worker: implements .spec → TDD → agent-spec lifecycle (self-verify)
+- reviewer (mechanical): agent-spec lifecycle + tdd-guard → pass/fail (inline output)
+- quality-reviewer (judgment): simplicity, security, error handling → OKF handoff file (quality-review-NNN)
+- reviewer (integration): cross-leaf conflicts, gaps, consistency → OKF handoff file (integration-review-NNN)
+- branch-agent: aggregates all reviews, spawns fixes for P0/P1, updates map
+
+### handoff file types (all OKF frontmatter)
+- scout-NNN: recon findings → .morphmap/scout-NNN-YYYYMMDD-slug.md
+- researcher-NNN: research brief → .morphmap/researcher-NNN-YYYYMMDD-slug.md
+- quality-review-NNN: quality verdict → .morphmap/quality-review-NNN-YYYYMMDD-slug.md
+- integration-review-NNN: integration verdict → .morphmap/integration-review-NNN-YYYYMMDD-slug.md
+- context-builder-NNN: domain glossary → .morphmap/CONTEXT.md (persistent, not versioned)
+
 ### leaf format tags (for markmap rendering)
 - [link] → leaf points to a file (spec, doc, ADR)
 - [table] → leaf produces tabular data
@@ -125,6 +139,16 @@ resource: index.md
 - Feeds /morphmap-improve cross-project analysis
 
 ## decisions ⬜ [log]
+
+### 2026-07-21
+- [spec] OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
+- [spec] All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
+- [spec] quality reviewer now spawned by branch agent in execution loop step 7d
+- [spec] integration reviewer spawned by branch agent after sub-branch completes (step 8, quality=strict)
+- [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → integration-review → branch-agent
+- [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
+- [learn] quality-reviewer was defined but unwired — now in execution loop
+- [learn] researcher agent had no OKF frontmatter at all — now has unified format
 
 ### 2026-07-20
 - [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally

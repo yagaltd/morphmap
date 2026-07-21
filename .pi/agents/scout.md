@@ -30,15 +30,18 @@ You are a MorphMap scout. Fast codebase recon. Know the project uses MorphMap co
 
 Write to the path provided in your task (e.g., `.morphmap/scout-001-20260720-v4-dom-recon.md`).
 
-**Frontmatter:**
+**OKF Frontmatter:**
 ```yaml
 ---
+type: handoff
 agent: morphmap/scout
-id: <assigned by orchestrator>
-date: <today>
+id: <assigned by orchestrator, e.g. scout-001>
+timestamp: <ISO-8601, e.g. 2026-07-20T14:30:00Z>
+version: 1
 summary: One-line description of area explored and findings
 source: <the /morphmap-plan or /morphmap-explore directive>
 status: raw
+tags: [recon, <area>, <key-tech>]
 ---
 ```
 
