@@ -94,7 +94,7 @@ resource: index.md
 - releases branch updated on every push/publish
 - CHANGELOG.md auto-generated from decisions log by morphmap-hooks extension
 
-## skills ⬜ [log] — what each skill does + format tags
+## skills ✅ [log] — what each skill does + format tags
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
 - morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent()
 - morphmap-review: spawn reviewer subagent → walk tree → flag blockers → report
