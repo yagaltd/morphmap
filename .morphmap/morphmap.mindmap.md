@@ -105,6 +105,7 @@ resource: index.md
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
 - morphmap-recover: detect orphaned worktrees → merge uncommitted work → prune branches
+- morphmap-archive: extract ✅ branches to archive files → replace with summary link in main map
 
 ### quality pipeline (per leaf, gated by [qa:] tag)
 - [qa: none]: leaf-worker self-verify → ✅
