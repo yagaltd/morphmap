@@ -58,9 +58,17 @@ Exclude: speculative findings, style preferences, optional refactors without nea
 - **[P2]** — Normal. Fix eventually.
 - **[P3]** — Low. Nice to have.
 
-## Output: OKF Handoff File
+## Output: Handoff File
 
-Write to the path provided in your task (e.g., `.morphmap/quality-review-001-20260720-login-form.md`).
+Write to the path provided in your task.
+
+**If no path provided, assign one yourself:**
+```bash
+ls .morphmap/quality-review-*.md 2>/dev/null | wc -l
+# → next ID = count + 1, write to .morphmap/quality-review-<NNN>-<YYYYMMDD>-<slug>.md
+```
+
+**File extension is ALWAYS `.md` — never `.okf` or anything else.** OKF is a frontmatter format, not a file extension.
 
 **OKF Frontmatter:**
 ```yaml
