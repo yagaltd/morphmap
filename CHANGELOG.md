@@ -1,83 +1,50 @@
 # Changelog
 
-All notable changes to MorphMap.
+All notable changes to MorphMap. Auto-generated from .morphmap/morphmap.mindmap.md.
 
 ## [Unreleased]
 
 ### Added
-- New leaf tags: `[qa: none|review|full]` (per-leaf quality), `[test: unit|property-based|snapshot|integration|e2e]` (testing strategy), `[skill: <name>]` (audit trail), `[human]` (human-managed leaf)
-- Recursive branch agent spawning: same agent type at any depth (##, ###, ####), 5-dimension context injection
-- Available skills cache (`.morphmap/available-skills.md`): scan-once, grouped by domain, regenerated on staleness
-- Skills loaded before .spec creation: constraints extracted into Boundaries section, preventing bugs instead of catching them
-- Mechanical reviewer wired into execution loop (was defined but never spawned)
-- Goal completion gate: 6 mechanical bash checks before `update_goal complete` (pending leaves, missing .specs, unresolved deps, missing reviews, pending sub-branches)
-- Parent scope check: parent reviews child sub-branch output against own scope declaration
-- Branch-level integration review after all sub-branches report ✅ (quality=strict)
-- Leaf worker: `[test:]` tag awareness, `[human]` tag skip
-- Quality reviewer: boundaries compliance check against .spec
+- new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]
+- recursive branch agent spawning: same agent at any depth (L1-L3), 5-dimension context injection
+- quality architecture: skills loaded before .spec via available-skills.md cache, constraints extracted into Boundaries
+- mechanical reviewer wired into execution loop (was defined but never spawned)
+- per-leaf [qa:] override — branch agent assigns tag, not blind posture inheritance
+- goal completion gate: 6 mechanical checks before update_goal complete
+- available-skills.md cache: generated at init/delegate, read by all branch agents
+- agent freezing: .morphmap/agents/ copy during init, agentPaths in pi-subagents config
+- --update-agents flag: refresh frozen agents with git diff review
+- improve skill: agent edit targets .morphmap/agents/ (user project) or .pi/agents/ (dogfooding), never global install
+- leaf worker: [test:] tag awareness, [human] tag skip
+- quality reviewer: boundaries compliance check against .spec
+- delegate skill: depth-agnostic spawning for all heading levels
+- init skill: available-skills.md generation at scaffold
+- execution flow doc: updated quality loop with per-leaf [qa:] gating
 
 ### Changed
-- Branch agent: execution loop rewritten (13 steps with recursion, per-leaf QA, skill loading, goal gate)
-- Delegate skill: depth-agnostic spawning for all heading levels + available-skills regeneration
-- Init skill: available-skills.md generation + agent freezing (.morphmap/agents/) + --update-agents flag
-- Improve skill: agent edit target priority (project-local first, never global)
-- Leaf worker: testing strategy section added, posture rules updated
-- Quality reviewer: "What to Check" expanded with boundaries compliance, output format updated
-- README: Agent Versioning section added, project structure updated
-- Execution flow doc: quality loop rewritten with per-leaf `[qa:]` gating
-- Format spec: Tags table expanded, leaf format updated, Per-Leaf Quality Tags section added
-- Plan skill: added Phase 0 goal creation for bounded planning sessions
-- Execution flow doc: updated quality loop with bug-hunter step and posture gates
-- Format spec: expanded handoff file section with agent types table and status lifecycle
+- OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
+- All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
+- quality reviewer now spawned by branch agent in execution loop step 7d
+- integration reviewer spawned by branch agent after sub-branch completes (step 8, quality=strict)
+- bug-hunter added as posture-gated step: quality=strict + 🔴/🟡 leaves only (step 7f)
+- quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → bug-hunter (adversarial, optional) → integration-review → branch-agent
 
 ## [0.2.0] — 2026-07-20
 
-### Added
-- Roadmap: v1.0 (now), v2.0 (brownfield, multi-repo, evalt), v3.0 (CognitiveOS, telemetry)
-- 5 MorphMap-owned subagents: branch-agent, leaf-worker, reviewer, scout, researcher
-- 9 slash commands with 8 skills: plan, delegate, review, amend, triage, improve, init, render, status
-- Task profiles for dynamic model assignment per domain (build-backend, build-frontend, etc.)
-- PDSA Study loop (`/morphmap-improve`): reads decisions+git+vcc_recall, detects patterns, proposes improvements
-- Skill usage logging: `[skill] <name>` entries in decisions log
-- Write Guard: 3-question self-reflection before any file write
-- Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits
-- Context Budget rule: compact if >40% full
-- `## skills` branch for map self-documentation
-- `## releases` branch for version tracking
-- Map and config now tracked in git (single source of truth)
-
 ### Changed
-- Root Orchestrator = main session (AGENTS.md loaded at startup), not a subagent
-- Orchestrator model: flash → pro (needs medium-high reasoning for intent understanding + synthesis)
-- Agent discovery: `.pi/agents/` convention (pi-subagents standard)
-- Reviewer: two modes (mechanical with tdd-guard layer, integration for cross-leaf)
-- Plan Phase 3: uses grill-for-unknowns skill (one question/turn, blast radius order)
-- .spec template: added Verifiable by Human + Delegated to Implementer sections
-- Classification: 4-tier forced choice (very good/good/bad/very bad) replaces fake confidence numbers
-- Status markers now have defined transition rules (⬜→🔄→✅)
-- All 9 commands e2e tested + documented
-- Tool procedures documented: when to use agent-spec, tdd-guard, evalt
-- .evalt/ test suite added (3 tests for scout, researcher, branch-agent)
+- v1 design decisions finalized
+- adopted OKF format for all knowledge documents
+- verified stack: pi-workflows NOT installed, pi-dynamic-wf removed
+- renamed project to MorphMap
+- git init, first commit
+- 4-tier forced choice replaces fake confidence numbers
+- end-to-end test: all 5 agents spawned + executed
 
 ### Fixed
-- Researcher: web_search unavailable → uses bash+curl
-- Branch-agent: agent-spec unavailable → uses bash (CLI needs shell)
-- Hallucination prevention: .morphmap/config `available` section + verified tool list
-- Model hardcoding removed from all prompts and agents
-- Stale `/mindmap-*` references cleaned
-- Kanban accurately reflects file existence (not testing status)
-
-## [0.1.0] — 2026-07-19
-
-### Added
-- Initial release
-- Format specification (`.mindmap.md` markmap-compatible)
-- Agent architecture (Root Orchestrator, Branch Agent, Leaf Worker)
-- 6 reference specification documents
-- MorphEditor example mindmap
-- OKF conformance for all reference docs
-- Push/Pull execution model with Theory of Constraints
-- 8 intercom message types
-- KPI tracking per level
-- Status markers (⬜🔄✅❌🔴)
-- External references (nodes link to any document type)
+- Root Orchestrator context at 40%+ caused drift — edited config unilaterally
+- Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits
+- Context Budget: check ctx_stats every 10 turns, compact if >40%
+- Write Guard added "Discussed?" check + violation logging
+- ## skills branch added to map — documents each skill's phases
+- skill usage logging: [skill] entries feed /morphmap-improve Phase 2
+- map write protocol: commit + render HTML after every map edit — agent rule + git hook
