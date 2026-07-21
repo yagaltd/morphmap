@@ -134,6 +134,20 @@ export default function (pi: ExtensionAPI) {
             };
           }
         }
+
+        // Model check: warn if cheap model used for risky/blocking leaf
+        const model = event.input?.model as string | undefined;
+        if (model && task) {
+          const bottleneck = extractBottleneck(task);
+          const isFlash = model.includes("flash");
+          if (isFlash && (bottleneck === "🔴" || bottleneck === "🟡")) {
+            pi.ui?.notify({
+              title: "MorphMap: model mismatch",
+              body: `Leaf needs ${bottleneck === "🔴" ? "strongest" : "pro"} model but spawned with ${model}. Config says: blocking→claude-sonnet-4, risky→deepseek-v4-pro.`,
+              style: "warning",
+            });
+          }
+        }
       }
     }
 
@@ -312,6 +326,12 @@ function isMindmapFile(path: string): boolean {
 
 function extractSpecPath(task: string): string | null {
   const match = task.match(/\.spec\s+(\S+\.spec)/);
+  return match ? match[1] : null;
+}
+
+function extractBottleneck(task: string): string | null {
+  // Look for bottleneck emoji in task description
+  const match = task.match(/(🔴|🟡|🔵|🟠|⚪)/);
   return match ? match[1] : null;
 }
 

@@ -11,6 +11,21 @@ Spawn branch agents via pi-subagents for autonomous leaf execution.
 Uses pi's `subagent()` tool with `agent: "morphmap/branch-agent"`.
 NOT the pi-subagents `delegate` builtin — that's a different, generic agent.
 
+## Phase 0: CRASH RECOVERY
+
+Before spawning agents, check if previous delegate was interrupted:
+
+```bash
+IN_PROGRESS=$(grep -c '🔄' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+PENDING=$(grep -c '⬜' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+```
+
+If `IN_PROGRESS > 0`:
+- Report: "Previous delegate crashed. N leaves in-progress, M pending."
+- Ask: "Resume? (y) — spawn agents for 🔄 + ⬜ leaves. (r)eset — mark 🔄 back to ⬜, start fresh."
+- If 'y': continue to Phase 1. Branch agents verify actual state before re-spawning.
+- If 'r': mark all 🔄 back to ⬜ in map. Continue to Phase 1.
+
 ## Phase 1: CACHE CHECK
 
 Before reading the map, ensure the available-skills cache is fresh.
