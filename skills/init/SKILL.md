@@ -119,15 +119,23 @@ Copy MorphMap agent definitions into `.morphmap/agents/` so they're git-tracked:
 ```bash
 mkdir -p .morphmap/agents
 
-# Copy agents from global install
+# Primary: copy from global install
 if [ -d ~/.pi/agent/agents/morphmap ]; then
-  cp ~/.pi/agent/agents/morphmap/*.md .morphmap/agents/
-elif [ -d .pi/agents ]; then
-  # Fallback: MorphMap dogfooding itself (source repo)
-  cp .pi/agents/*.md .morphmap/agents/
+  cp ~/.pi/agent/agents/morphmap/*.md .morphmap/agents/ 2>/dev/null
 fi
 
-echo "Agents frozen to .morphmap/agents/"
+# Merge: also copy from .pi/agents/ (source repo, may have extras like quality-reviewer)
+if [ -d .pi/agents ]; then
+  cp .pi/agents/*.md .morphmap/agents/ 2>/dev/null
+fi
+
+# Verify: expected 7 agents (branch-agent, leaf-worker, reviewer, scout, researcher, quality-reviewer, context-builder)
+AGENT_COUNT=$(ls .morphmap/agents/*.md 2>/dev/null | wc -l)
+if [ "$AGENT_COUNT" -lt 5 ]; then
+  echo "⚠ Only $AGENT_COUNT agents frozen (expected at least 5). Check global install."
+else
+  echo "✓ $AGENT_COUNT agents frozen to .morphmap/agents/"
+fi
 ```
 
 **Why:** Agents are the "compiler" for your project. Changing agents changes
