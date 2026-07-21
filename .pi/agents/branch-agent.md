@@ -237,25 +237,31 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
    f. **Skip all reviews** if `[qa: none]`: leaf worker self-verify only.
 
 8. **Integration review** (after all direct children complete):
-   - If quality=strict AND I have sub-branches:
+   
+   **quality=strict:** Full integration review (spawn reviewer with full functional verification — bombadil, lonkero, health check).
+   - If I have sub-branches:
      Spawn integration reviewer for ALL sub-branches (cross-sub-branch):
      ```
      subagent({
        agent: "morphmap/reviewer",
-       task: "Integration review of <branch-name> (N sub-branches: ...). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
+       task: "Integration review of <branch-name> (N sub-branches: ...). Run full functional verification (bombadil + lonkero + health check). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
        context: "fresh"
      })
      ```
-   - If quality=strict AND I only have direct leaves:
+   - If I only have direct leaves:
      Spawn integration reviewer for those leaves (cross-leaf):
      ```
      subagent({
        agent: "morphmap/reviewer",
-       task: "Integration review of <sub-branch> (N leaves: ...). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
+       task: "Integration review of <sub-branch> (N leaves: ...). Run full functional verification (bombadil + lonkero + health check). Write to .morphmap/integration-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
        context: "fresh"
      })
      ```
-   - If quality≠strict: skip integration review.
+   
+   **quality=fast (default):** Lite integration — health check + build/tests only. Skip bombadil exploration, skip lonkero. Minimum: verify the app starts and responds.
+   - Same spawn as above but task says: "Lite integration review. Run health check + npm test + npm run build. Skip bombadil exploration."
+   
+   **quality=none:** Skip integration review entirely.
    
    Update map's `## context` branch with file reference.
    Log: `- <today>: [skill] morphmap/reviewer (integration) used for <branch/sub-branch> · outcome: <pass/fail>`
@@ -311,11 +317,11 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
     QA_FILES=$(ls .morphmap/quality-review-*.md 2>/dev/null | wc -l)
     [ "$QA_FULL" -gt 0 ] && [ "$QA_FILES" -eq 0 ] && { echo "FAIL: quality-review files missing."; FAILS=$((FAILS + 1)); }
     
-    # f. Integration review present? (quality=strict)
-    [ "$QUALITY" = "strict" ] && {
+    # f. Integration review present? (only if quality≠none)
+    if [ "$QUALITY" != "none" ]; then
       INTEG=$(ls -t .morphmap/integration-review-*.md 2>/dev/null | head -1)
       [ -z "$INTEG" ] && { echo "FAIL: integration review missing."; FAILS=$((FAILS + 1)); }
-    }
+    fi
     
     # Verdict
     if [ "$FAILS" -eq 0 ]; then

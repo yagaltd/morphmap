@@ -44,7 +44,40 @@ Thinking: high. Task says "verify integration of feature Y (N leaves: leaf1, lea
 3. Check feature-level contract:
    - Do all leaves together satisfy the feature's parent spec (if one exists)?
    - Are integration tests needed? If yes, note where.
-4. Write findings to the assigned handoff file path.
+4. **Run project toolchain** (deterministic, always):
+   ```bash
+   npm test && npm run build
+   ```
+   If fail → report with exact error output.
+5. **Functional verification** (choose based on project type):
+   ```bash
+   # Start app
+   npm run dev &>/tmp/morphmap-dev.log &
+   DEV_PID=$!
+   sleep 5  # wait for server
+   
+   # Basic health check
+   curl -s -o /dev/null -w "%{http_code}" http://localhost:5173 2>/dev/null || echo "UNREACHABLE"
+   
+   # If bombadil spec exists → run property-based browser tests
+   if [ -f "spec.bombadil" ]; then
+     bombadil browser test spec.bombadil 2>&1
+     BOMBADIL_EXIT=$?
+   fi
+   
+   # If lonkero installed → security scan
+   if which lonkero &>/dev/null; then
+     lonkero scan http://localhost:5173 --quick 2>&1
+   fi
+   
+   # Cleanup
+   kill $DEV_PID 2>/dev/null
+   ```
+   - Bombadil exit code 0 = pass, 2 = property violation → report FAIL
+   - Lonkero: any HIGH/CRITICAL → report FAIL
+   - Health check fails (UNREACHABLE, 5xx) → report FAIL
+   - If no bombadil/no lonkero: basic health check is the minimum
+6. Write findings to the assigned handoff file path.
 
 **OKF Frontmatter:**
 ```yaml
@@ -81,6 +114,13 @@ Leaves reviewed: <N>
 
 ## Verdict
 Ready to pass to upper level? yes | no (fixes needed)
+
+## Functional Verification
+- Health check: <pass/fail — URL reachable? status code?>
+- Bombadil: <pass/fail/N/A — N properties checked, M violations>
+- Lonkero: <pass/fail/N/A — N vulnerabilities found>
+- Build: <pass/fail>
+- Tests: <pass/fail — N passed, M failed>
 ```
 
 ## Rules

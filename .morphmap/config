@@ -3,7 +3,7 @@
 
 available:
   extensions: [pi-subagents, pi-intercom, context-mode, pi-codex-goal]
-  cli: [agent-spec, markmap-cli]
+  cli: [agent-spec, markmap-cli, bombadil, lonkero, deathcore]
   builtin: [/goal, vcc_recall]
   verified-at: 2026-07-19
 
