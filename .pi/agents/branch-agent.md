@@ -95,11 +95,16 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 2. **Search indexed knowledge** for recent decisions affecting this leaf domain
 
 3. **Write .spec if missing:**
-   a. **Identify domain:** Match leaf path and parent scope against `.morphmap/available-skills.md` domains.
+   a. **Identify domain + tools:** Match leaf path and parent scope against `.morphmap/available-skills.md`.
       - `.ts`/`.js`/`.html`/`.css` → web-frontend
       - `.rs` → rust
       - `auth`/`payment`/`token` → security
       - `css`/`style`/`theme` → design
+      - If leaf has `[test:]` tag → check available tools in cache:
+        - `[test: e2e]` → look for playwriter, playwright, agent-browser in `## tools`
+        - `[test: unit]` → vitest, jest are sufficient
+        - `[test: integration]` → vitest + jsdom or playwright
+        - Assign specific tool in the leaf's task context so leaf worker doesn't guess
    b. **Load relevant skills:** Read matching SKILL.md files, extract constraints.
       Example: `modern-web-guidance` → "DO NOT use innerHTML. Use textContent or createElement."
    c. **Assign tags per decision matrices:**
@@ -147,10 +152,15 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
       ```
       Append format tags: `[link]` for file refs, `[table]` for data, `[code]` for blocks, `[checkbox]` for tasks.
 
-4. **Assign model/reasoning** per bottleneck tag + quality level:
-   - `[qa: full]` → strongest model for BLOCKING/RISKY leaves
-   - `[qa: none]` → cheapest model for trivial leaves
-   - Read leaf profiles from `.morphmap/config`.
+4. **Assign model/reasoning** per bottleneck tag + quality level + task type:
+   - For test leaves: use `testProfiles` from config (test-unit, test-integration, test-e2e, test-property, test-snapshot)
+     - `[test: e2e]` → vision-capable model (zai/glm-5.2), high thinking
+     - `[test: unit]` → cheapest text model, off thinking
+     - `[test: integration]` → pro model, high thinking
+   - For non-test leaves: use `leafProfiles` from config
+     - `[qa: full]` → strongest model for BLOCKING/RISKY leaves
+     - `[qa: none]` → cheapest model for trivial leaves
+   - Never assign a text-only model to a UI/E2E test leaf
 
 5. **Spawn leaf worker:**
    ```
@@ -162,6 +172,7 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
             Context from orchestrator: phase=<X>, compat=<Y>, scope=<Z>,
             quality=<W>, budget=<V>.
             Test strategy: <from [test:] tag>.
+            Available test tools: <from available-skills.md ## tools — use these, don't guess>.
             .spec file: <path>.
             Allowed changes: <from Boundaries>.",
      context: "fresh"
