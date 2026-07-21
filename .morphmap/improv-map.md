@@ -308,17 +308,22 @@ Skills like `modern-web-guidance` exist but are never consulted during .spec cre
 3. If no .spec exists for leaf:
    a. Identify domain:
       - Check leaf path, parent scope, bottleneck tag
-      - web frontend? → load modern-web-guidance
-      - Rust? → load coding-guidelines
-      - Cloud/deploy? → load cloudflare or domain-cloud-native
-      - Generic → skip skill loading
+      - Match against .morphmap/available-skills.md groupings
+      - web-frontend? → load modern-web-guidance, waapi, css-animations
+      - rust? → load coding-guidelines, rust-router, domain-web, m11-ecosystem
+      - security? → load bug-hunter
+      - design? → load hallmark, imagegen-frontend-web
+      - cloud? → load cloudflare, workers-best-practices, wrangler
+      - No match → skip skill loading
    
    b. Load skill (if domain match):
       Read skill file, extract constraints into list:
         modern-web-guidance → "DO NOT use innerHTML. Use textContent or createElement."
-        modern-web-guidance → "DO NOT use document.write."
-        modern-web-guidance → "Prefer <dialog> over custom modals."
         coding-guidelines → "Use async/await, not raw .then() chains."
+        waapi → "Use element.animate(), not jQuery animation."
+   
+   c. Skill matching is via .morphmap/available-skills.md cache (see §10).
+      One scan at delegate time, read by all branch agents. Zero per-leaf cost.
    
    c. Assign tags per decision matrices:
       [qa: none|review|full] — see §2.2
@@ -529,15 +534,19 @@ The branch-level integration review runs only when quality=strict AND branch has
 | # | File | Changes |
 |---|------|---------|
 | 1 | `docs/format-spec.md` | New tags table entries. Updated leaf format. Updated OKF frontmatter fields. |
-| 2 | `.pi/agents/branch-agent.md` | Full execution loop rewrite (steps 0-12). Skill loading logic. Tag assignment matrices. Recursive spawning. Parent scope check. |
+| 2 | `.pi/agents/branch-agent.md` | Full execution loop rewrite (steps 0-12). Skill loading via available-skills cache. Tag assignment matrices. Recursive spawning. Parent scope check. |
 | 3 | `.pi/agents/leaf-worker.md` | Add: read [test:] tag, apply testing strategy. Skip [human] leaves. |
 | 4 | `.pi/agents/reviewer.md` | No body changes — already defined. Mechanical mode wired via branch-agent loop. |
 | 5 | `.pi/agents/quality-reviewer.md` | Add: check against .spec Boundaries section (including skill constraints). |
-| 6 | `skills/delegate/SKILL.md` | Phase 2: scan all heading levels. Phase 3: depth-agnostic task template. |
-| 7 | `skills/plan/SKILL.md` | Minor: Phase 0 goal creation already added. No further changes. |
-| 8 | `docs/execution-flow.md` | Full quality loop rewrite with [qa:] gating, skill loading, recursive spawning. |
-| 9 | `.morphmap/morphmap.mindmap.md` | Updated `## skills` section. Decision log entries. |
-| 10 | `CHANGELOG.md` | All changes documented. |
+| 6 | `skills/delegate/SKILL.md` | Phase 1: generate .morphmap/available-skills.md if stale. Phase 2: scan all heading levels. Phase 3: depth-agnostic task template. |
+| 7 | `skills/init/SKILL.md` | Phase 2: generate .morphmap/available-skills.md during scaffold. |
+| 8 | `skills/plan/SKILL.md` | Minor: Phase 0 goal creation already added. No further changes. |
+| 9 | `docs/execution-flow.md` | Full quality loop rewrite with [qa:] gating, skill loading, recursive spawning. |
+| 10 | `.morphmap/morphmap.mindmap.md` | Updated `## skills` section. Decision log entries. `## context` references. |
+| 11 | `CHANGELOG.md` | All changes documented. |
+
+New artifacts created:
+- `.morphmap/available-skills.md` — auto-generated skill cache per project (see §10)
 
 ---
 
@@ -546,18 +555,23 @@ The branch-level integration review runs only when quality=strict AND branch has
 Dependencies between changes:
 
 ```
-1. docs/format-spec.md          ← no dependencies, just documentation
-2. .pi/agents/branch-agent.md   ← depends on format spec (tags), 
-                                   depends on quality architect (logic)
-3. .pi/agents/leaf-worker.md    ← depends on format spec tags
-4. skills/delegate/SKILL.md     ← depends on branch-agent recursion
-5. .pi/agents/quality-reviewer.md ← depends on format spec boundaries
-6. docs/execution-flow.md       ← depends on all above (documentation)
-7. .morphmap/morphmap.mindmap.md ← depends on all above (documentation)
-8. CHANGELOG.md                  ← last
+1. docs/format-spec.md              ← no dependencies, just documentation
+2. .morphmap/improv-map.md          ← this file — already committed
+3. skills/init/SKILL.md             ← add available-skills.md generation (Phase 2)
+4. skills/delegate/SKILL.md         ← available-skills generation + depth-agnostic spawning
+5. .pi/agents/branch-agent.md       ← depends on format spec (tags),
+                                       depends on available-skills cache (skill loading),
+                                       depends on quality architecture (logic)
+6. .pi/agents/leaf-worker.md        ← depends on format spec tags
+7. .pi/agents/quality-reviewer.md   ← depends on format spec boundaries
+8. docs/execution-flow.md           ← depends on all above (documentation)
+9. .morphmap/morphmap.mindmap.md    ← depends on all above (documentation)
+10. CHANGELOG.md                     ← last
 ```
 
-Files 1-5 can be implemented in one commit. Files 6-8 in a second commit.
+Commit 1: files 3-5 (infrastructure: cache + delegate + branch-agent core)
+Commit 2: files 6-7 (leaf-worker + quality-reviewer updates)
+Commit 3: files 8-10 (docs + changelog)
 
 ---
 
@@ -570,3 +584,145 @@ Files 1-5 can be implemented in one commit. Files 6-8 in a second commit.
 | Skill loading adds latency to .spec creation | Only on first .spec per domain. Cache constraints for subsequent leaves. |
 | [human] leaves block branch completion | Branch agent skips them, continues other leaves. Human unblocks async. |
 | Parent scope check is vague — agent may miss gaps | Scope check is against parent's OWN scope declaration, which was written during decomposition. Not vague. |
+
+---
+
+## 10. Available Skills Cache (Option C)
+
+### 10.1 Problem
+
+Hardcoding domain→skill mappings in branch-agent is brittle. Users install/remove skills. Domains overlap (a Rust web server needs BOTH `domain-web` AND `coding-guidelines`). No way to discover skills dynamically without re-scanning on every .spec creation.
+
+### 10.2 Solution
+
+A single cache file at `.morphmap/available-skills.md` is generated once at init/delegate time (or regenerated when >7 days stale). All branch agents read it at startup. Matching is via keyword grep on skill name + description.
+
+### 10.3 Generation
+
+**When:** `/morphmap-init` Phase 2 (after config), `/morphmap-delegate` Phase 1 (before spawning agents if cache missing or >7 days old).
+
+**How:** Scan all SKILL.md frontmatter from installed skill directories:
+
+```bash
+# Scan skill directories
+for skill_dir in ~/.pi/agent/skills ~/.agents/skills skills/; do
+  [ -d "$skill_dir" ] || continue
+  find "$skill_dir" -name 'SKILL.md' | while read f; do
+    dir=$(dirname "$f")
+    name=$(basename "$dir")
+    # Extract frontmatter: name + description (first 10 lines)
+    head -10 "$f" | grep -E '^name:|^description:' | sed 's/^name: */  /; s/^description: */    /'
+    echo "  path: $f"
+    echo ""
+  done
+done
+```
+
+**Grouping:** After scanning, the agent groups skills by domain keywords found in name + description:
+
+| Domain keyword | Matches skills with... |
+|---------------|----------------------|
+| `rust` | name or description contains: rust, cargo, crate, borrow, async, tokio |
+| `web-frontend` | name or description contains: web, html, css, frontend, browser, js, animation, hyperframes |
+| `web-backend` | name or description contains: web, http, rest, api, axum, actix, worker |
+| `security` | name or description contains: security, bug, audit, threat, unsafe, auth |
+| `design` | name or description contains: design, ui, taste, frontend, hallmark, image, style |
+| `cloud` | name or description contains: cloudflare, worker, durable, wrangler, sandbox |
+| `video` | name or description contains: video, hyperframes, remotion, animation, three |
+| `data` | name or description contains: database, sql, d1, sqlite, postgres, kv |
+| `general` | does not match any specific domain |
+
+Skills can appear in multiple domains. `waapi` matches both `web-frontend` and `video`.
+
+**Staleness:** If cache is >7 days old, regenerate. If `skills/` directory has new directories, regenerate. Otherwise reuse.
+
+### 10.4 Cache Format
+
+```markdown
+# Available Skills
+> Auto-generated 2026-07-21 by morphmap-init --scan-skills
+> Source: ~/.pi/agent/skills, ~/.agents/skills, skills/
+> Stale after: 2026-07-28
+
+## rust
+- **coding-guidelines**: Rust code style, naming, clippy, best practices — `~/.pi/agent/skills/coding-guidelines/SKILL.md`
+- **rust-router**: ALL Rust questions including errors, design, coding — `~/.pi/agent/skills/rust-router/SKILL.md`
+- **domain-web**: Web services, HTTP, REST, axum, actix — `~/.pi/agent/skills/domain-web/SKILL.md`
+- **m11-ecosystem**: Crate recommendations, dependencies, features — `~/.pi/agent/skills/m11-ecosystem/SKILL.md`
+- **m01-ownership**: Ownership, borrow, lifetime issues — `~/.pi/agent/skills/m01-ownership/SKILL.md`
+- **m06-error-handling**: Result, Option, Error, ?, anyhow, thiserror — `~/.pi/agent/skills/m06-error-handling/SKILL.md`
+
+## web-frontend
+- **modern-web-guidance**: Modern HTML/CSS/JS best practices, web APIs — `~/.pi/agent/skills/modern-web-guidance/SKILL.md`
+- **css-animations**: CSS keyframes, animation-delay, fill-mode — `~/.pi/agent/skills/css-animations/SKILL.md`
+- **waapi**: Web Animations API, element.animate() — `~/.pi/agent/skills/waapi/SKILL.md`
+- **hyperframes**: Video compositions, animations, title cards — `~/.pi/agent/skills/hyperframes/SKILL.md`
+
+## security
+- **bug-hunter**: Adversarial bug finding, security audits — `~/.pi/agent/skills/bug-hunter/SKILL.md`
+- **unsafe-checker**: Unsafe Rust review, FFI, raw pointers — `~/.pi/agent/skills/unsafe-checker/SKILL.md`
+
+## design
+- **hallmark**: Anti-slop design for greenfield pages, audits, redesigns — `~/.pi/agent/skills/hallmark/SKILL.md`
+- **design-taste-frontend**: Anti-slop frontend for landing pages, portfolios — `~/.pi/agent/skills/design-taste-frontend/SKILL.md`
+- **imagegen-frontend-web**: Premium website design reference images — `~/.pi/agent/skills/imagegen-frontend-web/SKILL.md`
+
+## cloud
+- **cloudflare**: Workers, Pages, KV, D1, R2, AI — `~/.pi/agent/skills/cloudflare/SKILL.md`
+- **workers-best-practices**: Workers production best practices — `~/.pi/agent/skills/workers-best-practices/SKILL.md`
+- **wrangler**: Workers CLI deploy, dev, manage — `~/.pi/agent/skills/wrangler/SKILL.md`
+
+## general
+- **find-skills**: Discover and install agent skills — `~/.pi/agent/skills/find-skills/SKILL.md`
+- **full-output-enforcement**: Complete code generation, no placeholders — `~/.pi/agent/skills/full-output-enforcement/SKILL.md`
+```
+
+### 10.5 Branch Agent Usage
+
+At startup (step 0), after reading its subtree:
+
+```
+Read .morphmap/available-skills.md.
+Parse domain groupings into memory.
+```
+
+When writing a .spec (step 3a):
+
+```
+Given leaf path: src/editor-core/selection/cursor.ts
+Keywords: ts, typescript, dom, editor, frontend
+
+Match against available-skills domains:
+  - ".ts" matches web-frontend
+  - "dom" matches web-frontend
+  - "editor" matches web-frontend
+  - No match for rust, security, cloud, design, video
+
+Load skills: modern-web-guidance, css-animations, waapi
+Extract constraints → Boundaries section
+Tag leaf: [skill: modern-web-guidance + css-animations + waapi]
+```
+
+### 10.6 Regeneration
+
+Manual: `find ... > .morphmap/available-skills.md` (delete old, delegate rebuilds on next run).
+
+Auto: delete when cache is >7 days old → next delegate run regenerates.
+
+Auto: if a skill directory was added/removed since cache was written (compare `ls` output), regenerate.
+
+### 10.7 Edge Cases
+
+- **No skills installed**: Cache file has only `## general` with `find-skills`. Branch agent skips skill loading gracefully.
+- **100+ skills**: Grouping collapses to domains, not per-skill. Branch agent reads only its matched domain section.
+- **Skill removed after cache**: Stale reference → branch agent tries to read, file not found → skip that skill, log warning, continue. No failure.
+- **Same skill in multiple domains**: `domain-web` matches both `rust` (axum) and `web-frontend` (general web). Loaded once, constraints deduplicated.
+
+### 10.8 Files Changed
+
+| File | Change |
+|------|--------|
+| `skills/init/SKILL.md` | Phase 2: after config, generate .morphmap/available-skills.md |
+| `skills/delegate/SKILL.md` | Phase 1: if available-skills.md missing or >7d stale, regenerate |
+| `.pi/agents/branch-agent.md` | Step 0: read available-skills.md. Step 3a: match domain, load skills. |
+| `.morphmap/morphmap.mindmap.md` | `## context`: reference available-skills.md |

@@ -159,6 +159,7 @@ resource: index.md
 - [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
 - [learn] quality-reviewer was defined but unwired — now in execution loop
 - [learn] researcher agent had no OKF frontmatter at all — now has unified format
+- [learn] skill discovery: Option C (available-skills.md cache) chosen over hardcoded mapping. §10 in improv-map.
 
 ### 2026-07-20
 - [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
