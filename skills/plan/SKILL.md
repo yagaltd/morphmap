@@ -9,6 +9,15 @@ argument-hint: "<directive, repo paths, URLs, or constraints>"
 
 Productize a directive into a morphmap tree. Evidence → decisions → tree → approve. Do not implement.
 
+## Phase 0: SET GOAL
+
+```
+create_goal({
+  objective: "Plan <directive>. Scout evidence, resolve decisions, produce approved tree with posture set.",
+  token_budget: 3000
+})
+```
+
 ## Phase 1: EXPLORE FIRST
 
 Gather evidence before asking questions. Use pi-subagents for parallel recon:

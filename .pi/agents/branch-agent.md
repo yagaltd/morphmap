@@ -45,6 +45,11 @@ You write the map. Updates after every leaf completion. Map is always current.
 
 Only process branches tagged [module] or [feature]. Skip [phase], [log], or unknown tags.
 
+0. **Set goal for branch execution:**
+   create_goal({
+     objective: "Deliver all leaves in <branch-name> subtree. Pull in risk-priority order. Report blockers.",
+     token_budget: 5000
+   })
 1. Pull next eligible leaf (⬜, [needs:] all ✅, risk-priority sorted per Eisenhower)
 2. Search indexed knowledge for recent decisions affecting this leaf domain
 3. If new decisions → adjust leaf/spec. If no .spec → write one:
@@ -69,6 +74,11 @@ Only process branches tagged [module] or [feature]. Skip [phase], [log], or unkn
       Update map's ## context branch with file reference.
       Log: `- <today>: [skill] morphmap/quality-reviewer used for <leaf> · outcome: <APPROVED/CHANGES_REQUESTED>`
    e. If quality=fast: skip quality reviewer (self-verify only)
+   f. **Bug hunter** (quality=strict AND leaf is 🔴 BLOCKING or 🟡 RISKY):
+      /bug-hunter --scan-only <files changed by leaf>
+      If confirmed bugs found: spawn leaf worker to fix → re-verify → re-run bug hunter.
+      Log: `- <today>: [skill] bug-hunter used for <leaf> · outcome: <N bugs found/fixed>`
+      Skip bug hunter on ⚪ STANDARD and 🔵 TIME_CONSUMING leaves (mechanical + judgment sufficient).
 8. After all leaves in sub-branch ✅ AND quality reviews pass:
    If quality=strict: assign integration-review ID and spawn:
    ```bash

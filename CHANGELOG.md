@@ -9,15 +9,19 @@ All notable changes to MorphMap.
 - All agent outputs now write versioned OKF handoff files (scout, researcher, quality-reviewer, reviewer/integration)
 - Quality reviewer wired into branch agent execution loop (step 7d)
 - Integration reviewer wired into branch agent execution loop (step 8, quality=strict)
-- Quality pipeline posture gates: fast=self-verify only, standard=+quality-review, strict=+integration-review
+- Bug hunter wired as posture-gated step (step 7f, quality=strict + 🔴/🟡 leaves only)
+- `/goal` wired into branch agent loop start (step 0) and plan skill Phase 0
+- Quality pipeline posture gates: fast=self-verify, standard=+quality-review, strict=+integration-review+bug-hunter(on risky)
+- Quality reviewer vs bug hunter analysis: complementary, not redundant
 
 ### Changed
 - Researcher agent: added OKF frontmatter (was missing entirely)
 - Reviewer agent: integration mode now writes OKF handoff file instead of inline output
 - Quality reviewer agent: output format upgraded to OKF handoff file with versioning
 - Scout agent: frontmatter updated to unified OKF format with type/version/timestamp
-- Branch agent: execution loop expanded from 9 to 10 steps with quality + integration review
-- Execution flow doc: updated quality loop diagram with posture gates and handoff file paths
+- Branch agent: execution loop expanded to 11 steps with quality + integration + bug-hunter + goal
+- Plan skill: added Phase 0 goal creation for bounded planning sessions
+- Execution flow doc: updated quality loop with bug-hunter step and posture gates
 - Format spec: expanded handoff file section with agent types table and status lifecycle
 
 ## [0.2.0] — 2026-07-20

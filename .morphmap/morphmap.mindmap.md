@@ -107,8 +107,14 @@ resource: index.md
 - leaf-worker: implements .spec → TDD → agent-spec lifecycle (self-verify)
 - reviewer (mechanical): agent-spec lifecycle + tdd-guard → pass/fail (inline output)
 - quality-reviewer (judgment): simplicity, security, error handling → OKF handoff file (quality-review-NNN)
+- bug-hunter (adversarial): Recon→Hunter→Skeptic→Referee → confirmed bugs (quality=strict, 🔴/🟡 only)
 - reviewer (integration): cross-leaf conflicts, gaps, consistency → OKF handoff file (integration-review-NNN)
 - branch-agent: aggregates all reviews, spawns fixes for P0/P1, updates map
+
+### quality vs bug-hunter (complementary, not redundant)
+- quality-reviewer: static code review (one agent, cheap). Checks simplicity, error patterns, domain fit, surgical scope.
+- bug-hunter: adversarial pipeline (4 agents, expensive). Finds runtime bugs, race conditions, auth bypasses. Can auto-fix.
+- Quality reviewer runs on every leaf (standard/strict). Bug hunter runs on 🔴/🟡 leaves only (strict).
 
 ### handoff file types (all OKF frontmatter)
 - scout-NNN: recon findings → .morphmap/scout-NNN-YYYYMMDD-slug.md
@@ -145,7 +151,10 @@ resource: index.md
 - [spec] All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
 - [spec] quality reviewer now spawned by branch agent in execution loop step 7d
 - [spec] integration reviewer spawned by branch agent after sub-branch completes (step 8, quality=strict)
-- [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → integration-review → branch-agent
+- [spec] bug-hunter added as posture-gated step: quality=strict + 🔴/🟡 leaves only (step 7f)
+- [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → bug-hunter (adversarial, optional) → integration-review → branch-agent
+- [learn] quality-reviewer vs bug-hunter: complementary. quality-reviewer=static code review (cheap, every leaf). bug-hunter=adversarial pipeline (expensive, 🔴/🟡 only). Not redundant.
+- [learn] /goal underutilized: only used for 5-why failure analysis. Now wired into branch-agent loop start + plan phase.
 - [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
 - [learn] quality-reviewer was defined but unwired — now in execution loop
 - [learn] researcher agent had no OKF frontmatter at all — now has unified format
