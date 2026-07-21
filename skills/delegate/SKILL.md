@@ -142,7 +142,7 @@ subagent({
 
 5. **Posture** — `"Context from orchestrator: phase=<prototype|mvp|stable>, compat=<break|keep>, scope=<narrow|moderate|broad>, quality=<fast|standard|strict>, budget=<low|balanced|high>."` Inherited from parent, overridable per leaf.
 
-**Parallel spawning:** Use `async: true` for independent branches. Use `worktree: true` if they touch different files. Branches with [needs:] dependencies on each other must be sequential — wait for the dependency to report ✅ before spawning the dependent.
+**Parallel spawning:** Use `async: true` for independent branches. Do NOT use `worktree: true` — it creates isolated copies, doubles disk usage, and leaves orphaned worktrees. All branch agents share the main working directory. Parallel agents that touch different files don't conflict. Branches with [needs:] dependencies on each other must be sequential — wait for the dependency to report ✅ before spawning the dependent.
 
 ## Phase 5: REPORT
 
