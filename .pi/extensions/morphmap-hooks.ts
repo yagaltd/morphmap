@@ -158,20 +158,40 @@ export default function (pi: ExtensionAPI) {
   pi.on("tool_result", async (event, ctx) => {
     const state = getState(ctx);
 
-    // ── 3. Auto-render + commit after map edit ─────────────────
+    // ── 3. Auto-render + changelog + commit after map edit ──
 
     if (event.toolName === "write" || event.toolName === "edit") {
       const path = event.input?.path as string | undefined;
       if (path && isMindmapFile(path) && !event.isError) {
         try {
           const { execSync } = await import("node:child_process");
+          const fs = await import("node:fs/promises");
           
+          // Read map content for changelog generation
+          const mapContent = await fs.readFile(path, "utf8");
+          
+          // Render HTML
           execSync(
             "npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open",
             { stdio: "pipe", timeout: 15000 }
           );
 
-          execSync("git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html", {
+          // Generate CHANGELOG.md from map decisions
+          const changelog = generateChangelog(mapContent);
+          await fs.writeFile("CHANGELOG.md", changelog, "utf8");
+
+          // Stage all generated artifacts
+          execSync("git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html CHANGELOG.md", {
+            stdio: "pipe",
+          });
+          execSync(
+            `git commit -m "map: auto-render + changelog after edit" --allow-empty`,
+            { stdio: "pipe" }
+          );
+
+          pi.ui?.notify({
+            title: "MorphMap: map rendered",
+            body: "HTML + CHANGELOG regenerated and committed.",
             stdio: "pipe",
           });
           execSync(
@@ -304,4 +324,157 @@ function extractError(event: any): string {
 
 function today(): string {
   return new Date().toISOString().split("T")[0];
+}
+
+// ── CHANGELOG GENERATOR ─────────────────────────────────────────
+
+interface ReleaseEntry {
+  version: string;
+  date: string;
+}
+
+interface DecisionEntry {
+  tag: string;
+  text: string;
+  date: string;
+}
+
+function generateChangelog(mapContent: string): string {
+  // Extract releases section
+  const releases = extractReleases(mapContent);
+  
+  // Extract all decisions with dates
+  const decisions = extractDecisions(mapContent);
+  
+  // Find last release date (decisions after this go to Unreleased)
+  const lastReleaseDate = releases.length > 0 ? releases[0].date : "";
+  
+  // Group decisions by version
+  const unreleased: DecisionEntry[] = [];
+  const versioned: Map<string, DecisionEntry[]> = new Map();
+  
+  for (const d of decisions) {
+    if (!lastReleaseDate || d.date > lastReleaseDate) {
+      unreleased.push(d);
+    } else {
+      // Assign to most recent release that is >= this decision's date
+      const release = releases.find(r => r.date >= d.date) ?? releases[releases.length - 1];
+      if (release) {
+        const key = release.version;
+        if (!versioned.has(key)) versioned.set(key, []);
+        versioned.get(key)!.push(d);
+      }
+    }
+  }
+  
+  // Build changelog
+  let md = "# Changelog\n\nAll notable changes to MorphMap. Auto-generated from .morphmap/morphmap.mindmap.md.\n";
+  
+  // Unreleased first
+  if (unreleased.length > 0) {
+    md += "\n## [Unreleased]\n";
+    md += formatSection(unreleased);
+  }
+  
+  // Versioned releases (newest first)
+  for (const r of releases) {
+    const entries = versioned.get(r.version) || [];
+    if (entries.length > 0) {
+      md += `\n## [${r.version}] — ${r.date}\n`;
+      md += formatSection(entries);
+    }
+  }
+  
+  return md;
+}
+
+function formatSection(entries: DecisionEntry[]): string {
+  const added = entries.filter(e => e.tag === "implemented");
+  const changed = entries.filter(e => e.tag === "spec") ;
+  const fixed = entries.filter(e => e.tag === "fix" || e.tag === "violation");
+  
+  let md = "";
+  if (added.length > 0) {
+    md += "\n### Added\n";
+    for (const e of added) md += `- ${e.text}\n`;
+  }
+  if (changed.length > 0) {
+    md += "\n### Changed\n";
+    for (const e of changed) md += `- ${e.text}\n`;
+  }
+  if (fixed.length > 0) {
+    md += "\n### Fixed\n";
+    for (const e of fixed) md += `- ${e.text}\n`;
+  }
+  return md;
+}
+
+function extractReleases(mapContent: string): ReleaseEntry[] {
+  const releases: ReleaseEntry[] = [];
+  const lines = mapContent.split("\n");
+  let inReleases = false;
+  
+  for (const line of lines) {
+    if (line.startsWith("## releases")) {
+      inReleases = true;
+      continue;
+    }
+    if (inReleases && line.startsWith("## ") && !line.startsWith("## releases")) {
+      break;
+    }
+    if (inReleases && line.startsWith("- ")) {
+      // Format: "- 0.2.0 (2026-07-20): ..." or "- 0.1.0 (2026-07-19): ..."
+      const match = line.match(/-(\s+)([\d.]+)\s*\(([^)]+)\)/);
+      if (match) {
+        releases.push({ version: match[2], date: match[3] });
+      }
+    }
+  }
+  
+  return releases.sort((a, b) => b.date.localeCompare(a.date)); // newest first
+}
+
+function extractDecisions(mapContent: string): DecisionEntry[] {
+  const decisions: DecisionEntry[] = [];
+  const lines = mapContent.split("\n");
+  let inDecisions = false;
+  let currentDate = "";
+  
+  for (const line of lines) {
+    if (line.startsWith("## decisions")) {
+      inDecisions = true;
+      continue;
+    }
+    if (inDecisions && line.startsWith("## ") && !line.startsWith("## decisions")) {
+      break;
+    }
+    if (inDecisions) {
+      // Extract date from ### heading
+      const dateMatch = line.match(/^###\s+(\d{4}-\d{2}-\d{2})/);
+      if (dateMatch) {
+        currentDate = dateMatch[1];
+        continue;
+      }
+      // Extract tagged entries (skip sub-branch headings like ####)
+      if (line.startsWith("- [") && currentDate) {
+        const tagMatch = line.match(/^-\s*\[(\w+)\]\s+(.+)/);
+        if (tagMatch) {
+          decisions.push({
+            tag: tagMatch[1],
+            text: tagMatch[2].trim(),
+            date: currentDate,
+          });
+        }
+      } else if (line.startsWith("- ") && currentDate && !line.startsWith("- [")) {
+        // Untagged entries → treated as "changed"
+        decisions.push({
+          tag: "spec",
+          text: line.replace(/^-\s*/, "").trim(),
+          date: currentDate,
+        });
+      }
+    }
+  }
+  
+  return decisions;
 }

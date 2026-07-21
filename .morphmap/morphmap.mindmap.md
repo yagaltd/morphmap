@@ -91,7 +91,7 @@ resource: index.md
 - semver (major.minor.patch) for code projects
 - date-based (YYYY-MM-DD) for marketing, operations, non-code
 - releases branch updated on every push/publish
-- CHANGELOG.md for full details
+- CHANGELOG.md auto-generated from decisions log by morphmap-hooks extension
 
 ## skills ⬜ [log] — what each skill does + format tags
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
