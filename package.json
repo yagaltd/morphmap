@@ -6,7 +6,8 @@
   "license": "MIT",
   "pi": {
     "skills": ["./skills"],
-    "prompts": ["./prompts"]
+    "prompts": ["./prompts"],
+    "extensions": ["./.pi/extensions/morphmap-hooks.ts"]
   },
   "peerDependencies": {
     "pi-subagents": ">=0.17.2",

@@ -291,8 +291,15 @@ if [ -f "$HOOK_SRC" ]; then
 fi
 ```
 
-This ensures `.morphmap/morphmap.mindmap.html` is always rendered
-and staged alongside `.morphmap/morphmap.mindmap.md` on every commit.
+The MorphMap pi extension (`.pi/extensions/morphmap-hooks.ts`) provides
+additional runtime hooks:
+- Blocks leaf-worker spawn without .spec file
+- Auto-renders + commits HTML after map edits (agent-triggered)
+- Auto-logs telemetry on tool failures
+- Warns on update_goal complete before gate check
+
+Both the git hook (human edits) and pi extension hook (agent edits) ensure
+`.morphmap/morphmap.mindmap.html` stays in sync with `.md`.
 
 ## Phase 6: Render + Report
 
