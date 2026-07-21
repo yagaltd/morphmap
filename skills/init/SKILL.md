@@ -278,22 +278,21 @@ Shared domain language for this project. Keep meaningful to domain experts; avoi
 
 If no git repo exists: `git init`.
 
-Install post-commit hook for automatic mindmap HTML rendering:
+Install pre-commit hook for automatic mindmap HTML rendering:
 
 ```bash
-# Copy the post-commit hook from morphmap package
+# Copy the pre-commit hook from morphmap package
 HOOK_SRC=".morphmap/post-commit-hook.sh"
-HOOK_DST=".git/hooks/post-commit"
+HOOK_DST=".git/hooks/pre-commit"
 if [ -f "$HOOK_SRC" ]; then
   cp "$HOOK_SRC" "$HOOK_DST"
   chmod +x "$HOOK_DST"
-  echo "✓ Post-commit hook installed: auto-renders HTML on map changes"
+  echo "✓ Pre-commit hook installed: auto-renders HTML before map commits"
 fi
 ```
 
-This ensures `.morphmap/morphmap.mindmap.html` stays in sync every time
-`.morphmap/morphmap.mindmap.md` is committed. Both mechanical (git hook)
-AND agent-enforced (branch-agent Rules section).
+This ensures `.morphmap/morphmap.mindmap.html` is always rendered
+and staged alongside `.morphmap/morphmap.mindmap.md` on every commit.
 
 ## Phase 6: Render + Report
 

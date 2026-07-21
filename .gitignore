@@ -3,6 +3,7 @@ node_modules/
 
 # Generated renders
 *.html
+!.morphmap/*.html
 
 # npm package
 *.tgz
