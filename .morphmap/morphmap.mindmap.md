@@ -137,7 +137,7 @@ resource: index.md
 - [module] → code module — branch-agent manages
 - [feature] → feature concern — branch-agent manages
 - [phase] → lifecycle (staging, production) — human-managed
-- [log] → documentation (decisions, skills, releases) — read-only
+- [log] → documentation (decisions, skills, releases) — human-managed, agent-read-only. Mark ✅ when accurate and current.
 - [adr] → architecture decision records — human-managed, read-only, linked to docs/adr/
 - unknown tag → default to human-managed
 
