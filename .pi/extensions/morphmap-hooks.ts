@@ -423,10 +423,10 @@ function extractReleases(mapContent: string): ReleaseEntry[] {
       break;
     }
     if (inReleases && line.startsWith("- ")) {
-      // Format: "- 0.2.0 (2026-07-20): ..." or "- 0.1.0 (2026-07-19): ..."
-      const match = line.match(/-(\s+)([\d.]+)\s*\(([^)]+)\)/);
+      // Format: "- 0.2.0 (2026-07-20): ..." or "- 2026-07-19 (2026-07-19): ..."
+      const match = line.match(/-\s+([\d][\d.\-]+)\s*\(([^)]+)\)/);
       if (match) {
-        releases.push({ version: match[2], date: match[3] });
+        releases.push({ version: match[1], date: match[2] });
       }
     }
   }
