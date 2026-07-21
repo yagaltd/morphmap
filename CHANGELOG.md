@@ -19,9 +19,11 @@ All notable changes to MorphMap.
 ### Changed
 - Branch agent: execution loop rewritten (13 steps with recursion, per-leaf QA, skill loading, goal gate)
 - Delegate skill: depth-agnostic spawning for all heading levels + available-skills regeneration
-- Init skill: available-skills.md generation at scaffold
+- Init skill: available-skills.md generation + agent freezing (.morphmap/agents/) + --update-agents flag
+- Improve skill: agent edit target priority (project-local first, never global)
 - Leaf worker: testing strategy section added, posture rules updated
 - Quality reviewer: "What to Check" expanded with boundaries compliance, output format updated
+- README: Agent Versioning section added, project structure updated
 - Execution flow doc: quality loop rewritten with per-leaf `[qa:]` gating
 - Format spec: Tags table expanded, leaf format updated, Per-Leaf Quality Tags section added
 - Plan skill: added Phase 0 goal creation for bounded planning sessions

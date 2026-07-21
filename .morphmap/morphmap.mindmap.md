@@ -121,6 +121,7 @@ resource: index.md
 - quality-review-NNN: quality verdict → .morphmap/quality-review-NNN-YYYYMMDD-slug.md
 - integration-review-NNN: integration verdict → .morphmap/integration-review-NNN-YYYYMMDD-slug.md
 - context-builder-NNN: domain glossary → .morphmap/CONTEXT.md (persistent, not versioned)
+- agents/: frozen agent definitions → .morphmap/agents/ (copied at init, updated via --update-agents)
 
 ### leaf format tags (for markmap rendering)
 - [link] → leaf points to a file (spec, doc, ADR)
@@ -153,6 +154,9 @@ resource: index.md
 - [implemented] per-leaf [qa:] override — branch agent assigns tag, not blind posture inheritance
 - [implemented] goal completion gate: 6 mechanical checks before update_goal complete
 - [implemented] available-skills.md cache: generated at init/delegate, read by all branch agents
+- [implemented] agent freezing: .morphmap/agents/ copy during init, agentPaths in pi-subagents config
+- [implemented] --update-agents flag: refresh frozen agents with git diff review
+- [implemented] improve skill: agent edit targets .morphmap/agents/ (user project) or .pi/agents/ (dogfooding), never global install
 - [implemented] leaf worker: [test:] tag awareness, [human] tag skip
 - [implemented] quality reviewer: boundaries compliance check against .spec
 - [implemented] delegate skill: depth-agnostic spawning for all heading levels

@@ -65,6 +65,8 @@ Human approves                       intercom.
 - Cross-branch dependencies: `[needs: branch/leaf]`
 - Risk-priority pull: 🔴 BLOCKING → 🟡 RISKY → 🔵 TIME → ⚪ STANDARD
 - Bottleneck detection, ETA tracking, budget tracking
+- **Agent versioning**: agents frozen into `.morphmap/agents/` per project — reproducible builds
+- **PDSA improvement loop**: `/morphmap-improve` studies patterns, proposes agent edits
 
 ## Commands
 
@@ -102,12 +104,23 @@ Render with `npx markmap-cli`.
 ## Project Structure
 
 ```
-.pi/agents/                ← pi-subagents agent definitions (5 agents)
+.morphmap/agents/          ← frozen agent definitions (per-project, git-tracked)
+.pi/agents/                ← agent source (MorphMap repo only)
 prompts/                   ← slash command templates (9 commands)
 skills/                    ← skill definitions (8 skills)
 package.json               ← pi package manifest
 CHANGELOG.md               ← version history
 ```
+
+## Agent Versioning
+
+MorphMap freezes agent definitions into `.morphmap/agents/` during `/morphmap-init`. This ensures reproducibility — agent changes are git-tracked and don't silently affect behavior.
+
+- **Freeze:** `/morphmap-init` copies agents from global install to `.morphmap/agents/`
+- **Evolve:** `/morphmap-improve` studies patterns and proposes agent edits — applied to the project-local copy
+- **Update:** `/morphmap-init --update-agents` syncs from global install, shows git diff for review
+
+Global MorphMap updates (`pi update morphmap`) never touch your project's frozen agents. You control when and if agent behavior changes.
 
 ## License
 

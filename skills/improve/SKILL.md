@@ -107,12 +107,22 @@ Approve? (y)es / (n)o / (m)odify: <description>
 ## Phase 4: APPLY (human-approved only)
 
 For each approved proposal:
-1. Apply the change (edit file, update config)
+1. Apply the change:
+   - **Agent edits:** edit `.morphmap/agents/<agent>.md` if it exists (user project, frozen copy).
+     If `.morphmap/agents/` does not exist, edit `.pi/agents/<agent>.md` (MorphMap dogfooding itself).
+     NEVER edit `~/.pi/agent/agents/morphmap/` (global install — affects all projects).
+   - **Config edits:** edit `.morphmap/config`
+   - **Scope edits:** edit `.morphmap/morphmap.mindmap.md` branch scope declarations
 2. Log to `## decisions`:
    ```
    - <today>: [improve] <description of change>. Reason: <evidence summary>.
    ```
 3. Git commit with message: `improve: <description>`
+
+**Agent edit target priority:**
+1. `.morphmap/agents/<agent>.md` — user project (frozen, git-tracked, isolated)
+2. `.pi/agents/<agent>.md` — MorphMap source repo (dogfooding, contributes upstream)
+3. NEVER `~/.pi/agent/agents/morphmap/` — global install (silently breaks all projects)
 
 For rejected proposals: log as `[improve] rejected: <description>. Reason: <human feedback>.`
 

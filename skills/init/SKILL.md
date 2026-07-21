@@ -1,13 +1,28 @@
 ---
 name: morphmap-init
-description: "Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield — auto-survey existing codebase."
+description: "Scaffold a new MorphMap project. Creates .morphmap/ directory with default config, blank mindmap. Use --scan for brownfield — auto-survey existing codebase. Use --update-agents to refresh frozen agent copies."
 user-invocable: true
-argument-hint: "[project name] [--scan] [path]"
+argument-hint: "[project name] [--scan] [--update-agents] [path]"
 ---
 
 # MorphMap Init
 
 Scaffold a new MorphMap project structure.
+
+**Modes:**
+- **Scaffold** (default): create new project with fresh mindmap
+- **Scan** (`--scan`): brownfield — survey existing codebase
+- **Update agents** (`--update-agents`): refresh frozen agents in existing project
+
+## Phase 0: CHECK MODE
+
+If `--update-agents` flag present:
+- Skip all other phases
+- Run only Phase 2d (copy agents from global install to `.morphmap/agents/`)
+- Show git diff of agent changes
+- Exit with: "Agents updated. Review diff and commit if satisfied."
+
+If `--update-agents` absent: proceed with full scaffold below.
 
 ## Phase 1: Create directories
 
@@ -79,6 +94,47 @@ Add to `.pi/settings.json` (project scope):
 ```
 
 **This is REQUIRED.** Without it, MorphMap agents won't work correctly.
+
+Add `agentPaths` to tell pi-subagents to load project-local agents first:
+
+```json
+{
+  "subagents": {
+    "agentPaths": [".morphmap/agents"],
+    "agentOverrides": {
+      "morphmap/branch-agent":    { "model": "deepseek/deepseek-v4-flash", "thinking": "high" },
+      ...
+    }
+  }
+}
+```
+
+`agentPaths` ensures `.morphmap/agents/` is checked before global install.
+This isolates the project from global agent updates.
+
+## Phase 2d: Freeze agents into project (REQUIRED)
+
+Copy MorphMap agent definitions into `.morphmap/agents/` so they're git-tracked:
+
+```bash
+mkdir -p .morphmap/agents
+
+# Copy agents from global install
+if [ -d ~/.pi/agent/agents/morphmap ]; then
+  cp ~/.pi/agent/agents/morphmap/*.md .morphmap/agents/
+elif [ -d .pi/agents ]; then
+  # Fallback: MorphMap dogfooding itself (source repo)
+  cp .pi/agents/*.md .morphmap/agents/
+fi
+
+echo "Agents frozen to .morphmap/agents/"
+```
+
+**Why:** Agents are the "compiler" for your project. Changing agents changes
+behavior without any git-visible diff. Freezing ensures reproducibility.
+
+**Upgrade later:** `/morphmap-init --update-agents` copies fresh agents from
+global install. Git shows the diff. You review before committing.
 
 ## Phase 3: Create mindmap and domain context
 
