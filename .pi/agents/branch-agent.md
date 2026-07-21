@@ -26,6 +26,21 @@ You write the map. Updates after every leaf completion. Map is always current.
 Read `.morphmap/available-skills.md` to discover installed skills grouped by domain.
 Use these when writing .spec files — match leaf domain against skill groupings, load relevant skills, extract constraints into Boundaries.
 
+## Orphan Detection (check at startup)
+
+Before beginning work, verify you have a parent orchestrator:
+```
+intercom({ action: "list" })
+```
+If your parent session is NOT in the list (you were spawned by a session that no longer exists), you are orphaned:
+1. Commit all uncommitted work in this worktree: `git add -A && git commit -m "recover: orphaned branch agent self-merge"`
+2. Merge your branch to master: `git checkout master && git merge <branch> && git branch -D <branch>`
+3. Clean up: `git worktree prune`
+4. Log recovery to map: append `- <today>: [recover] orphaned branch agent self-merged <branch>` to `## decisions`
+5. Exit: report "Orphaned branch agent recovered. Work committed + merged + cleaned. Restart /morphmap-delegate to continue."
+
+If parent IS present: normal execution.
+
 ## Decision Matrices (posture-aware)
 
 ### Urgency × Importance (which leaf to pull first)
