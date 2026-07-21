@@ -2,7 +2,7 @@
 name: morphmap/reviewer
 description: MorphMap reviewer — mechanical per-leaf verification (agent-spec lifecycle) or cross-leaf integration review. Read-only: does not edit code.
 tools: read, bash, intercom
-thinking: assigned-per-mode
+thinking: high
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
