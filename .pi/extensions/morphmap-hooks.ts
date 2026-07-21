@@ -135,15 +135,25 @@ export default function (pi: ExtensionAPI) {
           }
         }
 
-        // Model check: warn if cheap model used for risky/blocking leaf
+        // Model enforcement: block flash model for BLOCKING leaves, warn for RISKY
         const model = event.input?.model as string | undefined;
         if (model && task) {
           const bottleneck = extractBottleneck(task);
           const isFlash = model.includes("flash");
-          if (isFlash && (bottleneck === "🔴" || bottleneck === "🟡")) {
+          const isPro = model.includes("pro");
+          
+          if (bottleneck === "🔴" && isFlash) {
+            // BLOCKING leaf with cheap model → hard block
+            return {
+              block: true,
+              reason: `🔴 BLOCKING leaf spawned with ${model}. Config requires claude-sonnet-4 or equivalent. Use agent-spec config leafProfiles.blocking model.`,
+            };
+          }
+          
+          if (bottleneck === "🟡" && isFlash) {
             pi.ui?.notify({
-              title: "MorphMap: model mismatch",
-              body: `Leaf needs ${bottleneck === "🔴" ? "strongest" : "pro"} model but spawned with ${model}. Config says: blocking→claude-sonnet-4, risky→deepseek-v4-pro.`,
+              title: "MorphMap: model may be too weak",
+              body: `🟡 RISKY leaf spawned with ${model}. Config suggests deepseek-v4-pro with high thinking. Consider respawning.`,
               style: "warning",
             });
           }

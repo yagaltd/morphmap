@@ -329,7 +329,7 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 - Log skill usage: after spawning leaf-worker, quality-reviewer, reviewer, or sub-branch agent, add to `## decisions`:
   `- <today>: [skill] morphmap/<agent> used for <leaf/sub-branch> · outcome: ✅/❌/🔄/APPROVED/CHANGES_REQUESTED`
 - Log telemetry: after leaf completion or WORKER_BLOCKER, add machine-readable entry:
-  `- <today>: [telemetry] <category>: retries=<N> model=<X> thinking=<Y> result=<Z>`
+  `- <today>: [telemetry] leaf-result: agent=morphmap/<agent> leaf=<leaf-path> model=<X> thinking=<Y> expected-model=<Z> result=<✅❌🔄> duration=<s> retries=<N>`
   Categories: leaf-result, spec-quality, model-fit, classification, eta-drift
 
 ## Write Guard
