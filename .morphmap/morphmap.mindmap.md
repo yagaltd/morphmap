@@ -148,6 +148,16 @@ resource: index.md
 - Delta-calculated: pre-spawn baseline subtracted from post-completion total
 - Feeds /morphmap-improve cross-project analysis
 
+### tool + model assignment (per task type)
+- Config has `taskProfiles` for general tasks and `testProfiles` for test-specific model assignment
+- `testProfiles` separate from `taskProfiles` because testing often needs different models:
+  - UI/E2E tests need vision-capable models (zai/glm-5.2) + browser tools (playwriter, agent-browser)
+  - Unit tests work with text models (deepseek-v4-flash) + vitest/jsdom
+  - Integration tests need stronger reasoning (deepseek-v4-pro)
+- Available CLI tools scanned at init/delegate into `.morphmap/available-skills.md` `## tools` section
+- Branch agent step 3a: for test leaves, match `[test:]` tag against available tools, assign appropriate tool + model
+- Leaf worker uses assigned tool — doesn't guess
+
 ## decisions ⬜ [log]
 
 ### 2026-07-21
