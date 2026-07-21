@@ -104,6 +104,7 @@ resource: index.md
 - morphmap-init: scaffold .morphmap/ + .morphmap/morphmap.mindmap.md + index.md + git init
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
+- morphmap-recover: detect orphaned worktrees → merge uncommitted work → prune branches
 
 ### quality pipeline (per leaf, gated by [qa:] tag)
 - [qa: none]: leaf-worker self-verify → ✅
