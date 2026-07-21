@@ -35,12 +35,13 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 [module] — scope: slash commands · 9/9 prompts + 8/8 skills · e2e tested: 4/9
-- ✅ /morphmap-init — scaffold verified
-- ✅ /morphmap-plan — scout + researcher + tree + .spec verified
-- ✅ /morphmap-delegate — branch-agent + leaf-worker verified
+## commands 🔄 [module] — scope: slash commands · 10/10 prompts + 9/9 skills · e2e tested: 5/10
+- ✅ /morphmap-init — scaffold + brownfield scan (MorphShell)
+- ✅ /morphmap-plan — budget estimate + grill + tree (MorphShell 4 scouts parallel)
+- ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery
 - ✅ /morphmap-improve — PDSA Study loop written
-- ⬜ /morphmap-review — warm (skill written, not spawned in e2e)
+- ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
+- ⬜ /morphmap-review — warm (quality review ran on MorphShell, OKF output needs fix)
 - ⬜ /morphmap-amend — warm (skill written, not spawned in e2e)
 - ⬜ /morphmap-triage — warm (skill written, not spawned in e2e)
 - ⬜ /morphmap — render via markmap-cli, warm
