@@ -108,10 +108,32 @@ Classify each decision:
 
 ## Phase 3: GRILL UNRESOLVED
 
-Use grill-for-unknowns skill. One question per turn, ordered by blast radius.
-Lettered options so user reacts instead of composes.
-Close each as decision — answered by user, answered by territory, or recorded OPEN on map.
-Propose defaults for low-risk unknowns instead of blocking.
+Use pi-interview to present unresolved decisions. One question per decision, ordered by blast radius. Lettered options so user reacts instead of composes.
+
+**Interview format rules (MANDATORY — pi-interview validation):**
+- `type: "single"` (radio) or `"multi"` (checkbox) or `"text"` (free input)
+- Options: array of `{ label: "A — short", content: { source: "full description", lang: "md" } }`
+- **`recommended` for single-select MUST be a string:** `"A"` (the label, not an object)
+- **`recommended` for multi-select MUST be an array:** `["A", "C"]`
+- `conviction: "strong"` pre-selects + shows Recommended badge; `"slight"` shows badge only
+- `weight: "critical"` for key decisions (visually prominent)
+
+Example (single-select):
+```json
+{
+  "id": "posture",
+  "type": "single",
+  "question": "Posture for this audit?",
+  "options": [
+    { "label": "A — mvp / break", "content": { "source": "Fast audit, breaking OK.", "lang": "md" } },
+    { "label": "B — mvp / compat", "content": { "source": "Fast audit, no breaking changes.", "lang": "md" } }
+  ],
+  "recommended": "A",
+  "conviction": "strong"
+}
+```
+
+Close each as decision after user answers — update map's `## decisions`, apply posture, continue to Phase 4.
 
 ## Phase 4: BUILD TREE
 
