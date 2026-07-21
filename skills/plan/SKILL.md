@@ -9,14 +9,56 @@ argument-hint: "<directive, repo paths, URLs, or constraints>"
 
 Productize a directive into a morphmap tree. Evidence → decisions → tree → approve. Do not implement.
 
-## Phase 0: SET GOAL
+## Phase 0: ESTIMATE BUDGET
 
+Check if tokei stats exist (brownfield project). If yes, compute token budget automatically.
+
+```bash
+TOKEI=".morphmap/tokei-stats.json"
+if [ -f "$TOKEI" ]; then
+  # Extract total code lines from tokei JSON
+  TOTAL_CODE=$(python3 -c "
+import json, sys
+with open('$TOKEI') as f:
+    data = json.load(f)
+total = 0
+for lang, stats in data.items():
+    if isinstance(stats, dict) and 'code' in stats:
+        total += stats['code']
+exclude = data.get('Markdown', {}).get('code', 0) + data.get('JSON', {}).get('code', 0)
+total -= exclude  # exclude docs/config from estimate
+print(max(total, 0))
+" 2>/dev/null || echo 0)
+  
+  # Estimate: JS/TS ~3 LOC per token, CSS/HTML ~8 LOC per token, overhead ~4000 tokens
+  EST_TOKENS=$(( TOTAL_CODE / 4 + 4000 ))
+  EST_TOKENS=$(( EST_TOKENS < 3000 ? 3000 : EST_TOKENS ))
+  EST_TOKENS=$(( EST_TOKENS > 30000 ? 30000 : EST_TOKENS ))
+  
+  echo "Project: ~${TOTAL_CODE} code LOC (excluding Markdown/JSON)"
+  echo "Estimated token budget needed: ${EST_TOKENS}"
+  echo ""
+  echo "Accept? (y)es / (n)o / enter custom value / 'off' for no budget:"
+  # Read user input (simplified — agent prompts human)
+else
+  EST_TOKENS=3000
+fi
+```
+
+Set goal with computed budget:
 ```
 create_goal({
   objective: "Plan <directive>. Scout evidence, resolve decisions, produce approved tree with posture set.",
-  token_budget: 3000
+  token_budget: <EST_TOKENS from above, or "off" if user chose no limit>
 })
 ```
+
+**Budget rules:**
+- Minimum: 3000 tokens (greenfield with no code)
+- Maximum: 30000 tokens (very large projects)
+- `off`: no budget limit — plan runs until complete (use for large brownfield)
+- User can override with any value or `off`
+- If no tokei stats (greenfield), default to 3000
 
 ## Phase 1: EXPLORE FIRST
 
