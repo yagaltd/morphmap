@@ -189,6 +189,7 @@ resource: index.md
 - [fix] Write Guard added "Discussed?" check + violation logging
 - [fix] ## skills branch added to map — documents each skill's phases
 - [fix] skill usage logging: [skill] entries feed /morphmap-improve Phase 2
+- [fix] map write protocol: commit + render HTML after every map edit — agent rule + git hook
 
 #### learnings (3)
 - [learn] reviewer: added tdd-guard layer for test trustworthiness
