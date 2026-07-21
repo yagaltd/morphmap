@@ -181,6 +181,7 @@ resource: index.md
 - [learn] skill discovery: Option C (available-skills.md cache) chosen over hardcoded mapping. §10 in improv-map.
 - [learn] dogfooding surfaced gap: ">5 → sub-branch" rule existed but didn't apply to [log] branches. Rule now universal. Map write protocol added: commit + render HTML after every map edit.
 - [learn] pi extension hooks: morphmap-hooks.ts for semi-mechanical enforcement (spec guard, goal gate warning, auto-render, telemetry)
+- [learn] dogfooding: pi-interview format bug — recommended for single-select must be string, not object. Fixed in plan Phase 3 with explicit format rules.
 
 ### 2026-07-20
 #### fixes (5)
