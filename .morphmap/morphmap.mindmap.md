@@ -147,6 +147,7 @@ resource: index.md
 ## decisions ⬜ [log]
 
 ### 2026-07-21
+#### implemented (15)
 - [implemented] new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]
 - [implemented] recursive branch agent spawning: same agent at any depth (L1-L3), 5-dimension context injection
 - [implemented] quality architecture: skills loaded before .spec via available-skills.md cache, constraints extracted into Boundaries
@@ -162,12 +163,16 @@ resource: index.md
 - [implemented] delegate skill: depth-agnostic spawning for all heading levels
 - [implemented] init skill: available-skills.md generation at scaffold
 - [implemented] execution flow doc: updated quality loop with per-leaf [qa:] gating
+
+#### specifications (6)
 - [spec] OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
 - [spec] All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
 - [spec] quality reviewer now spawned by branch agent in execution loop step 7d
 - [spec] integration reviewer spawned by branch agent after sub-branch completes (step 8, quality=strict)
 - [spec] bug-hunter added as posture-gated step: quality=strict + 🔴/🟡 leaves only (step 7f)
 - [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → bug-hunter (adversarial, optional) → integration-review → branch-agent
+
+#### learnings (6)
 - [learn] quality-reviewer vs bug-hunter: complementary. quality-reviewer=static code review (cheap, every leaf). bug-hunter=adversarial pipeline (expensive, 🔴/🟡 only). Not redundant.
 - [learn] /goal underutilized: only used for 5-why failure analysis. Now wired into branch-agent loop start + plan phase.
 - [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
@@ -176,28 +181,40 @@ resource: index.md
 - [learn] skill discovery: Option C (available-skills.md cache) chosen over hardcoded mapping. §10 in improv-map.
 
 ### 2026-07-20
+#### fixes (5)
 - [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
 - [fix] Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits
 - [fix] Context Budget: check ctx_stats every 10 turns, compact if >40%
 - [fix] Write Guard added "Discussed?" check + violation logging
 - [fix] ## skills branch added to map — documents each skill's phases
 - [fix] skill usage logging: [skill] entries feed /morphmap-improve Phase 2
+
+#### learnings (3)
 - [learn] reviewer: added tdd-guard layer for test trustworthiness
 - [learn] plan Phase 3: use grill-for-unknowns skill
 - [learn] .spec template: add Verifiable by Human + Delegated to Implementer
+
+#### discussions (4)
 - [discuss] Cortex conflicts with context-mode. Not needed. v3 with CognitiveOS.
 - [discuss] OpenSpace: quality tracking covered by /morphmap-improve
 - [discuss] taskProfiles: deferred to v2
 - [discuss] roadmap: v2=brownfield+multi-repo, v3=CognitiveOS+cross-project telemetry
 
 ### 2026-07-19
+#### decisions (3)
 - v1 design decisions finalized
 - adopted OKF format for all knowledge documents
 - verified stack: pi-workflows NOT installed, pi-dynamic-wf removed
+
+#### project (3)
 - renamed project to MorphMap
 - git init, first commit
 - 4-tier forced choice replaces fake confidence numbers
+
+#### learnings (1)
 - end-to-end test: all 5 agents spawned + executed
+
+#### discussions (4)
 - [discuss] grill = plan Phase 3 with xhigh thinking, not separate agent
 - [discuss] MorphEditor dogfooding: pick one small feature
 - [discuss] branch-agent needs config-read step for leafProfiles
