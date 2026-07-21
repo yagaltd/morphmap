@@ -18,6 +18,7 @@ resource: index.md
 
 ## context ⬜
 - Domain glossary → .morphmap/CONTEXT.md
+- improv-map: quality + recursion + context improvements → .morphmap/improv-map.md
 
 
 # MorphMap — AI-Native Project Management
