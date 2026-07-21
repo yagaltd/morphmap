@@ -204,6 +204,7 @@ resource: index.md
 - [learn] agent hallucination: reports claim ✅ with test counts + diffs but code not on disk. Hook checks .spec existence but not code existence. Need post-subagent code verification.
 - [implemented] /morphmap-recover: detects orphaned worktrees, merges uncommitted work, prunes branches
 - [implemented] orphan detection: branch-agent checks parent via intercom at startup, self-merges if orphaned
+- [learn] integration gap found during MorphShell testing: reviewer integration mode was CODE-ONLY — never ran the app. Phase 3 skipped on quality=fast. Now: quality=fast runs lite (health check), quality=strict runs full (bombadil + lonkero). Only quality=none skips.
 - [learn] MorphShell dogfooding complete: plan (budget estimate + 4 scouts), delegate (3 rounds, 15 branches), recover (13 worktrees), testProfiles, tool scanning, model enforcement, telemetry. 5 e2e verified, 5 remaining.
 
 ### 2026-07-20
