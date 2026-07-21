@@ -35,7 +35,7 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 [module] — scope: slash commands · 10/10 prompts + 9/9 skills · e2e tested: 5/10
+## commands 🔄 [module] — scope: slash commands · 11/11 prompts + 10/10 skills · e2e tested: 5/11
 - ✅ /morphmap-init — scaffold + brownfield scan (MorphShell)
 - ✅ /morphmap-plan — budget estimate + grill + tree (MorphShell 4 scouts parallel)
 - ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery
