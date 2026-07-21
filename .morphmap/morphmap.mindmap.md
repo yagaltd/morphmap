@@ -142,8 +142,9 @@ resource: index.md
 ### telemetry (for cross-project improvement)
 - [telemetry] entries in ## decisions are machine-readable, anonymized
 - Categories: leaf-result, spec-quality, model-fit, classification, eta-drift
-- Format: `[telemetry] <category>: agent=<name> leaf=<path> model=<model> thinking=<level> expected-model=<config> result=<✅❌🔄> duration=<s> retries=<N>`
-- Token counts not available from pi extension API — estimated from model × duration × thinking level
+- Format: `[telemetry] <category>: agent=<name> leaf=<path> model=<model> thinking=<level> expected-model=<config> tokens-in=<N> tokens-out=<N> cost=$<amount> result=<✅❌🔄> duration=<s> retries=<N>`
+- Token/cost captured from pi runtime env vars (PI_RUN_TOKENS_IN, PI_RUN_TOKENS_OUT, PI_RUN_ESTIMATED_COST)
+- Delta-calculated: pre-spawn baseline subtracted from post-completion total
 - Feeds /morphmap-improve cross-project analysis
 
 ## decisions ⬜ [log]
