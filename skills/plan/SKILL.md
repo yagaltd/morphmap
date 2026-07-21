@@ -38,27 +38,31 @@ print(max(total, 0))
   echo "Project: ~${TOTAL_CODE} code LOC (excluding Markdown/JSON)"
   echo "Estimated token budget needed: ${EST_TOKENS}"
   echo ""
-  echo "Accept? (y)es / (n)o / enter custom value / 'off' for no budget:"
-  # Read user input (simplified — agent prompts human)
+  echo "🛑 STOP. Ask the human before proceeding:"
+  echo "   'Budget estimated at ${EST_TOKENS} tokens. Accept? (y)es / (n)o / enter custom value / 'off' for no limit.'"
+  echo "   DO NOT proceed to Phase 1 until human approves the budget."
 else
-  EST_TOKENS=3000
+  EST_TOKENS=0
+  echo "Greenfield project (no tokei stats). Ask human for budget or use default 3000."
 fi
 ```
 
-Set goal with computed budget:
+**After human approval**, set goal with the approved budget:
 ```
 create_goal({
   objective: "Plan <directive>. Scout evidence, resolve decisions, produce approved tree with posture set.",
-  token_budget: <EST_TOKENS from above, or "off" if user chose no limit>
+  token_budget: <approved value, or omit for 'off'>
 })
 ```
 
 **Budget rules:**
-- Minimum: 3000 tokens (greenfield with no code)
-- Maximum: 30000 tokens (very large projects)
-- `off`: no budget limit — plan runs until complete (use for large brownfield)
-- User can override with any value or `off`
-- If no tokei stats (greenfield), default to 3000
+- Human MUST approve before proceeding. Never auto-set budget without asking.
+- Present estimate with context: LOC count, what the budget covers (scout + research + tree + grill).
+- If human says 'off': omit token_budget entirely (no limit).
+- If human enters a number: use that value.
+- If human says 'y': use the estimate.
+- Minimum: 3000 tokens (greenfield). Maximum sensible: 50000 tokens.
+- **Large brownfield warning:** >10K LOC projects with parallel scouts may need 2-3x the estimate. Suggest 'off' or double the estimate if spawning >2 parallel agents.
 
 ## Phase 1: EXPLORE FIRST
 
