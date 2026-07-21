@@ -197,6 +197,10 @@ resource: index.md
 - [learn] pi extension hooks: morphmap-hooks.ts for semi-mechanical enforcement (spec guard, goal gate warning, auto-render, telemetry)
 - [learn] dogfooding: pi-interview format bug — recommended for single-select must be string, not object. Fixed in plan Phase 3 with explicit format rules.
 - [learn] ADR support: new [adr] branch tag, ADR template in format spec, hook verifies referenced ADR files exist. Captures decision rationale that survives compaction.
+- [learn] worktree isolation trap: agents wrote code to worktrees but never committed/merged. 13 orphaned worktrees on MorphShell. Fixed: delegate no longer uses worktree:true.
+- [learn] agent hallucination: reports claim ✅ with test counts + diffs but code not on disk. Hook checks .spec existence but not code existence. Need post-subagent code verification.
+- [implemented] /morphmap-recover: detects orphaned worktrees, merges uncommitted work, prunes branches
+- [implemented] orphan detection: branch-agent checks parent via intercom at startup, self-merges if orphaned
 
 ### 2026-07-20
 #### fixes (5)

@@ -20,6 +20,8 @@ All notable changes to MorphMap. Auto-generated from .morphmap/morphmap.mindmap.
 - delegate skill: depth-agnostic spawning for all heading levels
 - init skill: available-skills.md generation at scaffold
 - execution flow doc: updated quality loop with per-leaf [qa:] gating
+- /morphmap-recover: detects orphaned worktrees, merges uncommitted work, prunes branches
+- orphan detection: branch-agent checks parent via intercom at startup, self-merges if orphaned
 
 ### Changed
 - OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
