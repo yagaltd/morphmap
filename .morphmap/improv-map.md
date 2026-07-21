@@ -507,6 +507,11 @@ The branch-level integration review runs only when quality=strict AND branch has
      API surface: <functions/types exported>.
      Known consumers: <who should be notified>.
      Open issues: <any gaps or concerns>."
+
+13. GOAL COMPLETION GATE (see §11):
+    Run mechanical checks before update_goal complete.
+    All pass → mark goal complete.
+    Any fail → fix gaps, retry gate.
 ```
 
 ---
@@ -534,7 +539,7 @@ The branch-level integration review runs only when quality=strict AND branch has
 | # | File | Changes |
 |---|------|---------|
 | 1 | `docs/format-spec.md` | New tags table entries. Updated leaf format. Updated OKF frontmatter fields. |
-| 2 | `.pi/agents/branch-agent.md` | Full execution loop rewrite (steps 0-12). Skill loading via available-skills cache. Tag assignment matrices. Recursive spawning. Parent scope check. |
+| 2 | `.pi/agents/branch-agent.md` | Full execution loop rewrite (steps 0-13). Skill loading via available-skills cache. Tag assignment matrices. Recursive spawning. Parent scope check. Goal completion gate. |
 | 3 | `.pi/agents/leaf-worker.md` | Add: read [test:] tag, apply testing strategy. Skip [human] leaves. |
 | 4 | `.pi/agents/reviewer.md` | No body changes — already defined. Mechanical mode wired via branch-agent loop. |
 | 5 | `.pi/agents/quality-reviewer.md` | Add: check against .spec Boundaries section (including skill constraints). |
@@ -584,6 +589,7 @@ Commit 3: files 8-10 (docs + changelog)
 | Skill loading adds latency to .spec creation | Only on first .spec per domain. Cache constraints for subsequent leaves. |
 | [human] leaves block branch completion | Branch agent skips them, continues other leaves. Human unblocks async. |
 | Parent scope check is vague — agent may miss gaps | Scope check is against parent's OWN scope declaration, which was written during decomposition. Not vague. |
+| Goal completion gate is grep-based — file renames break checks | .spec paths in map are canonical. Leaf workers write to the path in the map. No rename drift. |
 
 ---
 
@@ -726,3 +732,113 @@ Auto: if a skill directory was added/removed since cache was written (compare `l
 | `skills/delegate/SKILL.md` | Phase 1: if available-skills.md missing or >7d stale, regenerate |
 | `.pi/agents/branch-agent.md` | Step 0: read available-skills.md. Step 3a: match domain, load skills. |
 | `.morphmap/morphmap.mindmap.md` | `## context`: reference available-skills.md |
+
+---
+
+## 11. Goal Completion Gate
+
+### 11.1 Problem
+
+LLMs are bad at self-assessment. A branch agent with goal "deliver selection subtree — 3 leaves" will call `update_goal complete` when 2 of 3 leaves are done. Context compacts, the agent gets distracted, or it simply forgets the third leaf. The map still shows ⬜ but nobody notices until `/morphmap-review`.
+
+`/goal` has no built-in verification. It trusts the agent's self-report. This trust is frequently violated.
+
+### 11.2 Solution
+
+A **mechanical pre-completion gate** — bash checks run BEFORE `update_goal complete`. The gate validates the map against disk. If any check fails, goal stays open and the agent fixes gaps.
+
+This is NOT a reviewer spawn. It's a bash script the branch agent runs itself. Deterministic, fast, zero context cost.
+
+### 11.3 Gate Checks
+
+Run at step 13 of the execution loop, after all leaves/sub-branches processed and before `update_goal complete`.
+
+```bash
+# ── Gate: Goal Completion Verification ──
+FAILS=0
+
+# a. All leaves done?
+PENDING=$(grep -c '^\s*-\s*[⬜🔄]' <<< "$SUBTREE" 2>/dev/null || echo 0)
+if [ "$PENDING" -gt 0 ]; then
+  echo "FAIL: $PENDING leaves still pending or in progress."
+  FAILS=$((FAILS + 1))
+fi
+
+# b. All .spec files exist?
+while IFS= read -r spec_path; do
+  if [ ! -f "$spec_path" ]; then
+    echo "FAIL: .spec file missing: $spec_path"
+    FAILS=$((FAILS + 1))
+  fi
+done < <(echo "$SUBTREE" | grep -oP '(?<=\→ ).*\.spec' || true)
+
+# c. All [needs:] resolved?
+UNRESOLVED=$(echo "$SUBTREE" | grep -oP '\[needs:.*?(?<!✅)\]' | grep -v '✅' || true)
+if [ -n "$UNRESOLVED" ]; then
+  echo "FAIL: Unresolved dependencies: $UNRESOLVED"
+  FAILS=$((FAILS + 1))
+fi
+
+# d. Quality review files match [qa: full] leaf count?
+QA_FULL_COUNT=$(echo "$SUBTREE" | grep -c '\[qa: full\]' || echo 0)
+QA_FILES_COUNT=$(ls .morphmap/quality-review-*.md 2>/dev/null | wc -l)
+# Note: this is approximate — agents should track which reviews cover which leaves.
+# For v1, check that count is reasonable (not zero when QA leaves exist).
+if [ "$QA_FULL_COUNT" -gt 0 ] && [ "$QA_FILES_COUNT" -eq 0 ]; then
+  echo "FAIL: $QA_FULL_COUNT leaves require [qa: full] but 0 quality-review files found."
+  FAILS=$((FAILS + 1))
+fi
+
+# e. Integration review exists? (quality=strict only)
+if [ "$QUALITY" = "strict" ]; then
+  INTEGRATION_FILE=$(ls -t .morphmap/integration-review-*.md 2>/dev/null | head -1)
+  if [ -z "$INTEGRATION_FILE" ]; then
+    echo "FAIL: quality=strict but no integration-review file found."
+    FAILS=$((FAILS + 1))
+  fi
+fi
+
+# f. All sub-branches complete?
+SUB_PENDING=$(echo "$SUBTREE" | grep -E '^###.*[⬜🔄]' | grep -v '^$' | wc -l)
+if [ "$SUB_PENDING" -gt 0 ]; then
+  echo "FAIL: $SUB_PENDING sub-branches still pending or in progress."
+  FAILS=$((FAILS + 1))
+fi
+
+# ── Gate verdict ──
+if [ "$FAILS" -eq 0 ]; then
+  echo "✅ GATE PASSED — $FAILS failures. Goal can be marked complete."
+else
+  echo "❌ GATE FAILED — $FAILS failures. Fix gaps before update_goal complete."
+fi
+```
+
+### 11.4 Integration in Execution Loop
+
+```
+Step 12: Report to parent with delivered summary.
+Step 13: Run Goal Completion Gate (bash checks above).
+         ALL PASS → update_goal complete.
+         ANY FAIL → log failures to ## decisions, fix gaps:
+           - Missing .spec → write it, spawn leaf worker
+           - Pending leaf → pull it
+           - Unresolved dep → escalate or fix
+           - Missing review → spawn reviewer
+           - Retry gate after fixes.
+```
+
+### 11.5 What This Does NOT Catch
+
+| Not caught | Why | Mitigation |
+|-----------|-----|-----------|
+| Code is buggy but tests pass | Gate checks structure, not logic | Quality reviewer + bug hunter |
+| .spec exists but is empty/wrong | `ls` returns true | agent-spec lifecycle catches this earlier |
+| API doesn't match parent's needs | Semantic check, not mechanical | Parent scope check (step 9) catches this |
+| Integration review says "pass" but is wrong | Reviewer agent judgment error | Quality=strict layers multiple reviewers |
+
+### 11.6 Files Changed
+
+| File | Change |
+|------|--------|
+| `.pi/agents/branch-agent.md` | Add step 13: Goal Completion Gate before `update_goal complete`. |
+| `docs/execution-flow.md` | Add gate section to execution flow doc. |
