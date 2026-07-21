@@ -104,13 +104,11 @@ resource: index.md
 - morphmap-render: npx markmap-cli → HTML
 - morphmap-status: read branch headers → text summary
 
-### quality pipeline (per leaf)
-- leaf-worker: implements .spec → TDD → agent-spec lifecycle (self-verify)
-- reviewer (mechanical): agent-spec lifecycle + tdd-guard → pass/fail (inline output)
-- quality-reviewer (judgment): simplicity, security, error handling → OKF handoff file (quality-review-NNN)
-- bug-hunter (adversarial): Recon→Hunter→Skeptic→Referee → confirmed bugs (quality=strict, 🔴/🟡 only)
-- reviewer (integration): cross-leaf conflicts, gaps, consistency → OKF handoff file (integration-review-NNN)
-- branch-agent: aggregates all reviews, spawns fixes for P0/P1, updates map
+### quality pipeline (per leaf, gated by [qa:] tag)
+- [qa: none]: leaf-worker self-verify → ✅
+- [qa: review]: leaf-worker → reviewer (mechanical) → ✅
+- [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
+- [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
 ### quality vs bug-hunter (complementary, not redundant)
 - quality-reviewer: static code review (one agent, cheap). Checks simplicity, error patterns, domain fit, surgical scope.
@@ -148,6 +146,18 @@ resource: index.md
 ## decisions ⬜ [log]
 
 ### 2026-07-21
+- [implemented] new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]
+- [implemented] recursive branch agent spawning: same agent at any depth (L1-L3), 5-dimension context injection
+- [implemented] quality architecture: skills loaded before .spec via available-skills.md cache, constraints extracted into Boundaries
+- [implemented] mechanical reviewer wired into execution loop (was defined but never spawned)
+- [implemented] per-leaf [qa:] override — branch agent assigns tag, not blind posture inheritance
+- [implemented] goal completion gate: 6 mechanical checks before update_goal complete
+- [implemented] available-skills.md cache: generated at init/delegate, read by all branch agents
+- [implemented] leaf worker: [test:] tag awareness, [human] tag skip
+- [implemented] quality reviewer: boundaries compliance check against .spec
+- [implemented] delegate skill: depth-agnostic spawning for all heading levels
+- [implemented] init skill: available-skills.md generation at scaffold
+- [implemented] execution flow doc: updated quality loop with per-leaf [qa:] gating
 - [spec] OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
 - [spec] All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
 - [spec] quality reviewer now spawned by branch agent in execution loop step 7d

@@ -37,7 +37,12 @@ Exclude: speculative findings, style preferences, optional refactors without nea
 2. **Security**: Untrusted input handling, injection, open redirects, auth bypasses
 3. **Error handling**: Swallowed errors, silent failures, catch blocks that hide signals
 4. **Surgical changes**: Unnecessary modifications beyond the task scope
-5. **Domain/ADR fit**: Conflicts with `.morphmap/CONTEXT.md` terminology, domain rules, or decisions in the mindmap
+5. **Boundaries compliance**: Does the code violate any constraint from the .spec Boundaries section?
+   - Read the .spec file. Extract Boundaries items.
+   - "DO NOT use innerHTML" → grep for `innerHTML` in changed files
+   - "DO NOT use document.write" → grep for `document.write`
+   - Report each violation with file path and line number.
+6. **Domain/ADR fit**: Conflicts with `.morphmap/CONTEXT.md` terminology, domain rules, or decisions in the mindmap
 
 ### Fail-Fast Error Handling
 1. Prefer propagation over local recovery
@@ -80,6 +85,11 @@ tags: [review, quality, <domain>]
 - [P1] `src/file.ts:42` — <description with evidence>
 - [P2] `src/other.js:15` — <description with evidence>
 (or: No findings — the change is clean.)
+
+### Boundaries Check
+- ✅ No innerHTML usage found
+- ❌ document.write found in src/editor.js:42 — violates .spec Boundaries
+(or: All Boundaries satisfied ✅)
 
 ### Human Reviewer Callouts (Non-Blocking)
 - This change introduces a new dependency: <package>

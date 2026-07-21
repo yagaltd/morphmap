@@ -5,21 +5,25 @@ All notable changes to MorphMap.
 ## [Unreleased]
 
 ### Added
-- Unified OKF handoff format: `type: handoff`, `version`, `timestamp`, `status` lifecycle (raw→distilled→stale)
-- All agent outputs now write versioned OKF handoff files (scout, researcher, quality-reviewer, reviewer/integration)
-- Quality reviewer wired into branch agent execution loop (step 7d)
-- Integration reviewer wired into branch agent execution loop (step 8, quality=strict)
-- Bug hunter wired as posture-gated step (step 7f, quality=strict + 🔴/🟡 leaves only)
-- `/goal` wired into branch agent loop start (step 0) and plan skill Phase 0
-- Quality pipeline posture gates: fast=self-verify, standard=+quality-review, strict=+integration-review+bug-hunter(on risky)
-- Quality reviewer vs bug hunter analysis: complementary, not redundant
+- New leaf tags: `[qa: none|review|full]` (per-leaf quality), `[test: unit|property-based|snapshot|integration|e2e]` (testing strategy), `[skill: <name>]` (audit trail), `[human]` (human-managed leaf)
+- Recursive branch agent spawning: same agent type at any depth (##, ###, ####), 5-dimension context injection
+- Available skills cache (`.morphmap/available-skills.md`): scan-once, grouped by domain, regenerated on staleness
+- Skills loaded before .spec creation: constraints extracted into Boundaries section, preventing bugs instead of catching them
+- Mechanical reviewer wired into execution loop (was defined but never spawned)
+- Goal completion gate: 6 mechanical bash checks before `update_goal complete` (pending leaves, missing .specs, unresolved deps, missing reviews, pending sub-branches)
+- Parent scope check: parent reviews child sub-branch output against own scope declaration
+- Branch-level integration review after all sub-branches report ✅ (quality=strict)
+- Leaf worker: `[test:]` tag awareness, `[human]` tag skip
+- Quality reviewer: boundaries compliance check against .spec
 
 ### Changed
-- Researcher agent: added OKF frontmatter (was missing entirely)
-- Reviewer agent: integration mode now writes OKF handoff file instead of inline output
-- Quality reviewer agent: output format upgraded to OKF handoff file with versioning
-- Scout agent: frontmatter updated to unified OKF format with type/version/timestamp
-- Branch agent: execution loop expanded to 11 steps with quality + integration + bug-hunter + goal
+- Branch agent: execution loop rewritten (13 steps with recursion, per-leaf QA, skill loading, goal gate)
+- Delegate skill: depth-agnostic spawning for all heading levels + available-skills regeneration
+- Init skill: available-skills.md generation at scaffold
+- Leaf worker: testing strategy section added, posture rules updated
+- Quality reviewer: "What to Check" expanded with boundaries compliance, output format updated
+- Execution flow doc: quality loop rewritten with per-leaf `[qa:]` gating
+- Format spec: Tags table expanded, leaf format updated, Per-Leaf Quality Tags section added
 - Plan skill: added Phase 0 goal creation for bounded planning sessions
 - Execution flow doc: updated quality loop with bug-hunter step and posture gates
 - Format spec: expanded handoff file section with agent types table and status lifecycle
