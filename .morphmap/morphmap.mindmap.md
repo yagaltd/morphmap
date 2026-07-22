@@ -113,10 +113,10 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 0/6 phases
-- Plan: docs/mech-mindmap.md · 1750 LOC TypeScript, 900 pure (Rust-portable)
+## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 1/6 phases
+- Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
-- ⬜ Phase A: types + state + config (~200 loc)
+- ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 707 LOC pure (zero pi imports) · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
 - ⬜ Phase B: gate functions — pre-spawn, submit, review, integration (~400 loc)
 - ⬜ Phase C: transition tools — submit_leaf, approve_leaf, integration_gate (~300 loc)
 - ⬜ Phase D: hooks integration — tool_call, pre/post subagent, map write (~200 loc)
@@ -177,6 +177,15 @@ resource: index.md
 - Leaf worker uses assigned tool — doesn't guess
 
 ## decisions ⬜ [log]
+
+### 2026-07-22
+#### mech Phase A implemented
+- [implemented] mech Phase A: pure state machine core → .morphmap/mech/{types,state,config,index}.ts + state.test.ts · 707 LOC pure + 492 LOC test · 49 tests passing · tsc clean
+- [decision] LeafStatus canonicalized to machine strings (pending/in_progress/submitted/in_review/blocked/done) with emoji as display-only map — §2.3 mixed emoji+strings, JSON (§6.1) authoritative so chose machine-native
+- [decision] idempotency = (leaf, to, evidenceHash) exists in transitions[] AND current status === to → no-op pass (crash-recovery safe, §8.1). Avoids duplicate log entries on replay.
+- [decision] [needs-contract:] build unblocks at "submitted" (contract real), integrate at "done" (§3.6). canStartLeaf() returns {buildBlocked, integrateBlocked}
+- [decision] reviewRounds increments ONLY on in_review → in_progress (CHANGES_REQUESTED loop), not on every transition
+- [note] Phase A actual 707 LOC vs plan est. 200 — confirms finding J (estimates optimistic). state.ts alone 337 (StateMachine + idempotency + dep-resolution). Total mech est. holds at ~2100-2800.
 
 ### 2026-07-21
 #### implemented (15)
