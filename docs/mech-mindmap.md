@@ -2,8 +2,9 @@
 
 type: plan
 timestamp: 2026-07-22T12:00:00Z
-version: 2
-tags: [mech, state-machine, deterministic]
+version: 3
+summary: Deterministic state machine for MorphMap — 554-line spec with 5-Why stress-tested design
+tags: [mech, state-machine, deterministic, 5why-tested]
 
 ---
 
@@ -56,7 +57,7 @@ The design is compact: ~1750 lines of TypeScript across 6 implementation phases.
 └────────────────────────────────────────────────┘
 ```
 
-**Pure module:** Functions take plain objects, return plain objects. Unit-testable without pi. 
+**Pure module:** Zero pi imports. Zero filesystem access. Zero network. All data arrives via function parameters. Functions take plain objects, return plain objects. Unit-testable without pi. 
 **Impure module:** Pi-specific wiring. Calls pure module for decisions, acts on results.
 
 ### 2.2 JSON Source of Truth
@@ -179,12 +180,21 @@ applyPosture(branch): reads phase + compat + quality → returns posture overrid
 Step A: md → json sync (if plan.md changed)
   → parse markdown → validate tags → write state.json
   → if invalid: block commit
+  → Round-trip guarantee: state.json regenerated from itself produces identical state.json
+    (test: plan.md → state.json → state.json' → no diff)
 
 Step B: codebase-graph sync (if source files changed)
   → git diff → tree-sitter parse changed files → update graph
+  → Graph writes serialized per module (single writer, no race)
+  → Cross-module callers surfaced to callee's graph (UI calls auth → auth graph shows UI as consumer)
+  → if tree-sitter not installed → skip, warn
 
 Step C: regenerate plan.md from state.json (normalize)
 Step D: render plan.html via markmap-cli
+
+Step E: state.json atomic write (every transition)
+  → write to state.json.tmp → fsync → atomic rename to state.json
+  → Prevents corruption on crash mid-write
 ```
 
 ---
@@ -253,6 +263,8 @@ Every sub-map renders via `markmap plans/<name>.plan.md -o plans/<name>.html`. S
 Common prefix (auth/*, api/*) with ≥3 children → group into sub-branch
 ```
 
+**Numbers are tunable config, not invariants.** Configure in `.morphmap/config.branchSize: { recommend: 5, mandatory: 10, maxSpecLines: 300 }`. Adjust per project domain.
+
 ### 3.5 Context Isolation
 
 Each sub-branch-agent gets FRESH context. Sees: its subtree, parent scope, known consumers, siblings. Does NOT see: sibling leaves, parent integration review, full steering map. 500-leaf ERP: no agent reads all 500. Each branch-agent reads ~10 leaves.
@@ -301,6 +313,10 @@ Each sub-branch-agent gets FRESH context. Sees: its subtree, parent scope, known
 
 Contract phase uses `--contract-only` flag on delegate. Execution reuses existing delegate. `.spec` files exist BEFORE leaf workers start.
 
+**Contract revision escape hatch:** If a leaf worker discovers the `.spec` is wrong during BUILD (missing API signature, wrong boundaries), it calls `morphmap_request_revision(leafId, reason)`. Leaf returns to ⬜. Branch agent rewrites .spec. Prevents silent implementation against bad contracts.
+
+**QA tier validation gate:** `mech_validate_qa_tier` — a leaf tagged `[auth]` or `[payment]` must have at least `[qa: full]`. Prevents agent misclassification at planning time. Configurable: `.morphmap/config.qaMinimums: { auth: "full", payment: "strict" }`.
+
 ### 4.3 Structured Leaf Worker
 
 Leaf worker flow (Plan→Build→Verify→Submit, Trio pattern):
@@ -311,6 +327,8 @@ BUILD: For each step: write test → fail → implement → pass → re-run all 
 VERIFY: agent-spec lifecycle → tdd-guard → npm test + build → self-review checklist
        "Did I add anything not in Boundaries? Any abstraction not in scenarios?"
 SUBMIT: morphmap_submit_leaf({ evidence })
+
+**Over-engineering guard:** After submit, a cheap second agent (`mech_overengineering_check`) reads diff + .spec and flags potential over-engineering (>3 new functions not in scenarios, new abstractions without callers). Warning only — accumulates, triggers human review after N warnings. Not a gate block.
 ```
 
 Leaf worker is execution-only. Planning + test writing extracted to branch agent / test-writer. This eliminates over-engineering at code level.
@@ -472,7 +490,7 @@ ctx_search(queries: ["trace:frontend/auth/jwt-refresh"], sort: "timeline")
 | F | Sub-Map Session Lifecycle (heartbeat, orphan, status sync) | 200 | Later |
 | — | Tests (unit + chain + integration) | 300 | Continuous |
 
-**Total: ~1750 lines, ~9.5 hours.** Pure module ~900 lines. Impure ~850 lines.
+**Total: ~1750-2200 lines, ~10-14 hours.** Pure module ~900-1100 lines. Impure ~850-1100 lines. Range accounts for schema boilerplate + config files missed in initial estimate.
 
 ### 7.2 File Structure
 
@@ -532,6 +550,7 @@ state.json is the recovery anchor. Written on every transition. Git-tracked.
 ### 8.3 Rollback / Disable
 
 - Per-branch opt-out: `[qa: none]` skips all gates
+- Per-gate disable: `mech.exclude_gates: ["gate_name"]` in config — disables a specific noisy gate without disabling all gates. Validates against gate dependency graph before applying.
 - Config flag: `mech.enabled: false` → gates become warnings
 - Emergency: `/morphmap-delegate --no-mech`
 
@@ -540,6 +559,8 @@ Disabling mech returns to current behavior. No data loss.
 ### 8.4 Backward Compatibility
 
 Existing projects continue working. New tags optional. No .spec format change. `mech.enabled: false` = identical to today. New projects default to `mech.enabled: true`.
+
+**Migration tooling (planned v0.3):** `morphmap-migrate --scan` analyzes existing project and suggests tags for existing leaves. Human reviews and approves. Until then, manual tag addition.
 
 ---
 
@@ -552,3 +573,7 @@ Existing projects continue working. New tags optional. No .spec format change. `
 - **Trio pattern:** Used inside leaf worker (Plan→Build→Verify→Submit). Not at branch-agent level.
 - **No Rust/Rhai:** Deferred. TypeScript first. Port only when bottlenecks proven.
 - **Markmap stays:** plan.md renders via existing markmap-cli. No new rendering engine.
+- **Event history deferred:** State machine tracks current state only. Full event sourcing (audit trail of every transition) deferred to v0.3 when traceability requirements mature.
+- **Human override delegation:** Depth-0 only for prototype. Delegated override (time-boxed, mandatory post-hoc review) deferred to v0.2 for team/CI scenarios.
+- **Audit compulsory triggers:** Advisory-only for v0.1. Security-critical modules ([qa: strict]) may get compulsory pre-change audit in v0.2.
+- **Trace↔improve integration:** Trace field exists for artifact linkage. morphmap-improve currently uses git log + decisions log, not trace. Integration planned for v0.3 when trace field is populated across all artifacts.
