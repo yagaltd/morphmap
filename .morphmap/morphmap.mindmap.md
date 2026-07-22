@@ -113,11 +113,11 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 1/6 phases
+## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 2/6 phases
 - Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 707 LOC pure (zero pi imports) · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
-- ⬜ Phase B: gate functions — pre-spawn, submit, review, integration (~400 loc)
+- ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
 - ⬜ Phase C: transition tools — submit_leaf, approve_leaf, integration_gate (~300 loc)
 - ⬜ Phase D: hooks integration — tool_call, pre/post subagent, map write (~200 loc)
 - ⬜ Phase E: tool failure recovery — classify, retry, reroute (~150 loc)
@@ -195,6 +195,14 @@ resource: index.md
 - [implemented] P3 fix: +8 tests covering gaps (done terminal, done-mutation rejection, done idempotent replay, blocked/unblock via transitionLeaf, mixed needs+needs-contract edges, ghost target, warning surfacing) → 57 tests, 131 expects, all green
 - [implemented] non-blocking: tsconfig.mech.json → tsconfig.json (conventional name, bare `tsc` works)
 - [learning] logged decision #3 diverged from spec §3.6 without amending the spec — process violation caught by review. Lesson: decisions must cite & reconcile the spec, not override silently. This is the mech thesis working: review turned a self-claimed ✅ into verified ✅.
+
+#### mech Phase B implemented
+- [implemented] Phase B gates → .morphmap/mech/gates/{pre-spawn,submit,review,integration}.ts + .morphmap/mech/lattice.ts · preSpawn (7) + submit (6) + review (6) + integration (4) = 22 gates · lattice maps transitions→chains
+- [decision] gates are PURE — they validate already-populated LeafEvidence; impure layer (Phase D) gathers evidence (runs CLI, reads files). Keeps gates unit-testable, no I/O.
+- [decision] tool-absent pattern: null evidence field → gate skips (pass). tdd-guard/bombadil/lonkero/healthCheck may be absent (finding A). Optional-result gate factory.
+- [decision] QA-tier conditional: p1CountZeroIfFull enforces P1=0 only at [qa: full|strict], skips at review/none (§4.1).
+- [decision] Phase A TransitionGateCtx widened (optional graph/allLeaves/allowedChanges) so cross-leaf/dependency gates get data. Backward-compatible.
+- [learning] integration test caught crossLeafNoConflict reading stale leaf.evidence instead of incoming evidence — unit test missed it (fixture put files on leaf). Lesson: integration tests through transitionLeaf are essential, not optional.
 
 ### 2026-07-21
 #### implemented (15)

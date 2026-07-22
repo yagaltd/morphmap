@@ -139,6 +139,9 @@ export interface TransitionInput {
   evidence?: Partial<LeafEvidence>;
   gates?: Gate<TransitionGateCtx>[]; // gates required for THIS transition
   now?: () => string; // injectable clock for deterministic tests
+  graph?: DependencyGraph; // for dependenciesResolvable gate
+  allLeaves?: Record<string, Leaf>; // for crossLeafNoConflict gate
+  allowedChanges?: string[]; // from .spec Boundaries, for filesMatchSpec gate
 }
 
 /**
@@ -204,7 +207,14 @@ export function transitionLeaf(
 
   // 4. gates: single runner (runGates) — first block short-circuits,
   //    warnings surface in the outcome but never block
-  const ctx: TransitionGateCtx = { leaf, evidence: mergedEvidence, to: input.to };
+  const ctx: TransitionGateCtx = {
+    leaf,
+    evidence: mergedEvidence,
+    to: input.to,
+    graph: input.graph,
+    allLeaves: input.allLeaves,
+    allowedChanges: input.allowedChanges,
+  };
   const gateResult = runGates(input.gates ?? [], ctx);
   if (!gateResult.pass) {
     return {
@@ -289,7 +299,7 @@ export function canStartLeaf(
 
 // Linear progression order. "blocked" excluded — a blocked target
 // satisfies no dependency.
-const STATUS_ORDER: LeafStatus[] = [
+export const STATUS_ORDER: LeafStatus[] = [
   "pending",
   "in_progress",
   "submitted",
@@ -297,7 +307,7 @@ const STATUS_ORDER: LeafStatus[] = [
   "done",
 ];
 
-function reachedAtLeast(status: LeafStatus, threshold: LeafStatus): boolean {
+export function reachedAtLeast(status: LeafStatus, threshold: LeafStatus): boolean {
   if (status === "blocked") return false;
   return STATUS_ORDER.indexOf(status) >= STATUS_ORDER.indexOf(threshold);
 }

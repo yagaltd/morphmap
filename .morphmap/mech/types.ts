@@ -218,11 +218,15 @@ export interface Gate<I> {
   run: (input: I) => GateResult;
 }
 
-// Context handed to every gate at transition time.
+// Context handed to every gate at transition time. Optional fields are
+// populated by the lattice layer for cross-leaf / dependency gates.
 export interface TransitionGateCtx {
   leaf: Leaf;
   evidence: LeafEvidence;
   to: LeafStatus;
+  graph?: DependencyGraph; // for dependenciesResolvable
+  allLeaves?: Record<string, Leaf>; // for crossLeafNoConflict
+  allowedChanges?: string[]; // from .spec Boundaries, for filesMatchSpec
 }
 
 // ── Over-engineering accumulator (§4.3, finding K) ────────────
