@@ -113,6 +113,16 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
+## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 0/6 phases
+- Plan: docs/mech-mindmap.md · 1750 LOC TypeScript, 900 pure (Rust-portable)
+- Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
+- ⬜ Phase A: types + state + config (~200 loc)
+- ⬜ Phase B: gate functions — pre-spawn, submit, review, integration (~400 loc)
+- ⬜ Phase C: transition tools — submit_leaf, approve_leaf, integration_gate (~300 loc)
+- ⬜ Phase D: hooks integration — tool_call, pre/post subagent, map write (~200 loc)
+- ⬜ Phase E: tool failure recovery — classify, retry, reroute (~150 loc)
+- ⬜ Phase F: sub-map session lifecycle — heartbeat, orphan, status sync (~200 loc)
+
 ### quality vs bug-hunter (complementary, not redundant)
 - quality-reviewer: static code review (one agent, cheap). Checks simplicity, error patterns, domain fit, surgical scope.
 - bug-hunter: adversarial pipeline (4 agents, expensive). Finds runtime bugs, race conditions, auth bypasses. Can auto-fix.
