@@ -113,12 +113,12 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 2/6 phases
+## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 3/6 phases
 - Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 707 LOC pure (zero pi imports) · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
 - ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
-- ⬜ Phase C: transition tools — submit_leaf, approve_leaf, integration_gate (~300 loc)
+- ✅ Phase C: transition tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate (pure handlers) · select gates via lattice, call transitionLeaf/runIntegrationGates · return {accepted/passed, failures} · 18 new tests · full suite 113/113 green · tsc exit 0 · tdd-guard 6/6 · end-to-end lifecycle tests (submit→approve→integrate, cannot-skip-review) · request_revision deferred to Phase D
 - ⬜ Phase D: hooks integration — tool_call, pre/post subagent, map write (~200 loc)
 - ⬜ Phase E: tool failure recovery — classify, retry, reroute (~150 loc)
 - ⬜ Phase F: sub-map session lifecycle — heartbeat, orphan, status sync (~200 loc)
@@ -203,6 +203,13 @@ resource: index.md
 - [decision] QA-tier conditional: p1CountZeroIfFull enforces P1=0 only at [qa: full|strict], skips at review/none (§4.1).
 - [decision] Phase A TransitionGateCtx widened (optional graph/allLeaves/allowedChanges) so cross-leaf/dependency gates get data. Backward-compatible.
 - [learning] integration test caught crossLeafNoConflict reading stale leaf.evidence instead of incoming evidence — unit test missed it (fixture put files on leaf). Lesson: integration tests through transitionLeaf are essential, not optional.
+
+#### mech Phase C implemented
+- [implemented] Phase C tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate · pure handlers (Phase D wraps with pi.registerTool + state.json I/O)
+- [decision] Phase C = pure tool handlers; Phase D = impure wiring. Tools select gates via lattice (agents don't pick gates), call transitionLeaf/runIntegrationGates, return agent-facing {accepted/passed, failures}. Keeps C testable.
+- [decision] request_revision (§4.2 escape hatch) deferred to Phase D — not in §2.5 tool list. Scope tight to plan.
+- [decision] integrationGate marks branch status=done on pass (branch-level transition); returns unchanged state on fail.
+- [decision] reviewFile param ⇒ evidence.qualityReviewExists=true (impure layer confirms path exists; pure tool trusts the flag).
 
 ### 2026-07-21
 #### implemented (15)

@@ -5,6 +5,7 @@
 export * from "./types";
 export * from "./state";
 export * from "./config";
+export * from "./tools";
 export * from "./gates/pre-spawn";
 export * from "./gates/submit";
 export * from "./gates/review";
