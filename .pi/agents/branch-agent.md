@@ -350,6 +350,12 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 - Prefer sandboxed execution over raw file reads for large outputs.
 - Search indexed knowledge before asking human.
 - Tree is living — restructure when leaf proves too big or too small.
+- **Leaf atomicity gate:** Before spawning leaf worker, verify .spec is atomic:
+  - Max 5 BDD scenarios per .spec (if >5 → split into sub-leaves)
+  - Max 3 files in Allowed Changes (if >3 → split)
+  - Max 200 lines estimated change (if .spec Boundaries imply more → split)
+  - Deterministic: `grep -c '^- \[' spec/*.spec` counts scenarios. No agent judgment.
+  - If leaf too large → restructure into sub-branches BEFORE spawning worker.
 - **>5 items threshold:** Any heading with >5 direct children must be restructured into sub-branches.
   Applies to [module], [feature], AND [log] branches (decisions, releases, skills docs).
   If `## decisions` has >5 entries under one date, group by tag into `####` sub-branches.
