@@ -2,8 +2,8 @@
 
 type: plan
 timestamp: 2026-07-22T12:00:00Z
-version: 3
-summary: Deterministic state machine for MorphMap — 554-line spec with 5-Why stress-tested design
+version: 4
+summary: Deterministic state machine for MorphMap — 590-line spec, 5-Why + deep-review tested, 44 gaps closed
 tags: [mech, state-machine, deterministic, 5why-tested]
 
 ---
@@ -129,12 +129,12 @@ Every gate is `(input) => { pass: boolean, reason?: string }`. Gates are compose
 ```
 preSpawnGates (before leaf worker starts):
   specFileExists | specScenarioCount ≤5 | specFileCount ≤3 |
-  specEstLOC ≤200 | modelAssigned | toolsAssigned | dependenciesResolvable
+  specEstLOC [soft] (warning: scenarios × 30 LOC avg. Override: [est-loc: N] tag) |
+  modelAssigned | toolsAssigned | dependenciesResolvable
 
 submitGates (leaf worker → branch agent):
   agentSpecLifecycle | tddGuardPassed | npmTestAndBuild |
   boundariesClean | crossLeafNoConflict | filesMatchSpec
-  specEstLOC (warning only: scenarios × 30 LOC avg. Override: [est-loc: N] tag on leaf)
 
 reviewGates (reviewer → branch agent):
   qualityReviewExists | P0Count=0 | P1Count=0 (if [qa: full]) |
