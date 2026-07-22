@@ -123,7 +123,12 @@ resource: index.md
 - ⬜ Phase E: tool failure recovery — classify, retry, reroute (~150 loc)
 - ⬜ Phase F: sub-map session lifecycle — heartbeat, orphan, status sync (~200 loc)
 
-### quality vs bug-hunter (complementary, not redundant)
+### mech-mindmap (deterministic state machine)
+- Pure gates (pre-spawn, submit, review, integration) — zero pi imports
+- Transition tools (submit_leaf, approve_leaf, integration_gate)
+- Tool failure recovery (classify, retry, reroute)
+- Sub-map session lifecycle (heartbeat, orphan, status sync)
+- Design: pure/impure split → direct Rust + Rhai port
 - quality-reviewer: static code review (one agent, cheap). Checks simplicity, error patterns, domain fit, surgical scope.
 - bug-hunter: adversarial pipeline (4 agents, expensive). Finds runtime bugs, race conditions, auth bypasses. Can auto-fix.
 - Quality reviewer runs on every leaf (standard/strict). Bug hunter runs on 🔴/🟡 leaves only (strict).
