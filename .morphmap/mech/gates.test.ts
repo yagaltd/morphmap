@@ -13,7 +13,7 @@ import { test, expect, describe } from "bun:test";
 import {
   agentSpecLifecycle,
   allGateNames,
-  allLeavesSubmitted,
+  allLeavesComplete,
   bombadilPassed,
   boundariesClean,
   crossLeafConflictsResolved,
@@ -263,17 +263,20 @@ describe("review gates", () => {
 
 // ── integration gates ─────────────────────────────────────────
 describe("integration gates", () => {
-  test("allLeavesSubmitted: all submitted→pass, one pending→fail", () => {
-    const b = branch([leaf({ id: "a", status: "done" }), leaf({ id: "b", status: "submitted" })]);
-    expect(allLeavesSubmitted.run(intCtx({ branch: b })).pass).toBe(true);
-    const b2 = branch([leaf({ id: "a", status: "done" }), leaf({ id: "b", status: "in_progress" })]);
-    expect(allLeavesSubmitted.run(intCtx({ branch: b2 })).pass).toBe(false);
+  test("allLeavesComplete: all done→pass, one not-done→fail", () => {
+    const b = branch([leaf({ id: "a", status: "done" }), leaf({ id: "b", status: "done" })]);
+    expect(allLeavesComplete.run(intCtx({ branch: b })).pass).toBe(true);
+    // submitted is no longer enough — branch-done requires leaf-done
+    const b2 = branch([leaf({ id: "a", status: "done" }), leaf({ id: "b", status: "submitted" })]);
+    expect(allLeavesComplete.run(intCtx({ branch: b2 })).pass).toBe(false);
+    const b3 = branch([leaf({ id: "a", status: "done" }), leaf({ id: "b", status: "in_progress" })]);
+    expect(allLeavesComplete.run(intCtx({ branch: b3 })).pass).toBe(false);
   });
 
-  test("allLeavesSubmitted: sub-branches incomplete→fail, complete→pass", () => {
+  test("allLeavesComplete: sub-branches incomplete→fail, complete→pass", () => {
     const b = branch([], { subBranches: ["c"] });
-    expect(allLeavesSubmitted.run(intCtx({ branch: b, rollup: { allComplete: false, anyBlocked: false, inProgress: ["c"] } })).pass).toBe(false);
-    expect(allLeavesSubmitted.run(intCtx({ branch: b, rollup: { allComplete: true, anyBlocked: false, inProgress: [] } })).pass).toBe(true);
+    expect(allLeavesComplete.run(intCtx({ branch: b, rollup: { allComplete: false, anyBlocked: false, inProgress: ["c"] } })).pass).toBe(false);
+    expect(allLeavesComplete.run(intCtx({ branch: b, rollup: { allComplete: true, anyBlocked: false, inProgress: [] } })).pass).toBe(true);
   });
 
   test("crossLeafConflictsResolved", () => {
@@ -303,7 +306,7 @@ describe("integration gates", () => {
     const bad = branch([leaf({ id: "a", status: "in_progress" })]);
     const r = runIntegrationGates(intCtx({ branch: bad }));
     expect(r.pass).toBe(false);
-    expect(r.reason).toContain("allLeavesSubmitted");
+    expect(r.reason).toContain("allLeavesComplete");
   });
 });
 
@@ -423,5 +426,17 @@ describe("full lifecycle via transitionLeaf + gates", () => {
       evidence: ev({ qualityReviewExists: true, qualityReviewP0Count: 0, qualityReviewP1Count: 5 }),
     });
     expect(out.transitioned).toBe(true);
+  });
+
+  test("spawn (pending→in_progress) blocked when spec missing (pre-spawn via transitionLeaf)", () => {
+    const b = branch([leaf({ id: "a", status: "pending" })]);
+    const out = transitionLeaf(b, {
+      leafId: "a",
+      to: "in_progress",
+      gates: gatesForLeafTransition("pending", "in_progress"),
+      evidence: ev({ specExists: false }),
+    });
+    expect(out.transitioned).toBe(false);
+    expect(out.result.reason).toContain("specFileExists");
   });
 });

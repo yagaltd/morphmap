@@ -211,6 +211,14 @@ resource: index.md
 - [decision] integrationGate marks branch status=done on pass (branch-level transition); returns unchanged state on fail.
 - [decision] reviewFile param ⇒ evidence.qualityReviewExists=true (impure layer confirms path exists; pure tool trusts the flag).
 
+#### mech Phase B+C quality review (morphmap/quality-reviewer)
+- [skill] morphmap/quality-reviewer used for mech Phase B+C (batched) · outcome: APPROVED WITH FINDINGS (0 blocking, 1×P2, 3×P3) · handoff: .morphmap/quality-review-002-20260722-mech-phaseBC.md
+- [implemented] P2 fix: added runtimeDependenciesMet gate to reviewGates — enforces integrateBlocked===false at in_review→done. Closes the [needs-contract:] gap (leaf could reach done while runtime dep not done, false "done=proof"). approveLeaf now passes graph/allLeaves into ctx.
+- [implemented] P3 fix: allLeavesSubmitted → allLeavesComplete, tightened check from "submitted" to "done". Branch-done now requires leaf-done (spec §2.4 naming reconciled — a submitted-but-unreviewed leaf no longer completes a branch).
+- [implemented] P3 fix: removed unused LeafEvidence import in submit.ts
+- [implemented] P3 fix: +2 tests (pre-spawn chain via transitionLeaf; runtime-dep blocks approve) → 115 tests, 276 expects, all green
+- [learning] P2 was a real enforcement gap invisible to self-verification (all 113 tests passed before) — the needs-contract build/integrate split has two gates (buildBlocked at spawn, integrateBlocked at approve) and only the first existed. Review caught the missing half.
+
 ### 2026-07-21
 #### implemented (15)
 - [implemented] new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]

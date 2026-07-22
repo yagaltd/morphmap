@@ -95,6 +95,8 @@ export function approveLeaf(
     to: "done",
     evidence,
     gates: reviewGates,
+    graph: input.graph,
+    allLeaves: input.allLeaves,
     now: input.now,
   });
   return toLeafResult(out);

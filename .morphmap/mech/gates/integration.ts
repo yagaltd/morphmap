@@ -8,7 +8,6 @@
  */
 import type { BranchState, DependencyGraph, GateResult } from "../types";
 import type { BranchRollup } from "../state";
-import { reachedAtLeast } from "../state";
 import { fail, pass, skip } from "./common";
 
 export interface IntegrationGateCtx {
@@ -22,19 +21,18 @@ export interface IntegrationGate {
   run: (ctx: IntegrationGateCtx) => GateResult;
 }
 
-// Every direct leaf must have reached at least "submitted"; every
-// sub-branch must be complete (rollup.allComplete).
-export const allLeavesSubmitted: IntegrationGate = {
-  name: "allLeavesSubmitted",
+// Every direct leaf must be DONE; every sub-branch must be complete
+// (rollup.allComplete). Spec §2.4 names this "allLeavesSubmitted" but
+// branch-completion semantically requires done (reconciled — review P3).
+export const allLeavesComplete: IntegrationGate = {
+  name: "allLeavesComplete",
   run: ({ branch, rollup }) => {
     const direct = Object.values(branch.leaves);
     if (direct.length > 0) {
-      const incomplete = direct.filter(
-        (l) => !reachedAtLeast(l.status, "submitted"),
-      );
+      const incomplete = direct.filter((l) => l.status !== "done");
       if (incomplete.length > 0) {
         return fail(
-          `${incomplete.length} leaf/leaves not submitted: ${incomplete.map((l) => l.id).join(", ")}`,
+          `${incomplete.length} leaf/leaves not done: ${incomplete.map((l) => l.id).join(", ")}`,
         );
       }
     }
@@ -75,7 +73,7 @@ export const integrationHealthCheckPassed: IntegrationGate = {
 };
 
 export const integrationGates: IntegrationGate[] = [
-  allLeavesSubmitted,
+  allLeavesComplete,
   crossLeafConflictsResolved,
   integrationReviewExists,
   integrationHealthCheckPassed,

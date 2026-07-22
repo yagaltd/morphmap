@@ -4,6 +4,7 @@
  * QA-tier conditional: P1 enforced only at [qa: full|strict] (§4.1).
  */
 import type { Gate, LeafEvidence, TransitionGateCtx } from "../types";
+import { canStartLeaf } from "../state";
 import { fail, pass, skip } from "./common";
 
 export const qualityReviewExists: Gate<TransitionGateCtx> = {
@@ -68,6 +69,21 @@ export const lonkeroPassed = optionalResultGate(
   "lonkero security scan",
 );
 
+// Runtime deps complete: a leaf cannot reach `done` while a runtime
+// dependency ([needs:] or [needs-contract:]) is unresolved. Pairs with
+// dependenciesResolvable (pre-spawn, checks buildBlocked). Spec §3.6:
+// "Both [buildBlocked, integrateBlocked] must be false for leaf to complete."
+export const runtimeDependenciesMet: Gate<TransitionGateCtx> = {
+  name: "runtimeDependenciesMet",
+  run: ({ leaf, graph, allLeaves }) => {
+    if (!graph || !allLeaves) return pass(); // no graph → skip
+    const r = canStartLeaf(leaf.id, graph, allLeaves);
+    return r.integrateBlocked
+      ? fail(`runtime dependencies not complete: ${r.blockedBy.join(", ")}`)
+      : pass();
+  },
+};
+
 export const reviewGates: Gate<TransitionGateCtx>[] = [
   qualityReviewExists,
   p0CountZero,
@@ -75,4 +91,5 @@ export const reviewGates: Gate<TransitionGateCtx>[] = [
   healthCheckPassed,
   bombadilPassed,
   lonkeroPassed,
+  runtimeDependenciesMet,
 ];

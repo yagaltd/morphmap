@@ -176,6 +176,19 @@ describe("approve_leaf", () => {
     expect(out.accepted).toBe(false);
     expect(out.failures[0]).toMatch(/illegal/);
   });
+
+  test("approve blocked when runtime dep (needs-contract) not done", () => {
+    // §3.6: integrateBlocked must be false to complete. dep at in_review →
+    // contract ok (build unblocked) but runtime not done → approve must fail.
+    const graph = { nodes: ["a", "dep"], edges: [{ from: "a", to: "dep", kind: "needs-contract" }] };
+    const b = branch([
+      leaf({ id: "a", status: "in_review" }),
+      leaf({ id: "dep", status: "in_review" }),
+    ]);
+    const out = approveLeaf(b, { leafId: "a", evidence: goodReview, graph, allLeaves: b.leaves });
+    expect(out.accepted).toBe(false);
+    expect(out.failures[0]).toContain("runtimeDependenciesMet");
+  });
 });
 
 // ── integration_gate ──────────────────────────────────────────
@@ -193,13 +206,13 @@ describe("integration_gate", () => {
     expect(out.newState.integrationStatus.allLeavesComplete).toBe(true);
   });
 
-  test("failed when a leaf is not submitted", () => {
+  test("failed when a leaf is not done", () => {
     const b = branch([leaf({ status: "in_progress" })], {
       integrationStatus: { ...branch().integrationStatus, reviewFileExists: true },
     });
     const out = integrationGate(b, { graph });
     expect(out.passed).toBe(false);
-    expect(out.failures[0]).toContain("allLeavesSubmitted");
+    expect(out.failures[0]).toContain("allLeavesComplete");
     expect(out.newState.status).toBe("in_progress"); // unchanged
   });
 
@@ -237,7 +250,7 @@ describe("integration_gate", () => {
     });
     const out = integrationGate(b, { graph });
     expect(out.passed).toBe(false);
-    expect(out.failures[0]).toContain("allLeavesSubmitted");
+    expect(out.failures[0]).toContain("allLeavesComplete");
   });
 
   test("cross-leaf conflict blocks integration", () => {

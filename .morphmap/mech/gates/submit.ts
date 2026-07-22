@@ -2,7 +2,7 @@
  * mech gates — submit (leaf worker → branch agent, on submit_leaf).
  * Spec §2.4 submitGates. Proves the work was actually done.
  */
-import type { Gate, LeafEvidence, TransitionGateCtx } from "../types";
+import type { Gate, TransitionGateCtx } from "../types";
 import { fail, pass, skip } from "./common";
 
 export const agentSpecLifecycle: Gate<TransitionGateCtx> = {
