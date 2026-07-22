@@ -87,6 +87,8 @@ codebase-graph/<module>.json (authoritative)
 
 **Why JSON-first:** Gates are pure functions. They read structured data, not parse markdown. Agent context shrinks (JSON excerpt ~1KB vs markdown block ~3KB). Validation at commit time. Humans still edit .md — no learning curve. Hook does the conversion.
 
+**Markdown fidelity guarantee:** Round-trip test guarantees `state.json → state.json'` is identical (no machine-state drift). Markdown regeneration normalizes formatting but preserves human content. Fields NOT in the JSON schema (custom comments, ordering preferences) are preserved in a `_markdown_extras` block — never silently dropped. Round-trip does NOT guarantee byte-for-byte markdown identity; it guarantees semantic equivalence + extras preservation.
+
 ### 2.3 State Machine Entities
 
 ```
@@ -132,6 +134,7 @@ preSpawnGates (before leaf worker starts):
 submitGates (leaf worker → branch agent):
   agentSpecLifecycle | tddGuardPassed | npmTestAndBuild |
   boundariesClean | crossLeafNoConflict | filesMatchSpec
+  specEstLOC (warning only: scenarios × 30 LOC avg. Override: [est-loc: N] tag on leaf)
 
 reviewGates (reviewer → branch agent):
   qualityReviewExists | P0Count=0 | P1Count=0 (if [qa: full]) |
@@ -185,7 +188,8 @@ Step A: md → json sync (if plan.md changed)
 
 Step B: codebase-graph sync (if source files changed)
   → git diff → tree-sitter parse changed files → update graph
-  → Graph writes serialized per module (single writer, no race)
+  → Graph writes serialized per module (single working tree, no race)
+  → Worktree mode: incremental updates disabled — graphs merge in morphmap-recover
   → Cross-module callers surfaced to callee's graph (UI calls auth → auth graph shows UI as consumer)
   → if tree-sitter not installed → skip, warn
 
@@ -276,7 +280,7 @@ Each sub-branch-agent gets FRESH context. Sees: its subtree, parent scope, known
 | `[needs: path]` | Target leaf ✅ | "I call this at runtime" |
 | `[needs-contract: path]` | Target leaf ⏳review | "I need the API signature" |
 
-`[needs-contract:]` enables parallel work — dependent leaf starts after contract approved, not after code complete. Deterministic resolution: `canStartLeaf()` walks the dependency graph. No agent judgment.
+`[needs-contract:]` enables parallel work — dependent leaf starts BUILD after contract approved, INTEGRATION still waits for ✅. `canStartLeaf()` returns `{buildBlocked, integrateBlocked}` — build resolves at ⏳review, integrate resolves at ✅. Both must be false for leaf to complete.
 
 ---
 
@@ -328,7 +332,7 @@ VERIFY: agent-spec lifecycle → tdd-guard → npm test + build → self-review 
        "Did I add anything not in Boundaries? Any abstraction not in scenarios?"
 SUBMIT: morphmap_submit_leaf({ evidence })
 
-**Over-engineering guard:** After submit, a cheap second agent (`mech_overengineering_check`) reads diff + .spec and flags potential over-engineering (>3 new functions not in scenarios, new abstractions without callers). Warning only — accumulates, triggers human review after N warnings. Not a gate block.
+**Over-engineering guard:** After submit, a cheap second agent (`mech_overengineering_check`) reads diff + .spec and flags potential over-engineering (>3 new functions not in scenarios, new abstractions without callers). Warning only — accumulates in `state.json.overengineering.warnings` per project. Default: 5 warnings triggers human review. Configurable: `.morphmap/config.overengineering.maxWarnings`.
 ```
 
 Leaf worker is execution-only. Planning + test writing extracted to branch agent / test-writer. This eliminates over-engineering at code level.
@@ -433,6 +437,10 @@ Split at same boundaries as mindmap tree. Each branch agent's module = one graph
     }
   },
   "subBranches": [],
+  "childBranchStatus": { "frontend/ui": "in_progress", "frontend/api": "complete" },
+  "transitions": [
+    { "leaf": "jwt-verify", "from": "pending", "to": "in_review", "timestamp": "2026-07-22T14:00:00Z", "evidenceHash": "a1b2c3" }
+  ],
   "integrationStatus": {
     "reviewFileExists": false,
     "allLeavesComplete": false
@@ -490,7 +498,7 @@ ctx_search(queries: ["trace:frontend/auth/jwt-refresh"], sort: "timeline")
 | F | Sub-Map Session Lifecycle (heartbeat, orphan, status sync) | 200 | Later |
 | — | Tests (unit + chain + integration) | 300 | Continuous |
 
-**Total: ~1750-2200 lines, ~10-14 hours.** Pure module ~900-1100 lines. Impure ~850-1100 lines. Range accounts for schema boilerplate + config files missed in initial estimate.
+**Total: ~2100-2800 lines, ~16-20 hours.** Pure module ~1100-1400 (StateMachine<T> + idempotency + dep-resolution ≈ 300, 4 gate files × 5-10 functions ≈ 400-500). Impure ~1000-1400 (hooks, tool registration, sync logic). Range replaces earlier optimistic estimate.
 
 ### 7.2 File Structure
 
@@ -539,7 +547,7 @@ Required before release: full leaf lifecycle, gate failure + recovery, human ove
 1. Restart pi, run `/morphmap-recover --auto`
 2. Recovery reads state.json: finds stuck leaves, checks orphans, merges work
 3. Branch-agent restores from state.json: reads subtree, respawns active sub-branch agents
-4. State machine is idempotent — replaying completed transitions is safe
+4. State machine is idempotent — replay checks `transitions[]` log in state.json. Completed transitions skipped. Evidence re-derived from committed code, not replayed from stale cache.
 
 state.json is the recovery anchor. Written on every transition. Git-tracked.
 
@@ -577,3 +585,6 @@ Existing projects continue working. New tags optional. No .spec format change. `
 - **Human override delegation:** Depth-0 only for prototype. Delegated override (time-boxed, mandatory post-hoc review) deferred to v0.2 for team/CI scenarios.
 - **Audit compulsory triggers:** Advisory-only for v0.1. Security-critical modules ([qa: strict]) may get compulsory pre-change audit in v0.2.
 - **Trace↔improve integration:** Trace field exists for artifact linkage. morphmap-improve currently uses git log + decisions log, not trace. Integration planned for v0.3 when trace field is populated across all artifacts.
+- **Child state rollup:** `rollupChildState()` pure function aggregates `childBranchStatus` from sub-map state.json files. Parent integration gate reads rollup, not flat leaf list. Enables nested sub-map aggregation.
+- **Double-commit bug:** Known issue in morphmap-hooks.ts (~L230-245) — post-tool block runs git commit twice. Fix before Phase D. Telemetry appends (`echo >> map`) pollute source of truth — migrate to `telemetry.json` in Phase D.
+- **This repo migration:** Current map leaves lack [qa:] tags. Before enabling mech: tag `## docs`, `## examples`, `## decisions`, `## releases`, `## skills` as `[qa: none]`. Tag auth/critical leaves as `[qa: full]`. Do not wait for v0.3 migration tooling.
