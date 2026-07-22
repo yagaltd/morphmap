@@ -94,7 +94,8 @@ codebase-graph/<module>.json (authoritative)
 ```
 Leaf {
   id: string              // leaf path, e.g. "auth/jwt-refresh"
-  status: LeafStatus      // ⬜ | 🔄 | ⏳submit | ⏳review | 🔴 | ✅
+  status: LeafStatus      // ⬜ | 🔄 | ⏳submit | ⏳review | 🔴 | ✅ | 💤 abandoned
+  abandonedReason: string // if abandoned: "discarded" | "cancelled" | "aside"
   bottleneck: Bottleneck  // 🔴 | 🟡 | ⚪ | 🔵
   qa: QALevel             // none | review | full | strict
   test: TestStrategy[]    // see §2.4
@@ -105,7 +106,8 @@ Leaf {
 
 Branch {
   id: string
-  status: BranchStatus    // ⬜ | 🔄 | ✅ | 🔴
+  status: BranchStatus    // ⬜ | 🔄 | ✅ | 🔴 | 💤 abandoned
+  abandonedReason: string
   leaves: string[]
   subBranches: string[]
   integrationStatus: IntegrationStatus
@@ -570,6 +572,35 @@ Existing projects continue working. New tags optional. No .spec format change. `
 
 **Migration tooling (planned v0.3):** `morphmap-migrate --scan` analyzes existing project and suggests tags for existing leaves. Human reviews and approves. Until then, manual tag addition.
 
+### 8.5 Abandoned Branches
+
+Branches or leaves can be marked `💤 abandoned` when consciously decided "not now" — not a failure, not a block, a decision to set aside.
+
+**Status semantics:** `abandonedReason` field records why: `discarded` (dead end, never again), `cancelled` (changed mind, could reopen), `aside` (not yet, revisit later). State machine treats all three identically — gates skip, state frozen. Difference is for humans reading the map and for agents proposing reopening.
+
+**On abandon:** All child leaves freeze at their current status. Evidence preserved. `.spec` files unmodified. Code (if any) stays committed. The branch becomes a reference artifact — research, decisions, partial work all intact.
+
+**Reopen flow:** `/morphmap-revisit <branch>`
+
+```
+Phase: ASSESS
+  Agent reads branch subtree + frozen leaves + abandonedReason
+  Checks: .spec still valid against codebase? Dependencies changed?
+           Still high value? Effort reasonable?
+  Agent proposes: reopen / keep-abandoned / archive
+
+Phase: DECIDE
+  Human reads assessment. Can override agent proposal.
+
+Phase: REOPEN (if chosen)
+  Branch: 💤 → 🔄
+  All leaves: frozen → ⬜ (evidence cleared, preSpawn gates re-run)
+  Branch agent starts from contract phase — no assumption old .spec valid
+  No code changed until new leaf workers execute
+```
+
+**Agent-initiated proposal:** During `/morphmap-plan`, scout or researcher can suggest "3 abandoned branches have relevant research for this feature." Human decides. Agent never reopens autonomously.
+
 ---
 
 ## Design Decisions Log
@@ -588,3 +619,4 @@ Existing projects continue working. New tags optional. No .spec format change. `
 - **Child state rollup:** `rollupChildState()` pure function aggregates `childBranchStatus` from sub-map state.json files. Parent integration gate reads rollup, not flat leaf list. Enables nested sub-map aggregation.
 - **Double-commit bug:** Known issue in morphmap-hooks.ts (~L230-245) — post-tool block runs git commit twice. Fix before Phase D. Telemetry appends (`echo >> map`) pollute source of truth — migrate to `telemetry.json` in Phase D.
 - **This repo migration:** Current map leaves lack [qa:] tags. Before enabling mech: tag `## docs`, `## examples`, `## decisions`, `## releases`, `## skills` as `[qa: none]`. Tag auth/critical leaves as `[qa: full]`. Do not wait for v0.3 migration tooling.
+- **Abandoned status:** `💤 abandoned` added to Leaf and Branch entities with `abandonedReason` field (discarded/cancelled/aside). Gates skip, state frozen. `/morphmap-revisit` command handles assess → decide → reopen flow. Agent can propose reopening during plan phase, never autonomously.
