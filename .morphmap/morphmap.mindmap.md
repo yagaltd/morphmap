@@ -23,7 +23,7 @@ resource: index.md
 
 # MorphMap — AI-Native Project Management
 
-## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage · 6/6 leaves
+## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage · 7/7 leaves
 - ✅ format specification → docs/format-spec.md
 - ✅ agent architecture + system prompts + hallucination prevention → docs/agent-architecture.md
 - ✅ intercom protocol specification → docs/intercom-protocol.md
