@@ -27,7 +27,7 @@ resource: index.md
 - ✅ format specification → docs/format-spec.md
 - ✅ agent architecture + system prompts + hallucination prevention → docs/agent-architecture.md
 - ✅ intercom protocol specification → docs/intercom-protocol.md
-- ✅ execution flow + TOC + KPI rules → docs/execution-flow.md
+- ✅ execution flow + full diagram → docs/execution-flow.md
 - ✅ triage flow + classification logic → docs/triage-flow.md
 - ✅ design decisions audit trail → docs/design-decisions.md
 
