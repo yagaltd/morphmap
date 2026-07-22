@@ -40,11 +40,13 @@ export class StateMachine<S extends string> {
   private readonly legal: ReadonlyArray<Transition<S>>;
   private readonly fromIndex: Map<S, Set<S>>;
   private readonly wildcardTargets: Set<S>;
+  private readonly terminal: ReadonlySet<S>;
 
-  constructor(legal: ReadonlyArray<Transition<S>>) {
+  constructor(legal: ReadonlyArray<Transition<S>>, terminal: ReadonlyArray<S> = []) {
     this.legal = legal;
     this.fromIndex = new Map();
     this.wildcardTargets = new Set();
+    this.terminal = new Set(terminal);
     for (const t of legal) {
       if (t.from === "*") {
         this.wildcardTargets.add(t.to);
@@ -60,7 +62,11 @@ export class StateMachine<S extends string> {
   }
 
   canTransition(from: S, to: S): boolean {
-    if (from === to) return true; // self-transition always legal (idempotent)
+    if (from === to) {
+      // self-transition: legal except from terminal states (done is locked —
+      // no silent evidence mutation; use done→pending escape hatch to revise)
+      return !this.terminal.has(from);
+    }
     if (this.fromIndex.get(from)?.has(to)) return true;
     return this.wildcardTargets.has(to);
   }
@@ -98,7 +104,10 @@ export const LEAF_TRANSITIONS: ReadonlyArray<Transition<LeafStatus>> = [
   { from: "done", to: "pending" }, // contract revision escape hatch
 ];
 
-export const leafMachine = new StateMachine(LEAF_TRANSITIONS);
+// "done" is terminal — once approved, a leaf's proof cannot be silently
+// mutated. Revising requires the explicit done→pending escape hatch.
+export const LEAF_TERMINAL: LeafStatus[] = ["done"];
+export const leafMachine = new StateMachine(LEAF_TRANSITIONS, LEAF_TERMINAL);
 
 // ── Evidence hashing (stable, short, deterministic) ───────────
 // Same evidence object → same hash. Key-order independent. No crypto.
@@ -151,7 +160,36 @@ export function transitionLeaf(
     };
   }
 
-  // 1. legality
+  // 1. merge evidence + hash (needed for the idempotency check)
+  const mergedEvidence: LeafEvidence = {
+    ...leaf.evidence,
+    ...(input.evidence ?? {}),
+  };
+  const hash = evidenceHash(mergedEvidence);
+
+  // 2. idempotency FIRST (before legality): if the leaf is already at the
+  //    target with a matching recorded transition, it's a no-op pass. This
+  //    keeps crash-recovery safe for terminal states (done→done replay)
+  //    without allowing evidence mutation.
+  if (leaf.status === input.to) {
+    const already = state.transitions.some(
+      (t) =>
+        t.leaf === input.leafId &&
+        t.to === input.to &&
+        t.evidenceHash === hash,
+    );
+    if (already) {
+      return {
+        state,
+        result: { pass: true, reason: "idempotent: transition already recorded" },
+        transitioned: false,
+        idempotentSkip: true,
+      };
+    }
+  }
+
+  // 3. legality — terminal `done` rejects self-transition (no silent
+  //    mutation of approved proof; use done→pending escape hatch to revise)
   if (!leafMachine.canTransition(leaf.status, input.to)) {
     return {
       state,
@@ -164,44 +202,14 @@ export function transitionLeaf(
     };
   }
 
-  // 2. merge evidence
-  const mergedEvidence: LeafEvidence = {
-    ...leaf.evidence,
-    ...(input.evidence ?? {}),
-  };
-  const hash = evidenceHash(mergedEvidence);
-
-  // 3. idempotency: a matching transition already exists AND leaf is
-  //    currently at the target → no-op pass (crash-recovery safe).
-  const exists = state.transitions.some(
-    (t) =>
-      t.leaf === input.leafId &&
-      t.to === input.to &&
-      t.evidenceHash === hash,
-  );
-  if (exists && leaf.status === input.to) {
-    return {
-      state,
-      result: { pass: true, reason: "idempotent: transition already recorded" },
-      transitioned: false,
-      idempotentSkip: true,
-    };
-  }
-
-  // 4. gates: first block short-circuits; warns never block
+  // 4. gates: single runner (runGates) — first block short-circuits,
+  //    warnings surface in the outcome but never block
   const ctx: TransitionGateCtx = { leaf, evidence: mergedEvidence, to: input.to };
-  const failures: string[] = [];
-  for (const g of input.gates ?? []) {
-    const r = g.run(ctx);
-    if (!r.pass && (r.severity ?? "block") === "block") {
-      failures.push(`${g.name}: ${r.reason ?? "failed"}`);
-      break;
-    }
-  }
-  if (failures.length > 0) {
+  const gateResult = runGates(input.gates ?? [], ctx);
+  if (!gateResult.pass) {
     return {
       state,
-      result: { pass: false, reason: failures.join("; ") },
+      result: gateResult,
       transitioned: false,
       idempotentSkip: false,
     };
@@ -232,7 +240,7 @@ export function transitionLeaf(
   };
   return {
     state: newState,
-    result: { pass: true },
+    result: { pass: true, reason: gateResult.reason, severity: gateResult.severity },
     transitioned: true,
     idempotentSkip: false,
   };
@@ -240,7 +248,7 @@ export function transitionLeaf(
 
 // ── Dependency resolution (§3.6) ──────────────────────────────
 //   [needs: target]         → target must be "done" (runtime call)
-//   [needs-contract: target]→ build unblocks at "submitted" (contract real),
+//   [needs-contract: target]→ build unblocks at "in_review" (contract reviewed),
 //                              integrate unblocks at "done"
 export function canStartLeaf(
   leafId: string,
@@ -263,8 +271,9 @@ export function canStartLeaf(
         blockedBy.push(edge.to);
       }
     } else {
-      // needs-contract
-      if (!reachedAtLeast(targetStatus, "submitted")) {
+      // needs-contract — build unblocks at in_review (contract reviewed & valid),
+      // integrate at done. Spec §3.6: "⏳review" = in_review, NOT submitted.
+      if (!reachedAtLeast(targetStatus, "in_review")) {
         buildBlocked = true;
         blockedBy.push(`${edge.to} (contract)`);
       }

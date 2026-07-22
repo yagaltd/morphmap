@@ -107,6 +107,15 @@ describe("StateMachine legality", () => {
     expect(leafMachine.canTransition("blocked", "done")).toBe(false);
   });
 
+  test("done is terminal: done→done rejected (no silent mutation)", () => {
+    expect(leafMachine.canTransition("done", "done")).toBe(false);
+  });
+
+  test("done escape hatch still legal (done→pending, done→blocked)", () => {
+    expect(leafMachine.canTransition("done", "pending")).toBe(true);
+    expect(leafMachine.canTransition("done", "blocked")).toBe(true);
+  });
+
   test("states() enumerates all lifecycle states", () => {
     const states = leafMachine.states();
     expect(states).toContain("pending");
@@ -207,7 +216,7 @@ describe("transitionLeaf", () => {
     expect(out.result.reason).toContain("specExists");
   });
 
-  test("gates: warn severity does not block", () => {
+  test("gates: warn severity does not block, surfaces in outcome", () => {
     const branch = makeBranch([makeLeaf("a")]);
     const warn: Gate<TransitionGateCtx> = {
       name: "estLOC",
@@ -220,6 +229,8 @@ describe("transitionLeaf", () => {
     });
     expect(out.transitioned).toBe(true);
     expect(out.result.pass).toBe(true);
+    expect(out.result.severity).toBe("warn");
+    expect(out.result.reason).toContain("estLOC");
   });
 
   test("evidence merged on transition", () => {
@@ -260,6 +271,45 @@ describe("transitionLeaf", () => {
       expect(branch.leaves["a"].status).toBe(to);
     }
     expect(branch.transitions).toHaveLength(4);
+  });
+
+  test("any state → blocked via transitionLeaf (WORKER_BLOCKER)", () => {
+    const branch = makeBranch([makeLeaf("a", "in_progress")]);
+    const out = transitionLeaf(branch, { leafId: "a", to: "blocked" });
+    expect(out.transitioned).toBe(true);
+    expect(out.state.leaves["a"].status).toBe("blocked");
+  });
+
+  test("blocked → in_progress via transitionLeaf (unblock)", () => {
+    const branch = makeBranch([makeLeaf("a", "blocked")]);
+    const out = transitionLeaf(branch, { leafId: "a", to: "in_progress" });
+    expect(out.transitioned).toBe(true);
+    expect(out.state.leaves["a"].status).toBe("in_progress");
+  });
+
+  test("done leaf rejects evidence mutation (done→done with new evidence)", () => {
+    const branch = makeBranch([makeLeaf("a", "done")]);
+    const out = transitionLeaf(branch, {
+      leafId: "a",
+      to: "done",
+      evidence: { agentSpecPassed: true },
+    });
+    expect(out.transitioned).toBe(false);
+    expect(out.result.pass).toBe(false);
+    expect(out.state.leaves["a"].evidence.agentSpecPassed).toBe(false);
+  });
+
+  test("done leaf idempotent replay (same evidence) is safe no-op", () => {
+    const base = makeBranch([makeLeaf("a", "done")]);
+    const branch: BranchState = {
+      ...base,
+      transitions: [
+        { leaf: "a", from: "in_review", to: "done", timestamp: "t", evidenceHash: evidenceHash(emptyEvidence()) },
+      ],
+    };
+    const out = transitionLeaf(branch, { leafId: "a", to: "done" });
+    expect(out.idempotentSkip).toBe(true);
+    expect(out.result.pass).toBe(true);
   });
 });
 
@@ -336,11 +386,16 @@ describe("canStartLeaf", () => {
     expect(r.integrateBlocked).toBe(false);
   });
 
-  test("[needs-contract:] build unblocks at submitted, integrate at done", () => {
+  test("[needs-contract:] build unblocks at in_review (not submitted), integrate at done", () => {
     const leaves: Record<string, Leaf> = { a: makeLeaf("a", "pending"), c: makeLeaf("c") };
     expect(canStartLeaf("c", graph, leaves).buildBlocked).toBe(true);
 
+    // submitted is NOT enough — contract may be rejected in review
     leaves["a"].status = "submitted";
+    expect(canStartLeaf("c", graph, leaves).buildBlocked).toBe(true);
+
+    // in_review = contract reviewed & valid → build unblocks
+    leaves["a"].status = "in_review";
     const r1 = canStartLeaf("c", graph, leaves);
     expect(r1.buildBlocked).toBe(false);
     expect(r1.integrateBlocked).toBe(true);
@@ -369,6 +424,30 @@ describe("canStartLeaf", () => {
     const leaves = { a: makeLeaf("a", "pending"), c: makeLeaf("c") };
     const r = canStartLeaf("c", graph, leaves);
     expect(r.blockedBy.some((b) => b.includes("contract"))).toBe(true);
+  });
+
+  test("mixed [needs] + [needs-contract] edges", () => {
+    const g: DependencyGraph = {
+      nodes: ["x", "y", "z"],
+      edges: [
+        { from: "z", to: "x", kind: "needs" },
+        { from: "z", to: "y", kind: "needs-contract" },
+      ],
+    };
+    const leaves = { x: makeLeaf("x", "done"), y: makeLeaf("y", "in_review"), z: makeLeaf("z") };
+    const r = canStartLeaf("z", g, leaves);
+    expect(r.buildBlocked).toBe(false);
+    expect(r.integrateBlocked).toBe(true); // y not done
+  });
+
+  test("ghost target defaults to pending → blocks", () => {
+    const g: DependencyGraph = {
+      nodes: ["b"],
+      edges: [{ from: "b", to: "ghost", kind: "needs" }],
+    };
+    const r = canStartLeaf("b", g, { b: makeLeaf("b") });
+    expect(r.buildBlocked).toBe(true);
+    expect(r.blockedBy).toContain("ghost");
   });
 });
 

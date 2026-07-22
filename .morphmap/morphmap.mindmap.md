@@ -183,9 +183,18 @@ resource: index.md
 - [implemented] mech Phase A: pure state machine core → .morphmap/mech/{types,state,config,index}.ts + state.test.ts · 707 LOC pure + 492 LOC test · 49 tests passing · tsc clean
 - [decision] LeafStatus canonicalized to machine strings (pending/in_progress/submitted/in_review/blocked/done) with emoji as display-only map — §2.3 mixed emoji+strings, JSON (§6.1) authoritative so chose machine-native
 - [decision] idempotency = (leaf, to, evidenceHash) exists in transitions[] AND current status === to → no-op pass (crash-recovery safe, §8.1). Avoids duplicate log entries on replay.
-- [decision] [needs-contract:] build unblocks at "submitted" (contract real), integrate at "done" (§3.6). canStartLeaf() returns {buildBlocked, integrateBlocked}
+- [decision] [needs-contract:] build unblocks at "in_review" (contract reviewed), integrate at "done" (§3.6). canStartLeaf() returns {buildBlocked, integrateBlocked}. [corrected from "submitted" — quality-review caught spec divergence, see review block]
 - [decision] reviewRounds increments ONLY on in_review → in_progress (CHANGES_REQUESTED loop), not on every transition
 - [note] Phase A actual 707 LOC vs plan est. 200 — confirms finding J (estimates optimistic). state.ts alone 337 (StateMachine + idempotency + dep-resolution). Total mech est. holds at ~2100-2800.
+
+#### mech Phase A quality review (morphmap/quality-reviewer + tdd-guard)
+- [skill] morphmap/quality-reviewer used for mech Phase A · outcome: CHANGES_REQUESTED (1×P1, 1×P2, 2×P3) · tdd-guard lint: 6/6 pass · handoff: .morphmap/quality-review-001-20260722-mech-phaseA.md
+- [implemented] P1 fix: needs-contract build unblock `submitted`→`in_review` (spec §3.6 conformance — build against a REVIEWED contract, not a claimed one)
+- [implemented] P2 fix: `done` made terminal (done→done rejected) — prevents silent evidence mutation of approved proof. Idempotency reordered BEFORE legality so crash-recovery replay stays a safe no-op.
+- [implemented] P3 fix: transitionLeaf reuses runGates (single gate runner — was divergent duplicate that dropped warnings); warnings now surface in outcome
+- [implemented] P3 fix: +8 tests covering gaps (done terminal, done-mutation rejection, done idempotent replay, blocked/unblock via transitionLeaf, mixed needs+needs-contract edges, ghost target, warning surfacing) → 57 tests, 131 expects, all green
+- [implemented] non-blocking: tsconfig.mech.json → tsconfig.json (conventional name, bare `tsc` works)
+- [learning] logged decision #3 diverged from spec §3.6 without amending the spec — process violation caught by review. Lesson: decisions must cite & reconcile the spec, not override silently. This is the mech thesis working: review turned a self-claimed ✅ into verified ✅.
 
 ### 2026-07-21
 #### implemented (15)
