@@ -125,3 +125,9 @@ test("buildStateIndex: maps branchId to path", () => {
   expect(index["frontend"]).toBe("plans/frontend/state.json");
   expect(index["backend"]).toBe("plans/backend/state.json");
 });
+
+test("buildBranchState: sessionId is undefined by default", () => {
+  const branches = parseMapToBranches(TEST_MAP);
+  const state = buildBranchState(branches[0]);
+  expect(state.sessionId).toBeUndefined();
+});

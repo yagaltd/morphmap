@@ -12,3 +12,6 @@ export * from "./gates/submit";
 export * from "./gates/review";
 export * from "./gates/integration";
 export * from "./lattice";
+
+// Re-export Node type helpers for one-map compatibility
+export { isLeaf, isBranch, nodeToLeaf, nodeToBranchState } from "./types";

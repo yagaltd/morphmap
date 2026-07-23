@@ -46,11 +46,11 @@ resource: index.md
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
 - ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
-- ⬜ /morphmap-review — warm (quality review ran on MorphShell, OKF output needs fix)
-- ⬜ /morphmap-amend — warm (skill written, not spawned in e2e)
-- ⬜ /morphmap-triage — warm (skill written, not spawned in e2e)
-- ⬜ /morphmap — render via markmap-cli, warm
-- ⬜ /morphmap-status — text summary, warm
+- ⬜ /morphmap-review → specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
+- ⬜ /morphmap-amend → specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
+- ⬜ /morphmap-triage → specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
+- ⬜ /morphmap → specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
+- ⬜ /morphmap-status → specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
 - ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
 - ✅ Phase D: mech state machine wired into execution loop (143 tests, 0 failures)
 
@@ -138,10 +138,10 @@ resource: index.md
 - ✅ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
 - ✅ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
 
-### one-map ✅ [module] — scope: unify entities, add compiler hook, map=session tree · 1/3 leaves
+### one-map ✅ [module] — scope: unify entities, add compiler hook, map=session tree · 3/3 leaves
 - ✅ compiler hook (JSONL evidence extraction) → .morphmap/specs/mech/one-map/compiler-hook.spec.md [qa: full] [test: integration]
-- ⬜ unify Leaf/Branch → Node type → .morphmap/specs/mech/one-map/unify-node-type.spec.md [qa: full] [test: unit]
-- ⬜ map = session tree (session IDs in metadata) → .morphmap/specs/mech/one-map/map-session-tree.spec.md [qa: review] [test: unit]
+- ✅ unify Leaf/Branch → Node type → .morphmap/specs/mech/one-map/unify-node-type.spec.md [qa: full] [test: unit]
+- ✅ map = session tree (session IDs in metadata) → .morphmap/specs/mech/one-map/map-session-tree.spec.md [qa: review] [test: unit]
 
 ### mech-mindmap (deterministic state machine)
 - Pure gates (pre-spawn, submit, review, integration) — zero pi imports

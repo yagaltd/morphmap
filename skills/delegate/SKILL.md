@@ -139,13 +139,28 @@ subagent({
     Context from orchestrator: phase=<X>, compat=<Y>, scope=<Z>,
     quality=<W>, budget=<V>.
     Available: pi-subagents, pi-intercom, context-mode, agent-spec CLI,
-    /goal, vcc_recall.
+    /goal, vcc_recall, morphmap_submit_leaf, morphmap_approve_leaf,
+    morphmap_integration_gate.
     If subtree has sub-branches: spawn sub-branch agents for each.
     If subtree has direct leaves: pull in risk-priority order.
     Report when subtree complete with summary of what was delivered.",
   context: "fresh"
 })
 ```
+
+**Session tracking:** After spawning, record the subagent session ID in `state.json`:
+```bash
+# Update state.json with session ID for this branch
+node -e "
+const fs = require('fs');
+const state = JSON.parse(fs.readFileSync('.morphmap/state.json', 'utf8'));
+state.childBranchStatus['<branch-id>'] = 'in_progress';
+// Session ID is available from the subagent result
+fs.writeFileSync('.morphmap/state.json', JSON.stringify(state, null, 2));
+"
+```
+
+The map shows 🔄 for branches with active sessions, 💤 for paused, ⬜ for not started.
 
 **The five context dimensions each agent receives:**
 

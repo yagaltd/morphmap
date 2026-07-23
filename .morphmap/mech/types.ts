@@ -184,6 +184,7 @@ export interface BranchState {
   transitions: TransitionEntry[]; // idempotency log (§8.1)
   integrationStatus: IntegrationStatus;
   abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
+  sessionId?: string; // pi subagent session ID (one-map §2: map = session tree)
 }
 
 export interface Posture {
@@ -252,4 +253,67 @@ export interface TransitionOutcome {
   result: GateResult; // pass + reason
   transitioned: boolean; // false if blocked or idempotent skip
   idempotentSkip: boolean; // true if replay of an already-recorded transition
+}
+
+// ── Unified Node type (one-map.md §1) ──────────────────────────
+// One entity type for both leaves and branches.
+// children: [] = leaf, children: [...] = branch.
+// Same state machine, same gates, same tools.
+
+export type NodeStatus = LeafStatus; // unified: same 7 states
+
+export interface Node {
+  id: string;
+  status: NodeStatus;
+  children: string[]; // empty = leaf, non-empty = branch
+  metadata: Record<string, unknown>; // domain-specific fields
+}
+
+export function isLeaf(node: Node): boolean {
+  return node.children.length === 0;
+}
+
+export function isBranch(node: Node): boolean {
+  return node.children.length > 0;
+}
+
+// Convert Node → Leaf (for leaf nodes with leaf-specific metadata)
+export function nodeToLeaf(node: Node): Leaf {
+  return {
+    id: node.id,
+    status: node.status,
+    bottleneck: (node.metadata.bottleneck as Bottleneck) ?? "standard",
+    qa: (node.metadata.qa as QALevel) ?? "review",
+    test: (node.metadata.test as TestStrategy[]) ?? ["unit"],
+    model: node.metadata.model as ModelAssignment,
+    tools: (node.metadata.tools as string[]) ?? ["agent-spec"],
+    evidence: node.metadata.evidence as LeafEvidence ?? emptyEvidence(),
+    reviewRounds: (node.metadata.reviewRounds as number) ?? 0,
+    trace: (node.metadata.trace as string) ?? node.id,
+    estLoc: node.metadata.estLoc as number | undefined,
+    abandonedReason: node.metadata.abandonedReason as AbandonedReason | undefined,
+  };
+}
+
+// Convert Node → BranchState (for branch nodes with branch-specific metadata)
+export function nodeToBranchState(node: Node): BranchState {
+  return {
+    branchId: node.id,
+    status: node.status as BranchStatus,
+    quality: (node.metadata.quality as BranchQuality) ?? "fast",
+    posture: node.metadata.posture as Posture | undefined,
+    leaves: (node.metadata.leaves as Record<string, Leaf>) ?? {},
+    subBranches: (node.metadata.subBranches as string[]) ?? [],
+    childBranchStatus: (node.metadata.childBranchStatus as Record<string, BranchStatus>) ?? {},
+    transitions: (node.metadata.transitions as TransitionEntry[]) ?? [],
+    integrationStatus: node.metadata.integrationStatus as IntegrationStatus ?? {
+      reviewFileExists: false,
+      healthCheckPassed: null,
+      bombadilPassed: null,
+      lonkeroPassed: null,
+      allLeavesComplete: false,
+      crossLeafConflicts: [],
+    },
+    abandonedReason: node.metadata.abandonedReason as AbandonedReason | undefined,
+  };
 }

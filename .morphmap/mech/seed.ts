@@ -287,6 +287,7 @@ export function buildBranchState(
       allLeavesComplete: false,
       crossLeafConflicts: [],
     },
+    sessionId: undefined, // set by delegate when branch agent is spawned
   };
 }
 
