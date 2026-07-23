@@ -130,6 +130,13 @@ resource: index.md
 - ✅ Phase E: tool failure recovery — pure core done (.morphmap/mech/recovery.ts, 16 tests) · impure wiring (live session checks) deferred
 - ✅ Phase F: sub-map session lifecycle — pure core done (.morphmap/mech/sub-map.ts, 13 tests) · impure wiring (heartbeat, worktree detection) deferred
 
+### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 0/5 leaves
+- ⬜ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
+- ⬜ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
+- ⬜ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
+- ⬜ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
+- ⬜ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
+
 ### mech-mindmap (deterministic state machine)
 - Pure gates (pre-spawn, submit, review, integration) — zero pi imports
 - Transition tools (submit_leaf, approve_leaf, integration_gate)
