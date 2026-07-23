@@ -17,6 +17,7 @@ AI-native project management for pi. Mindmap-based, agent-delegated, contract-ve
 - [Execution Flow](docs/execution-flow.md) — push/pull, Theory of Constraints, WORKER_BLOCKER, quality loop
 - [Triage Flow](docs/triage-flow.md) — intake classification, scope matching, PR linkage
 - [Design Decisions](docs/design-decisions.md) — full audit trail of all design decisions
+- [One-Map Architecture](docs/one-map.md) — unified architecture: one entity (Node), one loop, one state machine. **Reference doc for all new implementation.**
 
 ## Mindmap
 

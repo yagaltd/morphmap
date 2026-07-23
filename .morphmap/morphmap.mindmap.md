@@ -19,28 +19,33 @@ resource: index.md
 ## context ⬜
 - Domain glossary → .morphmap/CONTEXT.md
 - improv-map: quality + recursion + context improvements → .morphmap/improv-map.md
+- one-map architecture (reference doc for new implementation) → docs/one-map.md
+- mech-mindmap state machine spec → docs/mech-mindmap.md
 
 
 # MorphMap — AI-Native Project Management
 
-## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage · 7/7 leaves
+## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage, state machine, one-map · 8/8 leaves
 - ✅ format specification → docs/format-spec.md
 - ✅ agent architecture + system prompts + hallucination prevention → docs/agent-architecture.md
 - ✅ intercom protocol specification → docs/intercom-protocol.md
 - ✅ execution flow + full diagram → docs/execution-flow.md
 - ✅ triage flow + classification logic → docs/triage-flow.md
 - ✅ design decisions audit trail → docs/design-decisions.md
+- ✅ mech-mindmap state machine spec → docs/mech-mindmap.md
+- ✅ one-map unified architecture (reference doc) → docs/one-map.md
 
 ## examples ✅ [log] — scope: MorphEditor mindmap, OKF conformance · 2/2 leaves
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 [module] — scope: slash commands · 11/11 prompts + 10/10 skills · e2e tested: 5/11
+## commands 🔄 [module] — scope: slash commands · 12/12 prompts + 10/10 skills · e2e tested: 5/12
 - ✅ /morphmap-init — scaffold + brownfield scan (MorphShell)
 - ✅ /morphmap-plan — budget estimate + grill + tree (MorphShell 4 scouts parallel)
-- ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery
+- ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery · ⚠️ one-shot, needs --loop flag
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
+- ⬜ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
 - ⬜ /morphmap-review — warm (quality review ran on MorphShell, OKF output needs fix)
 - ⬜ /morphmap-amend — warm (skill written, not spawned in e2e)
 - ⬜ /morphmap-triage — warm (skill written, not spawned in e2e)
@@ -60,10 +65,11 @@ resource: index.md
 - ✅ branch-agent: agent-spec→bash (CLI needs shell, not tool name)
 - ✅ agent install: ~/.pi/agent/agents/morphmap/ for pi-subagents discovery
 
-## extension 🔄 [module] — scope: pi extension package · 2/3 leaves
+## extension 🔄 [module] — scope: pi extension package · 3/3 leaves
 - ✅ package.json + install from GitHub (pi install works)
 - ✅ agent discovery fixed (.pi/agents/ → ~/.pi/agent/agents/morphmap/)
-- ⬜ npm packaging (not needed — GitHub install works)
+- ✅ npm packaging (not needed — GitHub install works)
+- ⚠️ mech tools NOT wired: morphmap-hooks.ts does not register transition tools, no state.json · Phase D (one-map.md §9)
 
 ## staging 🔄 [phase]
 ### e2e-test
@@ -96,7 +102,8 @@ resource: index.md
 
 ## skills ✅ [log] — what each skill does + format tags
 - morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
-- morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent()
+- morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent() · ⚠️ one-shot, needs --loop flag
+- morphmap-run: spawn ALL ready branches in parallel → monitor via intercom + state.json → loop until all done (NEW, one-map.md §9)
 - morphmap-review: spawn reviewer subagent → walk tree → flag blockers → report
 - morphmap-amend: classify addition (4-tier) → route to branch-agent or flag human
 - morphmap-triage: read external (GitHub/email/chat) → classify (4-tier) → route or flag
@@ -113,15 +120,15 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 3/6 phases
+## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 3/6 phases (6/6 pure cores done, Phase D wiring pending)
 - Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 707 LOC pure (zero pi imports) · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
 - ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
 - ✅ Phase C: transition tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate (pure handlers) · select gates via lattice, call transitionLeaf/runIntegrationGates · return {accepted/passed, failures} · 18 new tests · full suite 113/113 green · tsc exit 0 · tdd-guard 6/6 · end-to-end lifecycle tests (submit→approve→integrate, cannot-skip-review) · request_revision deferred to Phase D
-- ⬜ Phase D: hooks integration — tool_call, pre/post subagent, map write (~200 loc)
-- ⬜ Phase E: tool failure recovery — classify, retry, reroute (~150 loc)
-- ⬜ Phase F: sub-map session lifecycle — heartbeat, orphan, status sync (~200 loc)
+- ⬜ Phase D: hooks integration — register transition tools in morphmap-hooks.ts, state.json I/O, md↔json sync · PURE CORE DONE (tools.ts, seed.ts, map-sync.ts, validate.ts, recovery.ts, sub-map.ts all tested) · IMPURE WIRING NOT DONE (hooks don't import mech, no state.json, no seedFromMap) · HIGHEST PRIORITY GAP
+- ✅ Phase E: tool failure recovery — pure core done (.morphmap/mech/recovery.ts, 16 tests) · impure wiring (live session checks) deferred
+- ✅ Phase F: sub-map session lifecycle — pure core done (.morphmap/mech/sub-map.ts, 13 tests) · impure wiring (heartbeat, worktree detection) deferred
 
 ### mech-mindmap (deterministic state machine)
 - Pure gates (pre-spawn, submit, review, integration) — zero pi imports
@@ -277,6 +284,17 @@ resource: index.md
 - [risk] HIGH: delegate skill does not auto-loop. No autonomous re-trigger after branch completion.
 - [risk] HIGH: double-commit bug in morphmap-hooks.ts (~L230-245) — git commit runs twice. Telemetry pollutes mindmap via echo >>.
 - [action] Phase D (hooks integration) is the highest priority gap. Wire mech into morphmap-hooks.ts, register transition tools, create state.json.
+
+#### one-map reference doc
+- [decision] docs/one-map.md promoted to reference doc for all new implementation. Replaces mech-mindmap.md as the primary architecture doc. mech-mindmap.md remains as the state machine spec (§2-§8).
+- [decision] Phase structure clarified: Phases A-F = pure state machine core (180 tests green). Phase D = impure wiring (NOT wired — highest priority gap). one-map phases = Phase D (wire mech) → Phase one-map (unify entities, add /morphmap-run, add compiler hook).
+- [decision] herdr removed from one-map.md. pi-subagents retained for context isolation. herdr deferred to Phase 3 (future).
+- [decision] New `/morphmap-run` command: spawn all ready branches in parallel, monitor via intercom + state.json, loop until all done. Addresses "auto-run for all branches when plans approved."
+- [decision] `--loop` flag on `/morphmap-delegate`: re-check for newly-ready branches after completions, re-spawn, repeat.
+- [decision] Compiler hook: parse agent JSONL on tool_result events, extract evidence (test/build exit codes, files changed), call mech state machine. Replaces agent self-summarization.
+- [decision] Map = session tree: pi subagent session IDs stored in node metadata. Map shows running/paused/done sessions.
+- [implemented] docs/one-map.md v2 patched: removed herdr, added phase structure, added implementation plan (§9), added /morphmap-run design, added compiler hook design, added Node metadata schema.
+- [action] Phase D: restore mech-pi/ wiring layer, register 3 transition tools in hooks, bootstrap state.json from mindmap, implement md↔json sync hook, update agent prompts to use mech tools.
 
 ### 2026-07-20
 #### fixes (5)

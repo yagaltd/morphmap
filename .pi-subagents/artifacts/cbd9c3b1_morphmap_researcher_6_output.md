@@ -1,0 +1,1 @@
+5-Why analysis complete for all four Section 8 operational decisions. Deliverable at `/tmp/mech-5why-section8.md` (28KB, ~560 lines).

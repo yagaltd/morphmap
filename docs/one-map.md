@@ -1,10 +1,10 @@
 # one-map — Unified MorphMap Architecture
 
 type: plan
-timestamp: 2026-07-22T12:00:00Z
-version: 1
-summary: Simplified architecture — one entity, one loop, one state machine. Map is session, fork is branch, agent assembled from map data.
-tags: [architecture, simplification, unified]
+timestamp: 2026-07-23T12:00:00Z
+version: 2
+summary: Simplified architecture — one entity, one loop, one state machine. Map is session tree, agent assembled from map metadata, compiler extracts evidence from JSONL.
+tags: [architecture, simplification, unified, reference]
 
 ---
 
@@ -12,9 +12,27 @@ tags: [architecture, simplification, unified]
 
 MorphMap's current design has separate entity types (Leaf vs Branch), separate agent files (branch-agent.md, leaf-worker.md, reviewer.md), separate session management (pi-subagents, intercom, goal extension, trio extension). This complexity came from building incrementally — each piece solved a problem, but the pieces don't cohere.
 
-**one-map unifies: one entity type, one loop, one state machine.** The mindmap IS the session tree. The fork IS a branch. The agent IS assembled from map metadata. The compiler extracts evidence deterministically. herdr spawns panes. state.json coordinates them.
+**one-map unifies: one entity type, one loop, one state machine.** The mindmap IS the session tree. The fork IS a branch. The agent IS assembled from map metadata. The compiler extracts evidence deterministically from agent JSONL. state.json coordinates them.
 
-Four pi extensions removed. No subagents. No intercom. No goal. No trio.
+pi-codex-goal removed (replaced by mech state machine). trio removed (replaced by compiler hook + submit gates). Agent files replaced by skill templates + metadata assembly.
+
+---
+
+## Phase Structure
+
+The implementation follows the mech-mindmap.md §7.1 phase structure. Phases A-F are the **pure state machine core** (zero pi imports, fully tested). Phase D is the **impure wiring** (hooks integration).
+
+| Phase | What | Status | Priority |
+|-------|------|--------|----------|
+| A | Types + State Machine Core | ✅ 49 tests | Done |
+| B | Gate Functions (22 gates, 4 chains) | ✅ 38 tests | Done |
+| C | Transition Tools (submitLeaf, approveLeaf, integrationGate) | ✅ 18 tests | Done |
+| D | Hooks Integration (register tools, state.json I/O, md↔json sync) | ⚠️ NOT WIRED | **NOW** |
+| E | Tool Failure Recovery (classifier, retry, reroute) | ✅ 16 tests | Done (pure) |
+| F | Sub-Map Session Lifecycle (orphan, status sync) | ✅ 13 tests | Done (pure) |
+| — | Tests (unit + chain + integration) | ✅ 180 tests, 402 expects | Continuous |
+
+**Current gap:** Phases A-F pure cores are complete (180 tests green). Phase D (hooks integration) is NOT wired — `morphmap-hooks.ts` does not register transition tools, no `state.json` exists on disk. This is the highest-priority gap.
 
 ---
 
@@ -29,26 +47,35 @@ No separate Leaf vs Branch. One type with dynamic metadata.
   "goal": "Implement JWT token refresh endpoint",
   "children": [],
   "metadata": {
-    "priority": "immediate",
-    "eta": "2026-07-30",
-    "model": "deepseek-pro",
+    "model": "deepseek/deepseek-v4-pro",
     "thinking": "high",
     "tools": ["agent-spec", "tdd-guard", "git"],
-    "calendar_link": null,
-    "budget": "$5.00"
+    "budget": "$5.00",
+    "eta": "2026-07-30",
+    "priority": "blocking",
+    "qa": "full",
+    "test": ["unit", "integration"],
+    "session_id": "subagent-405d2f3d"
   }
 }
 ```
 
 | Field | Required | Purpose |
 |-------|----------|---------|
-| `id` | Yes | Unique path in tree |
-| `status` | Yes | State machine transition target |
+| `id` | Yes | Unique path in tree (e.g. "auth/jwt-refresh") |
+| `status` | Yes | State machine state (pending/in_progress/submitted/in_review/blocked/done/abandoned) |
 | `goal` | No | What this node should accomplish |
 | `children` | Yes | Empty = leaf, non-empty = branch |
 | `metadata` | No | Open object — any domain-specific fields |
 
-Empty children = executable leaf. Non-empty children = branch that manages sub-nodes. Same state machine. Same loop. Same gates.
+**Required metadata fields:**
+- `model` / `thinking` — assigned by branch agent per bottleneck tag + config profiles
+- `tools` — assigned by branch agent per `[test:]` + domain tags
+- `priority` — bottleneck tag (blocking/risky/standard/time/verify)
+- `qa` — quality level (none/review/full/strict)
+- `session_id` — pi subagent session ID (for map-as-session-tree)
+
+Empty children = executable leaf. Non-empty children = branch that manages sub-nodes. Same state machine. Same gates. Same loop.
 
 **One node serves: code leaves, marketing tasks, portfolio projects, SLA tracking, calendar events.** The compiler reads `id` + `status` + `children`. Everything else is domain metadata.
 
@@ -56,18 +83,18 @@ Empty children = executable leaf. Non-empty children = branch that manages sub-n
 
 ## 2. Map = Session Manager
 
-The mindmap IS the session tree. Each branch = one herdr pane = one pi session.
+The mindmap IS the session tree. Each branch = one pi subagent session. Session IDs stored in node metadata.
 
 ```
 portfolio map (depth -1)
 │
-├── ## morphmap 🔄 [pane: w1:p2]
-│       └── pi session active — working on mech Phase C
+├── ## morphmap 🔄 [session: subagent-405d2f3d]
+│       └── pi subagent active — working on mech Phase D
 │
-├── ## explore-oauth 💤 [pane: w1:p3]
-│       └── pi session paused — fork spawned, set aside
+├── ## explore-oauth 💤 [session: subagent-92233a31]
+│       └── pi subagent paused — set aside
 │
-├── ## invoicing ⬜ [pane: —]
+├── ## invoicing ⬜ [session: —]
 │       └── no session yet — not started
 │
 └── ## decisions ⬜ [log]
@@ -75,14 +102,14 @@ portfolio map (depth -1)
 
 | Action | Mechanism |
 |--------|-----------|
-| Open project | Focus herdr pane → pi session resumes |
-| Fork to new branch | New node → new herdr pane → new pi session |
-| Set aside | Mark node 💤 → pane detached, state frozen |
-| Resume | Mark node 🔄 → pane reattached, state restored |
-| Zoom in | Focus pane → full terminal view |
-| Zoom out | Portfolio map showing all active panes |
+| Open project | Focus pi session → agent resumes |
+| Fork to new branch | New node → spawn pi subagent → record session ID in metadata |
+| Set aside | Mark node 💤 → detach session, freeze state.json |
+| Resume | Mark node 🔄 → reattach session, restore state |
+| Zoom in | Read subtree from mindmap |
+| Zoom out | Portfolio map showing all branches |
 
-The map IS the session manager. No separate session database. No session ID lookup. The map shows what's running, what's paused, what's done.
+The map IS the session manager. No separate session database. The map shows what's running, what's paused, what's done. Session IDs in metadata link map nodes to pi subagent sessions.
 
 ---
 
@@ -95,7 +122,8 @@ Node metadata:
   goal: "Implement JWT token refresh"
   model: deepseek-pro, thinking: high
   tools: [agent-spec, tdd-guard, git]
-  priority: immediate
+  priority: blocking
+  qa: full
 
 Skill template (universal):
   "You are a leaf worker. Follow Plan→Build→Verify→Submit.
@@ -131,17 +159,28 @@ Same mechanism. Different metadata. A marketing leaf has `campaign_deadline` ins
 
 ## 5. Compiler Replaces Goal + Trio
 
-Agent streams JSONL → hook extracts evidence → updates state.json. Deterministic. No agent summarization.
+Agent streams JSONL → compiler hook extracts evidence → updates state.json. Deterministic. No agent summarization.
 
 ```
-Agent works ──→ JSONL (raw stream, git-committed for audit)
+Agent works ──→ JSONL (pi session log, git-committed for audit)
                     │
-Compiler (hook) ──→ extracts: status transitions, evidence, telemetry
+Compiler hook ──→ parses JSONL → extracts evidence → calls mech state machine
                     │
                     ├──→ state.json (structured, authoritative)
-                    └──→ plan.md (generated, human view)
-                         └──→ mindmap.html (d3.js from state.json)
+                    └──→ mindmap.md (generated from state.json via markmap)
 ```
+
+**Compiler hook** runs on `tool_result` events in `morphmap-hooks.ts`. For each agent completion, it parses the JSONL to extract:
+
+| Evidence field | Source in JSONL |
+|----------------|-----------------|
+| `agentSpecPassed` | `agent-spec lifecycle` exit code |
+| `tddGuardPassed` | `tdd-guard lint` exit code |
+| `npmTestPassed` | `npm test` exit code |
+| `npmBuildPassed` | `npm run build` exit code |
+| `filesChanged` | `git diff --name-only` output |
+| `testsRun` | Test names from test output |
+| `boundariesClean` | agent-spec boundary check result |
 
 | Old (pi extensions) | New (compiler) |
 |---------------------|----------------|
@@ -149,7 +188,7 @@ Compiler (hook) ──→ extracts: status transitions, evidence, telemetry
 | `/trio` — agent self-reviews | Leaf worker prompt + submit gates = same pattern, enforced |
 | Agent writes summary in mindmap | Compiler extracts from JSONL, writes state.json deterministically |
 
-The compiler is the hook we already have. Phase D extends it. No new infrastructure.
+The compiler is a pi extension hook (`morphmap-hooks.ts`). No new infrastructure.
 
 ---
 
@@ -181,8 +220,8 @@ Branch node's job: plan the work, dispatch to sub-nodes, wait for completion, in
 ```
 Branch node (has children):
   1. PLAN:    For each child → write .spec (if leaf) or scope (if sub-branch)
-  2. DISPATCH: For each child → herdr pane split → agent start → agent prompt
-  3. WAIT:    Poll child state.json (pull, not push)
+  2. DISPATCH: For each child → subagent({ agent: "morphmap/branch-agent", ... })
+  3. WAIT:    Poll child state.json + intercom signals
   4. INTEGRATE: All children ✅ → integration gates → report to parent
 
 Leaf node (no children):
@@ -196,43 +235,86 @@ Branch agent context stays small: reads filtered submit outputs (~200B per leaf)
 
 ---
 
-## 8. Dependencies Removed
+## 8. Dependencies
 
-| Old | New | Why |
-|-----|-----|-----|
-| pi-subagents | herdr pane split + agent start | Same context isolation, cleaner interface |
-| pi-intercom | state.json (pull, not push) | Parent polls child state.json when ready to integrate |
+| Old (pi extensions) | New (one-map) | Why |
+|---------------------|---------------|-----|
 | pi-codex-goal | mech state machine | Status tracked in state.json, not session memory |
-| pi.registerTool | mech CLI | Agent-agnostic — same CLI for pi, codex, claude |
+| pi-intercom (push) | state.json (pull) + intercom (signals) | Parent polls child state.json; intercom for completion signals |
+| Agent files (branch-agent.md, leaf-worker.md) | Skill template + node metadata | Agent assembled from map, not fixed files |
+| Agent self-summarizes mindmap | Compiler hook extracts from JSONL | Deterministic, no agent hallucination |
 
 **What stays:**
-- context-mode (MCP — knowledge retrieval, not orchestration)
+- pi-subagents (context isolation — fresh context per agent)
+- context-mode (MCP — knowledge retrieval)
+- pi-intercom (completion signals between sessions)
 - agent-spec, tdd-guard, bombadil, lonkero (Rust CLIs — agent-agnostic)
 - state.json, plan.md, .spec (formats — agent-agnostic)
 - markmap-cli (rendering)
 
 **What's new:**
-- herdr (Rust binary — terminal multiplexer + agent runtime, supports 21 agent kinds)
-- mech CLI (transition tools — submit_leaf, approve_leaf, integration_gate)
-- Compiler (hook — extracts evidence from JSONL, writes state.json)
+- Compiler hook (in morphmap-hooks.ts — extracts evidence from JSONL)
+- `/morphmap-run` command (parallel autonomous execution)
+- Unified Node type in state machine (replaces Leaf + BranchState)
 
 ---
 
-## Transition Path
+## 9. Implementation Plan
 
-```
-Phase A-C (now):    pi + morphmap-hooks + pi-subagents + context-mode
-                    mech pure module built, tested in pi
+### Phase D (NOW — wire mech into execution)
 
-Phase 3 (herdr):    herdr replaces pi-subagents + intercom
-                    mech pure module still TypeScript, runs in pi panes
-                    context-mode still needed
+**Goal:** Connect the 180-test pure state machine to the execution loop.
 
-Phase 4 (one-map):  mech pure module → Rust
-                    context-mode → SQLite FTS5 in Rust
-                    morphmap-hooks → compiler in Rust
-                    One entity type. One loop. One state machine.
-```
+1. **Restore mech-pi wiring layer** (`.morphmap/mech-pi/morphmap-tools.ts`, `morphmap-tools-pi.ts`, `morphmap-state.ts`)
+   - `morphmap-state.ts`: loadState/saveState with atomic write (tmp→fsync→rename)
+   - `morphmap-tools.ts`: orchestration (load→pure-handler→save)
+   - `morphmap-tools-pi.ts`: TypeBox schemas + pi.registerTool wrappers
+
+2. **Wire into morphmap-hooks.ts**
+   - Import `registerMechTools` from `mech-pi/morphmap-tools-pi`
+   - Call `registerMechTools(pi)` at extension load
+   - Register 3 tools: `morphmap_submit_leaf`, `morphmap_approve_leaf`, `morphmap_integration_gate`
+
+3. **Bootstrap state.json from mindmap**
+   - Wire `seedFromMap()` (mech/seed.ts + mech-pi/morphmap-seed.ts) into `/morphmap-init` and `/morphmap-delegate`
+   - Parse `## [module]`/`[feature]` branches → per-branch `state.json`
+   - Write `state-index.json` mapping branchId → path
+
+4. **Implement md↔json sync hook** (§2.7 Step A)
+   - On mindmap write: parse markdown → validate → update state.json
+   - On state.json change: regenerate mindmap.md from state.json
+
+5. **Update agent prompts**
+   - branch-agent.md: use `morphmap_approve_leaf` + `morphmap_integration_gate` (not just /goal)
+   - leaf-worker.md: already calls `morphmap_submit_leaf` (tool will now be registered)
+   - reviewer.md: feed evidence into `morphmap_approve_leaf`
+
+### Phase one-map (NEXT — unify entities, add run loop)
+
+1. **Unify Leaf/Branch → Node in types.ts**
+   - Single `Node` type with `children: string[]` (empty = leaf)
+   - `metadata` open object for domain-specific fields
+   - Same state machine, same gates
+
+2. **Add `/morphmap-run` command**
+   - Spawn all ready `[module]`/`[feature]` branches in parallel (async: true)
+   - Monitor via intercom + state.json polling
+   - Loop: re-check for newly-ready branches after completions
+   - Repeat until all branches ✅ or 🔴
+
+3. **Add `--loop` flag to `/morphmap-delegate`**
+   - After branch agents report completion, re-check for newly-ready branches
+   - Re-spawn, repeat until no ready branches
+
+4. **Add compiler hook**
+   - Parse agent JSONL on `tool_result` events
+   - Extract evidence (test results, build status, files changed)
+   - Call mech state machine with structured evidence
+
+5. **Map = session tree**
+   - Store pi subagent session IDs in node metadata
+   - Map shows running/paused/done sessions
+   - Resume = reattach to session
 
 ---
 
@@ -240,9 +322,10 @@ Phase 4 (one-map):  mech pure module → Rust
 
 - **One entity type** — no Leaf vs Branch distinction. Same state machine, same gates.
 - **Open metadata** — required fields: id, status, children. Everything else optional, domain-specific.
-- **Map = session** — mindmap IS the session tree. Fork = branch. Pane = herdr session.
+- **Map = session** — mindmap IS the session tree. Session IDs in metadata link to pi subagent sessions.
 - **Agent from map** — assembled at spawn from skill template + node metadata. No agent files.
 - **Compiler, not summarizer** — deterministic extraction from JSONL. No agent writes summaries.
-- **Pull coordination** — parent polls child state.json. No push messaging.
-- **herdr as spawn layer** — replaces subagents + intercom. Keeps context isolation.
+- **Pull coordination** — parent polls child state.json. intercom for completion signals only.
+- **pi-subagents for isolation** — fresh context per agent. herdr deferred to Phase 3.
 - **State machine enforces loop** — loop is agent prompt, state machine is gate lock.
+- **Phase D first** — wiring the 180-test state machine is the highest-priority gap. Without it, completion is still trust-based.

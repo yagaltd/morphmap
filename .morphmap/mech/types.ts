@@ -18,13 +18,20 @@ export type LeafStatus =
   | "submitted" //    ⏳  worker called submit_leaf, submitGates passed
   | "in_review" //    ⏳  branch agent / reviewer owns it
   | "blocked" //      🔴  WORKER_BLOCKER or unresolved dependency
+  | "abandoned" //    💤  consciously set aside (§8.5) — frozen, rediscoverable
   | "done"; //        ✅  approve_leaf passed, reviewGates passed
 
 export type BranchStatus =
   | "pending" //  ⬜
   | "in_progress" // 🔄
   | "done" // ✅
-  | "blocked"; // 🔴
+  | "blocked" // 🔴
+  | "abandoned"; // 💤 (§8.5)
+
+// Why a branch/leaf was set aside (§8.5). State machine treats all three
+// identically (frozen, gates skip). Difference is an agent/human signal:
+//   discarded = negative (dead end, don't redo) · aside/cancelled = reopenable.
+export type AbandonedReason = "discarded" | "cancelled" | "aside";
 
 // Bottleneck tags (mirror .morphmap/config leafProfiles)
 export type Bottleneck =
@@ -68,6 +75,7 @@ export const LEAF_STATUS_EMOJI: Record<LeafStatus, string> = {
   submitted: "⏳",
   in_review: "⏳",
   blocked: "🔴",
+  abandoned: "💤",
   done: "✅",
 };
 
@@ -76,6 +84,7 @@ export const BRANCH_STATUS_EMOJI: Record<BranchStatus, string> = {
   in_progress: "🔄",
   done: "✅",
   blocked: "🔴",
+  abandoned: "💤",
 };
 
 export const BOTTLENECK_EMOJI: Record<Bottleneck, string> = {
@@ -144,6 +153,7 @@ export interface Leaf {
   reviewRounds: number;
   trace: string; // branchId/leafId linkage (§6.3)
   estLoc?: number; // optional override for [est-loc: N] tag
+  abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
 }
 
 export interface IntegrationStatus {
@@ -173,6 +183,7 @@ export interface BranchState {
   childBranchStatus: Record<string, BranchStatus>; // rollup source (§588)
   transitions: TransitionEntry[]; // idempotency log (§8.1)
   integrationStatus: IntegrationStatus;
+  abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
 }
 
 export interface Posture {

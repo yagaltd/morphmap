@@ -1,0 +1,1 @@
+All checks pass. 166 lines, 5 complete 5-Why chains (25 "Why #" entries), 5 verdicts, 5 hidden-assumption sections with 19 total assumptions surfaced. Here's the acceptance report:
