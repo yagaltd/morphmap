@@ -113,28 +113,41 @@ The map IS the session manager. No separate session database. The map shows what
 
 ---
 
-## 3. Agent Defined by Map, Not Files
+## 3. Agent = Skill Template + Node Metadata
 
-Agent assembled at spawn time from node metadata + skill template.
+Agent assembled at spawn time from **skill template** (system prompt) + **node metadata** (assignment). NOT a single source.
 
 ```
-Node metadata:
-  goal: "Implement JWT token refresh"
-  model: deepseek-pro, thinking: high
-  tools: [agent-spec, tdd-guard, git]
-  priority: blocking
-  qa: full
-
-Skill template (universal):
-  "You are a leaf worker. Follow Plan→Build→Verify→Submit.
-   Read the .spec. Write tests first. Self-verify before submit."
-
-Assembled agent:
-  skill template + node metadata → system prompt
-  No predefined agent file. Map IS the assignment.
+Skill template (.md file)           Node metadata (map)
+┌─────────────────────────────┐    ┌─────────────────────────────┐
+│ "You are a leaf worker."     │    │ model: deepseek-v4-pro      │
+│ "Read .spec. Write tests."   │    │ thinking: high              │
+│ "Plan → Build → Verify."     │    │ tools: [agent-spec, git]    │
+│ "Follow BDD scenarios."      │    │ budget: $5.00               │
+│ (SOP, execution loop,        │    │ eta: 2026-07-30             │
+│  decision matrices)          │    │ qa: full                    │
+└─────────────────────────────┘    └─────────────────────────────┘
+                                       │
+                                       ▼
+                        Branch agent assembles:
+                        template + metadata → system prompt
+                        config.ts maps [qa:]/[test:] → ModelAssignment
 ```
 
-Like human work: assign task, tools, deadline, worker. No permanent role file. The map defines what the agent IS for this task. Same skill template serves all leaf nodes. Same branch template serves all branch nodes.
+**Skill template** = the "training" — system prompt, execution loop, SOP, decision matrices. Lives in `.pi/agents/*.md`. Does NOT hardcode model/tools/reasoning.
+
+**Node metadata** = the "assignment" — model, thinking, tools, budget, ETA, goal. Lives in `state.json` + mindmap tags. Branch agent assigns per-node via `config.ts` mapping:
+
+| Tag | Maps to | Example |
+|-----|---------|---------|
+| `[qa: full]` + `🔴` | `assignModel("blocking", "full")` | `claude-sonnet-4, thinking: max` |
+| `[qa: none]` + `⚪` | `assignModel("standard", "none")` | `deepseek-v4-flash, thinking: off` |
+| `[test: e2e]` | `assignTools(["e2e"])` | `playwriter, agent-browser` |
+| `[test: unit]` | `assignTools(["unit"])` | `vitest, jest` |
+
+**Human flow analogy:** trained worker (skill template) + tools + assignment (model, reasoning, goal). Worker competence = model + reasoning. Assignment comes from map metadata, not hardcoded in template.
+
+**Flexibility:** a task/branch can override model/thinking/tools via metadata. `config.ts` provides defaults from [qa:]/[test:] tags. Branch agent can override per-node. No agent file changes needed.
 
 ---
 

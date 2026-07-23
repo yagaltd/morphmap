@@ -10,6 +10,7 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { registerMechTools } from "../../.morphmap/mech-pi/morphmap-tools-pi";
 
 // ── Session state (survives across hook invocations) ──────────
 
@@ -72,6 +73,10 @@ const FAILURE_PATTERNS: Record<string, { pattern: RegExp; suggestion: string; se
 // ── MAIN ──────────────────────────────────────────────────────
 
 export default function (pi: ExtensionAPI) {
+
+  // Register the three deterministic transition tools (§2.5). Agents MUST
+  // call these to advance leaf/branch status — the gate enforcement point.
+  registerMechTools(pi);
 
   // ============================================================
   // PRE-TOOL HOOKS

@@ -130,10 +130,10 @@ resource: index.md
 - ⬜ Phase E: tool failure recovery — classifyFailure, findStuckLeaves, recoveryReport · NOT IMPLEMENTED (recovery.ts does not exist)
 - ⬜ Phase F: sub-map session lifecycle — syncChildStatuses, detectSubmapOrphans · NOT IMPLEMENTED (sub-map.ts does not exist)
 
-### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 0/5 leaves
-- ⬜ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
-- ⬜ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
-- ⬜ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
+### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 3/5 leaves
+- ✅ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
+- ✅ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
+- ✅ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
 - ⬜ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
 - ⬜ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
 
