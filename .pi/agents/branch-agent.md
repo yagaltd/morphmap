@@ -164,6 +164,12 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
       Append format tags: `[link]` for file refs, `[table]` for data, `[code]` for blocks, `[checkbox]` for tasks.
 
 4. **Assign model/reasoning** per bottleneck tag + quality level + task type:
+   Call the model-assign CLI to get the exact model:
+   ```bash
+   MODEL_JSON=$(bun run .morphmap/mech/model-assign.ts <bottleneck> <qa> <test1,test2,...>)
+   MODEL=$(echo "$MODEL_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'{d[\"provider\"]}/{d[\"model\"]}')")
+   THINKING=$(echo "$MODEL_JSON" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d['thinking'])")
+   ```
    - For test leaves: use `testProfiles` from config (test-unit, test-integration, test-e2e, test-property, test-snapshot)
      - `[test: e2e]` → vision-capable model (zai/glm-5.2), high thinking
      - `[test: unit]` → cheapest text model, off thinking
@@ -177,8 +183,8 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
    ```
    subagent({
      agent: "morphmap/leaf-worker",
-     model: x,
-     thinking: y,
+     model: MODEL,
+     thinking: THINKING,
      task: "Implement <leaf-path> against .spec <path>.
             Context from orchestrator: phase=<X>, compat=<Y>, scope=<Z>,
             quality=<W>, budget=<V>.

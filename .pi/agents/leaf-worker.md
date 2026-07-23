@@ -1,8 +1,8 @@
 ---
 name: morphmap/leaf-worker
 description: Leaf Worker — implements against .spec contract. TDD per BDD scenario. Self-verifies. Does not freelance.
-model: assigned-per-bottleneck-tag
-thinking: assigned-per-bottleneck-tag
+model: deepseek/deepseek-v4-flash
+thinking: off
 defaultContext: fresh
 inheritProjectContext: false
 tools: read, edit, bash, write, morphmap_submit_leaf
