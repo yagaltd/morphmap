@@ -237,28 +237,39 @@ export default function (pi: ExtensionAPI) {
             });
           }
 
-          // Stage all generated artifacts
-          execSync("git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html CHANGELOG.md", {
+          // ── md→json sync: parse mindmap → state.json ──
+          // §2.7 Step A: on map write, parse markdown → validate → write state.json
+          try {
+            const { seedFromMap } = await import("../../.morphmap/mech-pi/morphmap-seed");
+            const seedResult = seedFromMap(path, ".morphmap");
+            if (seedResult.branches > 0) {
+              pi.ui?.notify({
+                title: "MorphMap: state.json synced",
+                body: `Seeded ${seedResult.branches} branches, ${seedResult.leaves} leaves from map.`,
+                style: "success",
+              });
+            }
+          } catch (syncErr) {
+            pi.ui?.notify({
+              title: "MorphMap: state.json sync failed",
+              body: `Parse error: ${(syncErr as Error).message}. Commit blocked.`,
+              style: "error",
+            });
+            throw syncErr; // block the commit
+          }
+
+          // Stage all generated artifacts (map + html + changelog + state.json)
+          execSync("git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html .morphmap/state.json .morphmap/state-index.json CHANGELOG.md", {
             stdio: "pipe",
           });
           execSync(
-            `git commit -m "map: auto-render + changelog after edit" --allow-empty`,
+            `git commit -m "map: auto-render + changelog + state.json after edit" --allow-empty`,
             { stdio: "pipe" }
           );
 
           pi.ui?.notify({
             title: "MorphMap: map rendered",
-            body: "HTML + CHANGELOG regenerated and committed.",
-            stdio: "pipe",
-          });
-          execSync(
-            `git commit -m "map: auto-render after edit" --allow-empty`,
-            { stdio: "pipe" }
-          );
-
-          pi.ui?.notify({
-            title: "MorphMap: map rendered",
-            body: "HTML regenerated and committed.",
+            body: "HTML + CHANGELOG + state.json regenerated and committed.",
             style: "success",
           });
         } catch {

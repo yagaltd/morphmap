@@ -90,6 +90,19 @@ done > /tmp/skill-entries.txt
 
 Skills can appear in multiple domains (e.g. `waapi` → both `web-frontend` and `video`).
 
+## Phase 1.5: BOOTSTRAP state.json
+
+If `.morphmap/state.json` does not exist, bootstrap it from the mindmap:
+
+```bash
+if [ ! -f ".morphmap/state.json" ]; then
+  echo "state.json missing — bootstrapping from mindmap"
+  bun run .morphmap/mech-pi/seed-runner.ts .morphmap/morphmap.mindmap.md .morphmap
+fi
+```
+
+The pi extension hook also auto-syncs state.json on mindmap writes (§2.7 Step A).
+
 ## Phase 2: READ MAP
 
 Read .morphmap/morphmap.mindmap.md. Find all headings tagged `[module]` or `[feature]` at any level.

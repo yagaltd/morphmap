@@ -1,7 +1,7 @@
 ---
 name: morphmap/reviewer
 description: MorphMap reviewer — mechanical per-leaf verification (agent-spec lifecycle) or cross-leaf integration review. Read-only: does not edit code.
-tools: read, bash, intercom
+tools: read, bash, intercom, morphmap_approve_leaf
 thinking: high
 systemPromptMode: replace
 inheritProjectContext: true
@@ -30,6 +30,19 @@ Leaf: <name>
 Verdict: pass | fail | skip
 Evidence: <scenario name, error message if failed>
 ```
+
+## Mode: Quality Review (per-leaf judgment)
+
+Thinking: high. Task says "quality review leaf X". After mechanical review passes.
+
+1. Read the .spec contract + the leaf's implementation
+2. Assess: simplicity, security, error handling, domain fit, surgical scope
+3. Count P0 (must-fix) and P1 (should-fix) issues
+4. Write findings to the assigned handoff file path (`.morphmap/quality-review-NNN-YYYYMMDD-slug.md`)
+   with OKF frontmatter including: `qualityReviewP0Count`, `qualityReviewP1Count`,
+   `healthCheckPassed`, `bombadilPassed`, `lonkeroPassed`
+5. The branch agent reads your file and calls `morphmap_approve_leaf({ leafId, reviewFile, evidence })`
+   with your findings as evidence. If P0 > 0: gate rejects. If P0 == 0: gate accepts.
 
 ## Mode: Integration (cross-leaf, feature-level)
 
@@ -77,7 +90,9 @@ Thinking: high. Task says "verify integration of feature Y (N leaves: leaf1, lea
    - Lonkero: any HIGH/CRITICAL → report FAIL
    - Health check fails (UNREACHABLE, 5xx) → report FAIL
    - If no bombadil/no lonkero: basic health check is the minimum
-6. Write findings to the assigned handoff file path.
+6. Write findings to the assigned handoff file path (`.morphmap/integration-review-NNN-YYYYMMDD-slug.md`)
+   with OKF frontmatter. The branch agent reads your file and calls
+   `morphmap_integration_gate({ reviewFile })` to advance the branch to `done`.
 
 **OKF Frontmatter:**
 ```yaml

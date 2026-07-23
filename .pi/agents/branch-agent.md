@@ -13,7 +13,7 @@ You are a branch agent for MorphMap. You own a module subtree at any depth in th
 
 Posture: phase=X, compat=Y, scope=Z, quality=W, budget=V
 Apply posture to all decision matrices below.
-Available tools: pi-subagents, pi-intercom, context-mode, agent-spec CLI, /goal, vcc_recall.
+Available tools: pi-subagents, pi-intercom, context-mode, agent-spec CLI, /goal, vcc_recall, morphmap_submit_leaf, morphmap_approve_leaf, morphmap_integration_gate.
 
 ## Your Map (always in context, you are the writer)
 
@@ -96,14 +96,10 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
    })
    ```
 
-0b. **Set goal (leaf-managing agents only):**
-   If I directly manage leaves (Leaf Manager or Hybrid mode):
-   ```
-   create_goal({
-     objective: "Deliver <subtree-name>: <N> leaves. Report to parent.",
-     token_budget: 5000
-   })
-   ```
+0b. **State tracking (leaf-managing agents only):**
+   The mech state machine (state.json) tracks progress. No /goal needed for
+   completion — the state machine advances when evidence validates.
+   /goal is used ONLY for 5-why root cause analysis (step 13b).
 
 1. **Pull next leaf** (⬜ `[needs:]` all ✅, skip `[human]`, risk-priority sort per Eisenhower)
 
@@ -213,19 +209,18 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
        })
        ```
        If fail → spawn leaf worker to fix → re-verify → re-review.
+       If pass → call `morphmap_approve_leaf({ leafId, evidence: { agentSpecPassed: true, ... } })`.
    
    d. **Quality review** (if `[qa: full]`):
-       ```bash
-       ls .morphmap/quality-review-*.md 2>/dev/null | wc -l
-       ```
        ```
        subagent({
-         agent: "morphmap/quality-reviewer",
-         task: "Review leaf <leaf-path>. Check boundaries compliance. Write to .morphmap/quality-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter.",
+         agent: "morphmap/reviewer",
+         task: "Quality review: leaf <leaf-path>. Check simplicity, security, error handling, domain fit, surgical scope. Count P0/P1. Write to .morphmap/quality-review-<NNN>-<YYYYMMDD>-<slug>.md with OKF frontmatter including P0/P1 counts.",
          context: "fresh"
        })
        ```
-       If CHANGES_REQUESTED with P0/P1 → spawn leaf worker to fix → re-verify.
+       If CHANGES_REQUESTED with P0 → spawn leaf worker to fix → re-verify.
+       If P0 == 0 → call `morphmap_approve_leaf({ leafId, reviewFile: ".morphmap/quality-review-NNN-...", evidence: { qualityReviewExists: true, qualityReviewP0Count: 0, ... } })`.
        Update map's `## context` branch with file reference.
        Log: `- <today>: [skill] morphmap/quality-reviewer used for <leaf> · outcome: <APPROVED/CHANGES_REQUESTED>`
    
@@ -287,54 +282,27 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
      Open issues: <any gaps or concerns>."
     ```
 
-13. **Goal completion gate** (leaf-managing agents only, before `update_goal complete`):
-    Run mechanical checks:
+13. **Integration gate** (leaf-managing agents only, before reporting to parent):
+    Call `morphmap_integration_gate({ reviewFile })` to run integration gates:
+    - allLeavesComplete: all leaves done/abandoned
+    - crossLeafConflictsResolved: no file conflicts between leaves
+    - integrationReviewExists: integration review file present
+    - integrationHealthCheckPassed: health/bombadil/lonkero (qa:full+ only)
+
     ```bash
-    FAILS=0
-    
-    # a. All leaves done?
+    # Verify state before gate call
     PENDING=$(grep -cE '^[[:space:]]*-[[:space:]]*[⬜🔄]' <<< "$SUBTREE" 2>/dev/null || echo 0)
     if [ "$PENDING" -gt 0 ]; then
       echo "FAIL: $PENDING leaves still pending or in progress."
-      FAILS=$((FAILS + 1))
-    fi
-    
-    # b. All .spec files exist?
-    echo "$SUBTREE" | grep -oP '(?<=→ ).*\.spec' | while read spec; do
-      [ -f "$spec" ] || { echo "FAIL: .spec missing: $spec"; FAILS=$((FAILS + 1)); }
-    done
-    
-    # c. All [needs:] resolved?
-    UNRESOLVED=$(echo "$SUBTREE" | grep -oP '\[needs:.*?(?<!✅)\]' | grep -v '✅' || true)
-    [ -n "$UNRESOLVED" ] && { echo "FAIL: Unresolved deps: $UNRESOLVED"; FAILS=$((FAILS + 1)); }
-    
-    # d. Sub-branches complete?
-    SUB_PENDING=$(echo "$SUBTREE" | grep -cE '^###.*[⬜🔄]' || echo 0)
-    [ "$SUB_PENDING" -gt 0 ] && { echo "FAIL: $SUB_PENDING sub-branches pending."; FAILS=$((FAILS + 1)); }
-    
-    # e. Quality reviews present for [qa: full] leaves?
-    QA_FULL=$(echo "$SUBTREE" | grep -c '\[qa: full\]' || echo 0)
-    QA_FILES=$(ls .morphmap/quality-review-*.md 2>/dev/null | wc -l)
-    [ "$QA_FULL" -gt 0 ] && [ "$QA_FILES" -eq 0 ] && { echo "FAIL: quality-review files missing."; FAILS=$((FAILS + 1)); }
-    
-    # f. Integration review present? (only if quality≠none)
-    if [ "$QUALITY" != "none" ]; then
-      INTEG=$(ls -t .morphmap/integration-review-*.md 2>/dev/null | head -1)
-      [ -z "$INTEG" ] && { echo "FAIL: integration review missing."; FAILS=$((FAILS + 1)); }
-    fi
-    
-    # Verdict
-    if [ "$FAILS" -eq 0 ]; then
-      echo "✅ GATE PASSED — goal can be marked complete."
-    else
-      echo "❌ GATE FAILED — $FAILS failures. Fix gaps before update_goal complete."
     fi
     ```
-    
-    ALL PASS → `update_goal complete`.
+
+    ALL PASS → `morphmap_integration_gate` advances branch to `done` in state.json.
+    ANY FAIL → fix gaps, retry gate.
     ANY FAIL → log failures, fix gaps, retry gate after fixes.
 
 ## On Leaf Failure — 5-Why Root Cause
+  /goal is used HERE for failure investigation only (not completion tracking):
   ```
   create_goal({
     objective: "5-why root cause of <failure>. Ask why until process-level cause found.",

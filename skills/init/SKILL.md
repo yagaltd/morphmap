@@ -377,7 +377,17 @@ additional runtime hooks:
 Both the git hook (human edits) and pi extension hook (agent edits) ensure
 `.morphmap/morphmap.mindmap.html` stays in sync with `.md`.
 
-## Phase 6: Render + Report
+The pi extension hook also bootstraps `state.json` from the mindmap via
+`seedFromMap()` (§2.7 Step A). This runs automatically on map writes.
+
+## Phase 6: Bootstrap state.json + Render + Report
+
+```bash
+# Bootstrap state.json from mindmap (if not already seeded)
+if [ ! -f ".morphmap/state.json" ]; then
+  bun run .morphmap/mech-pi/seed-runner.ts .morphmap/morphmap.mindmap.md .morphmap
+fi
+```
 
 ```bash
 npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open

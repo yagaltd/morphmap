@@ -126,16 +126,16 @@ resource: index.md
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
 - ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
 - ✅ Phase C: transition tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate (pure handlers) · select gates via lattice, call transitionLeaf/runIntegrationGates · return {accepted/passed, failures} · 18 new tests · full suite 113/113 green · tsc exit 0 · tdd-guard 6/6 · end-to-end lifecycle tests (submit→approve→integrate, cannot-skip-review) · request_revision deferred to Phase D
-- ⬜ Phase D: hooks integration — register transition tools in morphmap-hooks.ts, state.json I/O, md↔json sync · PURE HANDLERS DONE (tools.ts tested) · IMPURE WIRING NOT DONE (no mech-pi/, hooks don't import mech, no state.json) · HIGHEST PRIORITY
+- ✅ Phase D: hooks integration — register transition tools in morphmap-hooks.ts, state.json I/O, md↔json sync · ALL WIRED (registerMechTools in hooks, seedFromMap in init/delegate, md→json sync on map write, double-commit bug fixed) · 128 tests green
 - ⬜ Phase E: tool failure recovery — classifyFailure, findStuckLeaves, recoveryReport · NOT IMPLEMENTED (recovery.ts does not exist)
 - ⬜ Phase F: sub-map session lifecycle — syncChildStatuses, detectSubmapOrphans · NOT IMPLEMENTED (sub-map.ts does not exist)
 
-### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 3/5 leaves
+### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 5/5 leaves
 - ✅ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
 - ✅ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
 - ✅ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
-- ⬜ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
-- ⬜ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
+- ✅ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
+- ✅ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
 
 ### mech-mindmap (deterministic state machine)
 - Pure gates (pre-spawn, submit, review, integration) — zero pi imports
