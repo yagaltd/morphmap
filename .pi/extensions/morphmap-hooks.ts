@@ -315,6 +315,44 @@ export default function (pi: ExtensionAPI) {
       }
     }
 
+    // ── 4b. Compiler hook: extract evidence from leaf-worker JSONL ──
+
+    if (event.toolName === "subagent" && !event.isError) {
+      const result = event.result as any;
+      const agent = event.input?.agent as string | undefined;
+
+      if (agent === "morphmap/leaf-worker" && result?.ok) {
+        try {
+          const { compileEvidence } = await import("../../.morphmap/mech-pi/morphmap-compiler");
+          const { loadState, saveState } = await import("../../.morphmap/mech-pi/morphmap-state");
+          const { readFileSync, existsSync } = await import("node:fs");
+
+          // Find session JSONL from subagent result
+          const sessionPath = result?.session || result?.sessionPath || result?.asyncDir;
+          if (sessionPath && existsSync(sessionPath)) {
+            const jsonl = readFileSync(sessionPath, "utf8");
+            const evidence = compileEvidence(jsonl);
+
+            // Update state.json with extracted evidence
+            const statePath = ".morphmap/state.json";
+            const state = loadState(statePath);
+            if (state && state.leaves) {
+              const leafName = extractLeafName(result?.output || "");
+              if (leafName && state.leaves[leafName]) {
+                state.leaves[leafName].evidence = {
+                  ...state.leaves[leafName].evidence,
+                  ...evidence,
+                };
+                saveState(statePath, state);
+              }
+            }
+          }
+        } catch {
+          // Silent — compiler is best-effort, don't block agent
+        }
+      }
+    }
+
     // ── 5. Failure recovery: detect known patterns ─────────────
 
     if (event.isError) {

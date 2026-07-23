@@ -138,9 +138,9 @@ resource: index.md
 - ✅ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
 - ✅ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
 
-### one-map 🔄 [module] — scope: unify entities, add compiler hook, map=session tree · 0/3 leaves
+### one-map ✅ [module] — scope: unify entities, add compiler hook, map=session tree · 1/3 leaves
+- ✅ compiler hook (JSONL evidence extraction) → .morphmap/specs/mech/one-map/compiler-hook.spec.md [qa: full] [test: integration]
 - ⬜ unify Leaf/Branch → Node type → .morphmap/specs/mech/one-map/unify-node-type.spec.md [qa: full] [test: unit]
-- ⬜ compiler hook (JSONL evidence extraction) → .morphmap/specs/mech/one-map/compiler-hook.spec.md [qa: full] [test: integration]
 - ⬜ map = session tree (session IDs in metadata) → .morphmap/specs/mech/one-map/map-session-tree.spec.md [qa: review] [test: unit]
 
 ### mech-mindmap (deterministic state machine)
