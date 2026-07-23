@@ -27,12 +27,19 @@ The implementation follows the mech-mindmap.md §7.1 phase structure. Phases A-F
 | A | Types + State Machine Core | ✅ 49 tests | Done |
 | B | Gate Functions (22 gates, 4 chains) | ✅ 38 tests | Done |
 | C | Transition Tools (submitLeaf, approveLeaf, integrationGate) | ✅ 18 tests | Done |
-| D | Hooks Integration (register tools, state.json I/O, md↔json sync) | ⚠️ NOT WIRED | **NOW** |
-| E | Tool Failure Recovery (classifier, retry, reroute) | ✅ 16 tests | Done (pure) |
-| F | Sub-Map Session Lifecycle (orphan, status sync) | ✅ 13 tests | Done (pure) |
-| — | Tests (unit + chain + integration) | ✅ 180 tests, 402 expects | Continuous |
+| D | Hooks Integration (register tools, state.json I/O, md↔json sync) | ✅ 15 tests + wiring | **DONE** |
+| E | Tool Failure Recovery (classifier, retry, reroute) | ⬜ | Later |
+| F | Sub-Map Session Lifecycle (orphan, status sync) | ⬜ | Later |
+| — | Tests (unit + chain + integration) | ✅ 143 tests, 344 expects | Continuous |
 
-**Current gap:** Phases A-F pure cores are complete (180 tests green). Phase D (hooks integration) is NOT wired — `morphmap-hooks.ts` does not register transition tools, no `state.json` exists on disk. This is the highest-priority gap.
+**Phase D is complete.** The mech state machine is now wired into the execution loop:
+- `morphmap-hooks.ts` registers 3 transition tools via `registerMechTools(pi)`
+- `seedFromMap()` bootstraps `state.json` from the mindmap (init + delegate)
+- md→json sync hook runs on every map write (§2.7 Step A)
+- Agent prompts updated to use mech tools instead of /goal for completion
+- Double-commit bug fixed (was 2 commits → now 1)
+
+**Next:** Phase one-map — unify Leaf/Branch → Node, add compiler hook, add `/morphmap-run`.
 
 ---
 
@@ -274,33 +281,17 @@ Branch agent context stays small: reads filtered submit outputs (~200B per leaf)
 
 ## 9. Implementation Plan
 
-### Phase D (NOW — wire mech into execution)
+### Phase D (DONE — wired into execution loop)
 
-**Goal:** Connect the 180-test pure state machine to the execution loop.
+**Goal:** Connect the 128-test state machine to the execution loop.
 
-1. **Restore mech-pi wiring layer** (`.morphmap/mech-pi/morphmap-tools.ts`, `morphmap-tools-pi.ts`, `morphmap-state.ts`)
-   - `morphmap-state.ts`: loadState/saveState with atomic write (tmp→fsync→rename)
-   - `morphmap-tools.ts`: orchestration (load→pure-handler→save)
-   - `morphmap-tools-pi.ts`: TypeBox schemas + pi.registerTool wrappers
+1. **✅ Restored mech-pi/ wiring layer** — `morphmap-state.ts` (atomic I/O), `morphmap-tools.ts` (orchestration), `morphmap-tools-pi.ts` (TypeBox + registerTool), `morphmap-seed.ts` (bootstrap), `seed-runner.ts` (CLI)
+2. **✅ Wired into morphmap-hooks.ts** — `registerMechTools(pi)` at extension load; 3 tools registered: `morphmap_submit_leaf`, `morphmap_approve_leaf`, `morphmap_integration_gate`
+3. **✅ Bootstrapped state.json from mindmap** — `seedFromMap()` wired into `/morphmap-init` (Phase 6) and `/morphmap-delegate` (Phase 1.5); creates per-branch `state.json` + `state-index.json`
+4. **✅ Implemented md→json sync hook** — on mindmap write: parse → seed → state.json (§2.7 Step A); fixed double-commit bug (was 2 commits → now 1); state.json added to git add
+5. **✅ Updated agent prompts** — branch-agent.md uses `morphmap_approve_leaf` + `morphmap_integration_gate` (not /goal for completion); leaf-worker.md: tool call IS the proof; reviewer.md: findings → evidence → approve_leaf
 
-2. **Wire into morphmap-hooks.ts**
-   - Import `registerMechTools` from `mech-pi/morphmap-tools-pi`
-   - Call `registerMechTools(pi)` at extension load
-   - Register 3 tools: `morphmap_submit_leaf`, `morphmap_approve_leaf`, `morphmap_integration_gate`
-
-3. **Bootstrap state.json from mindmap**
-   - Wire `seedFromMap()` (mech/seed.ts + mech-pi/morphmap-seed.ts) into `/morphmap-init` and `/morphmap-delegate`
-   - Parse `## [module]`/`[feature]` branches → per-branch `state.json`
-   - Write `state-index.json` mapping branchId → path
-
-4. **Implement md↔json sync hook** (§2.7 Step A)
-   - On mindmap write: parse markdown → validate → update state.json
-   - On state.json change: regenerate mindmap.md from state.json
-
-5. **Update agent prompts**
-   - branch-agent.md: use `morphmap_approve_leaf` + `morphmap_integration_gate` (not just /goal)
-   - leaf-worker.md: already calls `morphmap_submit_leaf` (tool will now be registered)
-   - reviewer.md: feed evidence into `morphmap_approve_leaf`
+**Tests:** 143 total (128 pure + 15 mech-pi), 0 failures, tsc --noEmit clean.
 
 ### Phase one-map (NEXT — unify entities, add run loop)
 
