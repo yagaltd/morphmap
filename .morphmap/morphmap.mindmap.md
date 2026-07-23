@@ -263,6 +263,21 @@ resource: index.md
 - [learn] integration gap found during MorphShell testing: reviewer integration mode was CODE-ONLY — never ran the app. Phase 3 skipped on quality=fast. Now: quality=fast runs lite (health check), quality=strict runs full (bombadil + lonkero). Only quality=none skips.
 - [learn] MorphShell dogfooding complete: plan (budget estimate + 4 scouts), delegate (3 rounds, 15 branches), recover (13 worktrees), testProfiles, tool scanning, model enforcement, telemetry. 5 e2e verified, 5 remaining.
 
+### 2026-07-23
+#### design verification — fractal autonomous loop
+- [verify] scout-002 design verification complete → .morphmap/scout-002-20260723-design-verification.md
+- [finding] branch-agent.md IS autonomous: writes .spec (step 3), spawns sub-branches recursively (step 0a), loops (step 11), uses /goal (step 0b/13). Does NOT use mech scripts — they are not wired in.
+- [finding] delegate SKILL.md is one-shot: spawns branch agents, reports, exits. Does NOT loop or re-spawn. Branch agent loops internally, but delegate requires manual re-trigger.
+- [finding] mech scripts (Phases A-C) fully implemented + tested (115 tests green) but NOT wired into execution. morphmap-hooks.ts does not call any mech functions, does not register transition tools, does not read/write state.json. Phase D (hooks integration) is "Soon" per docs/mech-mindmap.md §7.1.
+- [finding] Root Orchestrator (AGENTS.md) routes user intent to skills via routing table. Trigger-based, not autonomous. No re-spawn loop.
+- [finding] Fractal loop exists at branch-agent level (steps 0-13 with repeat) but is NOT fully autonomous like Fractal (PREPARE→PLAN→EXECUTE→REVIEW→COMMIT). Delegate is one-shot, Root is trigger-based, leaf worker is one-shot.
+- [finding] Branch agent writes .spec files itself (step 3). Does NOT read plan.md from agent-spec. agent-spec CLI used for verification only.
+- [finding] Missing planned files: state.json, plans/*.plan.md, codebase-graph/, specs/ directory. Missing planned agents: spec-reviewer.md, refactor-worker.md.
+- [risk] CRITICAL: mech state machine is dead code — 115 tests pass but gates never run during execution. Completion is still trust-based.
+- [risk] HIGH: delegate skill does not auto-loop. No autonomous re-trigger after branch completion.
+- [risk] HIGH: double-commit bug in morphmap-hooks.ts (~L230-245) — git commit runs twice. Telemetry pollutes mindmap via echo >>.
+- [action] Phase D (hooks integration) is the highest priority gap. Wire mech into morphmap-hooks.ts, register transition tools, create state.json.
+
 ### 2026-07-20
 #### fixes (5)
 - [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
