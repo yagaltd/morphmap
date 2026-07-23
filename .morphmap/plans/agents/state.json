@@ -1,0 +1,330 @@
+{
+  "branchId": "agents",
+  "status": "done",
+  "quality": "fast",
+  "leaves": {
+    ".pi/agents/branch-agent.md": {
+      "id": ".pi/agents/branch-agent.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/.pi/agents/branch-agent.md"
+    },
+    ".pi/agents/leaf-worker.md": {
+      "id": ".pi/agents/leaf-worker.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/.pi/agents/leaf-worker.md"
+    },
+    ".pi/agents/reviewer.md": {
+      "id": ".pi/agents/reviewer.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/.pi/agents/reviewer.md"
+    },
+    ".pi/agents/scout.md": {
+      "id": ".pi/agents/scout.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/.pi/agents/scout.md"
+    },
+    ".pi/agents/researcher.md": {
+      "id": ".pi/agents/researcher.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/.pi/agents/researcher.md"
+    },
+    "bash+curl": {
+      "id": "bash+curl",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/bash+curl"
+    },
+    "bash": {
+      "id": "bash",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/bash"
+    },
+    "agent-install:-~/.pi/agent/agents/morphmap/-for-pi-subagents-discovery": {
+      "id": "agent-install:-~/.pi/agent/agents/morphmap/-for-pi-subagents-discovery",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "agents/agent-install:-~/.pi/agent/agents/morphmap/-for-pi-subagents-discovery"
+    }
+  },
+  "subBranches": [],
+  "childBranchStatus": {},
+  "transitions": [],
+  "integrationStatus": {
+    "reviewFileExists": false,
+    "healthCheckPassed": null,
+    "bombadilPassed": null,
+    "lonkeroPassed": null,
+    "allLeavesComplete": false,
+    "crossLeafConflicts": []
+  }
+}

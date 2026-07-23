@@ -1,0 +1,174 @@
+{
+  "branchId": "extension",
+  "status": "in_progress",
+  "quality": "fast",
+  "leaves": {
+    "package.json-+-install-from-github-(pi-install-works)": {
+      "id": "package.json-+-install-from-github-(pi-install-works)",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "extension/package.json-+-install-from-github-(pi-install-works)"
+    },
+    "~/.pi/agent/agents/morphmap/)": {
+      "id": "~/.pi/agent/agents/morphmap/)",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "extension/~/.pi/agent/agents/morphmap/)"
+    },
+    "npm-packaging-(not-needed-—-github-install-works)": {
+      "id": "npm-packaging-(not-needed-—-github-install-works)",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "extension/npm-packaging-(not-needed-—-github-install-works)"
+    },
+    "mech-tools-wired:-registermechtools-in-hooks,-state.json-bootstrapped,-md↔json-sync-active": {
+      "id": "mech-tools-wired:-registermechtools-in-hooks,-state.json-bootstrapped,-md↔json-sync-active",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "extension/mech-tools-wired:-registermechtools-in-hooks,-state.json-bootstrapped,-md↔json-sync-active"
+    }
+  },
+  "subBranches": [],
+  "childBranchStatus": {},
+  "transitions": [],
+  "integrationStatus": {
+    "reviewFileExists": false,
+    "healthCheckPassed": null,
+    "bombadilPassed": null,
+    "lonkeroPassed": null,
+    "allLeavesComplete": false,
+    "crossLeafConflicts": []
+  }
+}

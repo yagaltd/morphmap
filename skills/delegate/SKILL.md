@@ -16,15 +16,19 @@ NOT the pi-subagents `delegate` builtin — that's a different, generic agent.
 Before spawning agents, check if previous delegate was interrupted:
 
 ```bash
-IN_PROGRESS=$(grep -c '🔄' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
-PENDING=$(grep -c '⬜' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+# Count 🔄 LEAVES (not branch headers) — leaves start with "- 🔄"
+IN_PROGRESS=$(grep -cE '^\s*-\s*🔄' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
+PENDING=$(grep -cE '^\s*-\s*⬜' .morphmap/morphmap.mindmap.md 2>/dev/null || echo 0)
 ```
 
 If `IN_PROGRESS > 0`:
 - Report: "Previous delegate crashed. N leaves in-progress, M pending."
 - Ask: "Resume? (y) — spawn agents for 🔄 + ⬜ leaves. (r)eset — mark 🔄 back to ⬜, start fresh."
 - If 'y': continue to Phase 1. Branch agents verify actual state before re-spawning.
-- If 'r': mark all 🔄 back to ⬜ in map. Continue to Phase 1.
+- If 'r': mark all 🔄 leaves back to ⬜ in map. Continue to Phase 1.
+
+Note: 🔄 on branch headers (`## name 🔄`) means the branch is in-progress, not crashed.
+Only `- 🔄` (leaf-level) triggers crash recovery.
 
 ## Phase 1: CACHE CHECK
 

@@ -1,0 +1,449 @@
+{
+  "branchId": "mech-mindmap",
+  "status": "in_progress",
+  "quality": "fast",
+  "leaves": {
+    ".morphmap/mech/{types,state,config,index}.ts": {
+      "id": ".morphmap/mech/{types,state,config,index}.ts",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/mech/{types,state,config,index}.ts"
+    },
+    ".morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts": {
+      "id": ".morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts"
+    },
+    ".morphmap/mech/tools.ts": {
+      "id": ".morphmap/mech/tools.ts",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/mech/tools.ts"
+    },
+    "json": {
+      "id": "json",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/json"
+    },
+    "phase-e:-tool-failure-recovery-—-classifyfailure,-findstuckleaves,-recoveryreport-·-not-implemented-(recovery.ts-does-not-exist)": {
+      "id": "phase-e:-tool-failure-recovery-—-classifyfailure,-findstuckleaves,-recoveryreport-·-not-implemented-(recovery.ts-does-not-exist)",
+      "status": "pending",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/phase-e:-tool-failure-recovery-—-classifyfailure,-findstuckleaves,-recoveryreport-·-not-implemented-(recovery.ts-does-not-exist)"
+    },
+    "phase-f:-sub-map-session-lifecycle-—-syncchildstatuses,-detectsubmaporphans-·-not-implemented-(sub-map.ts-does-not-exist)": {
+      "id": "phase-f:-sub-map-session-lifecycle-—-syncchildstatuses,-detectsubmaporphans-·-not-implemented-(sub-map.ts-does-not-exist)",
+      "status": "pending",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/phase-f:-sub-map-session-lifecycle-—-syncchildstatuses,-detectsubmaporphans-·-not-implemented-(sub-map.ts-does-not-exist)"
+    },
+    ".morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md": {
+      "id": ".morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md"
+    },
+    ".morphmap/specs/mech/phase-d/register-transition-tools.spec.md": {
+      "id": ".morphmap/specs/mech/phase-d/register-transition-tools.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/register-transition-tools.spec.md"
+    },
+    ".morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md": {
+      "id": ".morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "integration"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jsdom"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md"
+    },
+    ".morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md": {
+      "id": ".morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "integration"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jsdom"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md"
+    },
+    ".morphmap/specs/mech/phase-d/update-agent-prompts.spec.md": {
+      "id": ".morphmap/specs/mech/phase-d/update-agent-prompts.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/update-agent-prompts.spec.md"
+    }
+  },
+  "subBranches": [
+    "phase-d-wiring-—-scope:-wire-mech-state-machine-into-execution-loop-·-5/5-leaves"
+  ],
+  "childBranchStatus": {},
+  "transitions": [],
+  "integrationStatus": {
+    "reviewFileExists": false,
+    "healthCheckPassed": null,
+    "bombadilPassed": null,
+    "lonkeroPassed": null,
+    "allLeavesComplete": false,
+    "crossLeafConflicts": []
+  }
+}
