@@ -45,13 +45,14 @@ resource: index.md
 - ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery · ⚠️ one-shot, needs --loop flag
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
-- ⬜ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
+- ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
 - ⬜ /morphmap-review — warm (quality review ran on MorphShell, OKF output needs fix)
 - ⬜ /morphmap-amend — warm (skill written, not spawned in e2e)
 - ⬜ /morphmap-triage — warm (skill written, not spawned in e2e)
 - ⬜ /morphmap — render via markmap-cli, warm
 - ⬜ /morphmap-status — text summary, warm
 - ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
+- ✅ Phase D: mech state machine wired into execution loop (143 tests, 0 failures)
 
 ## agents ✅ [module] — scope: agent definitions · 5/5 leaves · all spawn-verified
 - ✅ branch-agent → .pi/agents/branch-agent.md · spawned + executed
@@ -69,7 +70,7 @@ resource: index.md
 - ✅ package.json + install from GitHub (pi install works)
 - ✅ agent discovery fixed (.pi/agents/ → ~/.pi/agent/agents/morphmap/)
 - ✅ npm packaging (not needed — GitHub install works)
-- ⚠️ mech tools NOT wired: morphmap-hooks.ts does not register transition tools, no state.json · Phase D (one-map.md §9)
+- ✅ mech tools wired: registerMechTools in hooks, state.json bootstrapped, md↔json sync active
 
 ## staging 🔄 [phase]
 ### e2e-test
@@ -130,7 +131,7 @@ resource: index.md
 - ⬜ Phase E: tool failure recovery — classifyFailure, findStuckLeaves, recoveryReport · NOT IMPLEMENTED (recovery.ts does not exist)
 - ⬜ Phase F: sub-map session lifecycle — syncChildStatuses, detectSubmapOrphans · NOT IMPLEMENTED (sub-map.ts does not exist)
 
-### phase-d-wiring 🔄 [module] — scope: wire mech state machine into execution loop · 5/5 leaves
+### phase-d-wiring ✅ [module] — scope: wire mech state machine into execution loop · 5/5 leaves
 - ✅ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
 - ✅ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
 - ✅ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
