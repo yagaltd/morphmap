@@ -1,76 +1,48 @@
 spec: task
 name: "morphmap-status"
 inherits: project
-tags: [commands, status, e2e]
+tags: [morphmap, status, summary]
 ---
 
 ## Intent
 
-Implement the `/morphmap-status` command skill (SKILL.md is missing) and e2e test it. The skill reads `.morphmap/morphmap.mindmap.md` branch headers only (~15 lines), outputs a text summary with branches, status, ETA, budget, blocker count. No markmap render. Cheap, thinking off.
+Implement the /morphmap-status command. Reads .morphmap/morphmap.mindmap.md branch headers and produces a text summary of project status: branches done/pending/blocked, leaf counts, ETA, budget.
 
 ## Decisions
 
-- Status reads only `##` branch headers (not leaf details)
-- Output format: text summary with branch name, status emoji, leaf counts
-- No HTML render — text only
-- Cheap model (deepseek-v4-flash, thinking off) per prompt config
-- Report includes: branch count, done/pending/blocked counts, blocker list
+- Parse branch headers: `## <name> <emoji> [tag] — scope: ... · <n>/<m> leaves`
+- Count: ✅ done, ⬜ pending, 🔄 in-progress, 🔴 blocked
+- Output: console table + summary line
 
 ## Boundaries
 
 ### Allowed Changes
-- `skills/status/SKILL.md` (CREATE — file is missing)
-- `prompts/morphmap-status.md` (update if needed)
-- `.morphmap/specs/commands/morphmap-status.spec.md` (this file)
+- Create: skills/status/SKILL.md (if not exists)
+- Create: prompts/morphmap-status.md (if not exists)
 
 ### Forbidden
 - Do NOT modify the mindmap markdown
-- Do NOT modify other skill files
-- Do NOT modify agent definitions
+- Do NOT modify other skills
 
 ## Completion Criteria
 
-Scenario: Status skill file exists
+Scenario: Status summary produced
   Test:
     Package: morphmap-status
-    Filter: skill_exists
-  Given the status skill directory exists
-  When status is implemented
-  Then `skills/status/SKILL.md` exists with OKF frontmatter and Phase structure
+    Filter: summary_produced
+  Given a mindmap with branches in various states
+  When /morphmap-status is executed
+  Then it outputs a summary with branch counts and leaf counts
 
-Scenario: Status outputs text summary
+Scenario: Blocked branches highlighted
   Test:
     Package: morphmap-status
-    Filter: text_summary
-  Given the mindmap has multiple branches
-  When status runs
-  Then output is text (not HTML) with branch names and status markers
-
-Scenario: Status includes blocker count
-  Test:
-    Package: morphmap-status
-    Filter: blocker_count
-  Given the mindmap has 🔴 blocked branches
-  When status runs
-  Then output includes blocker count and list
-
-Scenario: Status includes done/pending counts
-  Test:
-    Package: morphmap-status
-    Filter: counts
-  Given the mindmap has ✅ done and ⬜ pending branches
-  When status runs
-  Then output includes done/pending counts
-
-Scenario: Status does not render HTML
-  Test:
-    Package: morphmap-status
-    Filter: no_html
-  Given status runs
-  When output is generated
-  Then no HTML file is created (text only)
+    Filter: blocked_highlighted
+  Given the mindmap has 🔴 branches
+  When /morphmap-status is executed
+  Then the report highlights blocked branches
 
 ## Out of Scope
 
-- Adding HTML rendering to status
-- Reading leaf details (branch headers only)
+- Real-time status updates
+- Integration with external dashboards

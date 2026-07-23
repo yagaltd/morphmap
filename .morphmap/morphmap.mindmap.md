@@ -46,11 +46,11 @@ resource: index.md
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
 - ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
-- ⬜ /morphmap-review → specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
-- ⬜ /morphmap-amend → specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
-- ⬜ /morphmap-triage → specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
-- ⬜ /morphmap → specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
-- ⬜ /morphmap-status → specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
+- ⬜ /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
+- ⬜ /morphmap-amend → .morphmap/specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
+- ⬜ /morphmap-triage → .morphmap/specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
+- ⬜ /morphmap → .morphmap/specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
+- ⬜ /morphmap-status → .morphmap/specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
 - ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
 - ✅ Phase D: mech state machine wired into execution loop (143 tests, 0 failures)
 

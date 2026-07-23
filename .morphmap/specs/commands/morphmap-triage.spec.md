@@ -1,77 +1,49 @@
 spec: task
 name: "morphmap-triage"
 inherits: project
-tags: [commands, triage, e2e]
+tags: [morphmap, triage, github]
 ---
 
 ## Intent
 
-E2e test the `/morphmap-triage` command. The skill classifies external input (GitHub issues/PRs, email, chat) against branch scope declarations using a forced 4-tier classification, checks PRs for existing leaf references first, auto-routes high-confidence matches, and flags low-confidence for human. Verify the classification and routing logic works end-to-end with sample inputs.
+Implement the /morphmap-triage command. Classifies external input (GitHub issues/PRs, email, chat) against branch scope. Auto-routes high-confidence matches, flags low-confidence for human.
 
 ## Decisions
 
-- PR check first: if PR description mentions a leaf path or .spec file → match exact, update leaf status, notify branch agent, no new leaf
-- Classification reads `##` branch scope from `.morphmap/morphmap.mindmap.md`
-- 4-tier forced choice: very good → auto-route, good → route+validate, bad → flag human, very bad → flag human+new domain
-- Routing uses `intercom({ action: "send", to: "branch-agent", message: { type: "new:leaf", ... } })`
-- All routing decisions logged to `## decisions` with confidence tier
-- Can run on CRON via pi scheduled subagent
+- 4-tier classification: exact → auto-route, high → auto-route, partial → flag, no match → human
+- GitHub integration: use gh CLI to fetch issues/PRs
+- Scope matching: issue/PR title + body keywords vs branch scope keywords
 
 ## Boundaries
 
 ### Allowed Changes
-- `skills/triage/SKILL.md` (fix if classification logic is incomplete)
-- `prompts/morphmap-triage.md` (update if needed)
-- `.morphmap/specs/commands/morphmap-triage.spec.md` (this file)
+- Create: skills/triage/SKILL.md (if not exists)
+- Create: prompts/morphmap-triage.md (if not exists)
+- Edit: .morphmap/morphmap.mindmap.md (add triage results)
 
 ### Forbidden
-- Do NOT modify other skill files
-- Do NOT modify the mindmap
-- Do NOT modify agent definitions
+- Do NOT modify agent system prompts
+- Do NOT modify other skills
 
 ## Completion Criteria
 
-Scenario: PR with existing leaf reference updates status
+Scenario: GitHub issue classified and routed
   Test:
     Package: morphmap-triage
-    Filter: pr_leaf_ref
-  Given a PR description mentioning a leaf path or .spec file
-  When triage processes it
-  Then leaf status is updated, branch agent notified via intercom, no new leaf created
+    Filter: issue_routed
+  Given a GitHub issue matching a branch scope
+  When /morphmap-triage is executed
+  Then it creates a leaf in the matching branch and notifies the branch-agent
 
-Scenario: GitHub issue matching branch scope
+Scenario: Low-confidence flagged for human
   Test:
     Package: morphmap-triage
-    Filter: issue_match
-  Given a GitHub issue that clearly matches a branch's scope keywords
-  When triage classifies it
-  Then classification is "very good" and auto-routed to that branch agent
-
-Scenario: GitHub issue with no match
-  Test:
-    Package: morphmap-triage
-    Filter: issue_no_match
-  Given a GitHub issue that doesn't match any branch scope
-  When triage classifies it
-  Then classification is "very bad" and flagged for human
-
-Scenario: Classification is 4-tier forced choice
-  Test:
-    Package: morphmap-triage
-    Filter: forced_choice
-  Given any external input
-  When triage classifies it
-  Then output is exactly one of: very good, good, bad, very bad (no confidence numbers)
-
-Scenario: Routing decision logged to decisions
-  Test:
-    Package: morphmap-triage
-    Filter: log_decision
-  Given an input is classified and routed
-  When the decision is made
-  Then it is logged to `## decisions` with timestamp and confidence tier
+    Filter: low_confidence
+  Given a GitHub issue with partial scope match
+  When /morphmap-triage is executed
+  Then it flags for human review
 
 ## Out of Scope
 
-- Implementing GitHub API integration (uses bash+curl per available tools)
-- Modifying the intercom protocol
+- Automated issue resolution
+- Email/chat integration (GitHub only for v1)
