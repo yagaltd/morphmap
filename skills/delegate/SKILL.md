@@ -185,4 +185,29 @@ Delegated <N> branches/sub-branches:
 
 Monitor with /morphmap-review
 Check status with /morphmap-status
+
+## Phase 6: LOOP (if --loop flag)
+
+If `--loop` flag is passed:
+```bash
+while true; do
+  # Re-check for newly-ready branches (deps may have cleared)
+  READY=$(python3 -c "
+import json
+with open('.morphmap/state.json') as f:
+    state = json.load(f)
+ready = [bid for bid, status in state.get('childBranchStatus', {}).items() if status in ('pending', 'blocked')]
+print(len(ready))
+" 2>/dev/null || echo 0)
+
+  if [ "$READY" -eq 0 ]; then
+    echo "All branches complete. Exiting loop."
+    break
+  fi
+
+  echo "Re-checking: $READY branches newly ready. Spawning..."
+  # Go back to Phase 3 (select branches)
+done
 ```
+
+Without `--loop`: report and exit. User re-runs `/morphmap-delegate` after branches complete.
