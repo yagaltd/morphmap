@@ -1,0 +1,1 @@
+Guard caught 🔴 emoji in task text. Removing all emojis. Also avoiding `.spec <path>` pattern:

@@ -431,10 +431,128 @@
       },
       "reviewRounds": 0,
       "trace": "mech-mindmap/.morphmap/specs/mech/phase-d/update-agent-prompts.spec.md"
+    },
+    ".morphmap/specs/mech/one-map/compiler-hook.spec.md": {
+      "id": ".morphmap/specs/mech/one-map/compiler-hook.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "integration"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jsdom"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/one-map/compiler-hook.spec.md"
+    },
+    "Node": {
+      "id": "Node",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "full",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-pro",
+        "thinking": "high"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/Node"
+    },
+    ".morphmap/specs/mech/one-map/map-session-tree.spec.md": {
+      "id": ".morphmap/specs/mech/one-map/map-session-tree.spec.md",
+      "status": "done",
+      "bottleneck": "standard",
+      "qa": "review",
+      "test": [
+        "unit"
+      ],
+      "model": {
+        "provider": "deepseek",
+        "model": "deepseek-v4-flash",
+        "thinking": "off"
+      },
+      "tools": [
+        "agent-spec",
+        "vitest",
+        "jest"
+      ],
+      "evidence": {
+        "specExists": false,
+        "specScenarioCount": 0,
+        "specFileCount": 0,
+        "agentSpecPassed": false,
+        "tddGuardPassed": null,
+        "npmTestPassed": false,
+        "npmBuildPassed": false,
+        "boundariesClean": false,
+        "filesChanged": [],
+        "testsRun": [],
+        "healthCheckPassed": null,
+        "bombadilPassed": null,
+        "lonkeroPassed": null,
+        "qualityReviewExists": false,
+        "qualityReviewP0Count": 0,
+        "qualityReviewP1Count": 0
+      },
+      "reviewRounds": 0,
+      "trace": "mech-mindmap/.morphmap/specs/mech/one-map/map-session-tree.spec.md"
     }
   },
   "subBranches": [
-    "phase-d-wiring-—-scope:-wire-mech-state-machine-into-execution-loop-·-5/5-leaves"
+    "phase-d-wiring-—-scope:-wire-mech-state-machine-into-execution-loop-·-5/5-leaves",
+    "one-map-—-scope:-unify-entities,-add-compiler-hook,-map=session-tree-·-3/3-leaves"
   ],
   "childBranchStatus": {},
   "transitions": [],

@@ -237,23 +237,24 @@
       "reviewRounds": 0,
       "trace": "commands//morphmap-run-—-new:-spawn-all-ready-branches-in-parallel,-loop-until-all-done-(one-map.md-§9)"
     },
-    "/morphmap-review-—-warm-(quality-review-ran-on-morphshell,-okf-output-needs-fix)": {
-      "id": "/morphmap-review-—-warm-(quality-review-ran-on-morphshell,-okf-output-needs-fix)",
+    ".morphmap/specs/commands/morphmap-review.spec.md": {
+      "id": ".morphmap/specs/commands/morphmap-review.spec.md",
       "status": "pending",
       "bottleneck": "standard",
       "qa": "review",
       "test": [
-        "unit"
+        "e2e"
       ],
       "model": {
-        "provider": "deepseek",
-        "model": "deepseek-v4-flash",
-        "thinking": "off"
+        "provider": "zai",
+        "model": "glm-5.2",
+        "thinking": "high"
       },
       "tools": [
         "agent-spec",
-        "vitest",
-        "jest"
+        "playwriter",
+        "agent-browser",
+        "playwright"
       ],
       "evidence": {
         "specExists": false,
@@ -274,25 +275,26 @@
         "qualityReviewP1Count": 0
       },
       "reviewRounds": 0,
-      "trace": "commands//morphmap-review-—-warm-(quality-review-ran-on-morphshell,-okf-output-needs-fix)"
+      "trace": "commands/.morphmap/specs/commands/morphmap-review.spec.md"
     },
-    "/morphmap-amend-—-warm-(skill-written,-not-spawned-in-e2e)": {
-      "id": "/morphmap-amend-—-warm-(skill-written,-not-spawned-in-e2e)",
+    ".morphmap/specs/commands/morphmap-amend.spec.md": {
+      "id": ".morphmap/specs/commands/morphmap-amend.spec.md",
       "status": "pending",
       "bottleneck": "standard",
       "qa": "review",
       "test": [
-        "unit"
+        "e2e"
       ],
       "model": {
-        "provider": "deepseek",
-        "model": "deepseek-v4-flash",
-        "thinking": "off"
+        "provider": "zai",
+        "model": "glm-5.2",
+        "thinking": "high"
       },
       "tools": [
         "agent-spec",
-        "vitest",
-        "jest"
+        "playwriter",
+        "agent-browser",
+        "playwright"
       ],
       "evidence": {
         "specExists": false,
@@ -313,25 +315,26 @@
         "qualityReviewP1Count": 0
       },
       "reviewRounds": 0,
-      "trace": "commands//morphmap-amend-—-warm-(skill-written,-not-spawned-in-e2e)"
+      "trace": "commands/.morphmap/specs/commands/morphmap-amend.spec.md"
     },
-    "/morphmap-triage-—-warm-(skill-written,-not-spawned-in-e2e)": {
-      "id": "/morphmap-triage-—-warm-(skill-written,-not-spawned-in-e2e)",
+    ".morphmap/specs/commands/morphmap-triage.spec.md": {
+      "id": ".morphmap/specs/commands/morphmap-triage.spec.md",
       "status": "pending",
       "bottleneck": "standard",
       "qa": "review",
       "test": [
-        "unit"
+        "e2e"
       ],
       "model": {
-        "provider": "deepseek",
-        "model": "deepseek-v4-flash",
-        "thinking": "off"
+        "provider": "zai",
+        "model": "glm-5.2",
+        "thinking": "high"
       },
       "tools": [
         "agent-spec",
-        "vitest",
-        "jest"
+        "playwriter",
+        "agent-browser",
+        "playwright"
       ],
       "evidence": {
         "specExists": false,
@@ -352,25 +355,26 @@
         "qualityReviewP1Count": 0
       },
       "reviewRounds": 0,
-      "trace": "commands//morphmap-triage-—-warm-(skill-written,-not-spawned-in-e2e)"
+      "trace": "commands/.morphmap/specs/commands/morphmap-triage.spec.md"
     },
-    "/morphmap-—-render-via-markmap-cli,-warm": {
-      "id": "/morphmap-—-render-via-markmap-cli,-warm",
+    ".morphmap/specs/commands/morphmap-render.spec.md": {
+      "id": ".morphmap/specs/commands/morphmap-render.spec.md",
       "status": "pending",
       "bottleneck": "standard",
       "qa": "review",
       "test": [
-        "unit"
+        "e2e"
       ],
       "model": {
-        "provider": "deepseek",
-        "model": "deepseek-v4-flash",
-        "thinking": "off"
+        "provider": "zai",
+        "model": "glm-5.2",
+        "thinking": "high"
       },
       "tools": [
         "agent-spec",
-        "vitest",
-        "jest"
+        "playwriter",
+        "agent-browser",
+        "playwright"
       ],
       "evidence": {
         "specExists": false,
@@ -391,25 +395,26 @@
         "qualityReviewP1Count": 0
       },
       "reviewRounds": 0,
-      "trace": "commands//morphmap-—-render-via-markmap-cli,-warm"
+      "trace": "commands/.morphmap/specs/commands/morphmap-render.spec.md"
     },
-    "/morphmap-status-—-text-summary,-warm": {
-      "id": "/morphmap-status-—-text-summary,-warm",
+    ".morphmap/specs/commands/morphmap-status.spec.md": {
+      "id": ".morphmap/specs/commands/morphmap-status.spec.md",
       "status": "pending",
       "bottleneck": "standard",
       "qa": "review",
       "test": [
-        "unit"
+        "e2e"
       ],
       "model": {
-        "provider": "deepseek",
-        "model": "deepseek-v4-flash",
-        "thinking": "off"
+        "provider": "zai",
+        "model": "glm-5.2",
+        "thinking": "high"
       },
       "tools": [
         "agent-spec",
-        "vitest",
-        "jest"
+        "playwriter",
+        "agent-browser",
+        "playwright"
       ],
       "evidence": {
         "specExists": false,
@@ -430,7 +435,7 @@
         "qualityReviewP1Count": 0
       },
       "reviewRounds": 0,
-      "trace": "commands//morphmap-status-—-text-summary,-warm"
+      "trace": "commands/.morphmap/specs/commands/morphmap-status.spec.md"
     },
     "e2e:-scout-+-researcher-+-branch-agent-+-leaf-worker-all-spawned-+-executed": {
       "id": "e2e:-scout-+-researcher-+-branch-agent-+-leaf-worker-all-spawned-+-executed",

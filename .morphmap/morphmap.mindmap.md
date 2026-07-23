@@ -121,7 +121,7 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap 🔄 [module] — scope: state machine + deterministic gates · 3/6 phases (A-C pure cores done, D-F pending)
+## mech-mindmap ✅ [module] — scope: state machine + deterministic gates · 3/6 phases (A-C+D+one-map done, E-F pending)
 - Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
