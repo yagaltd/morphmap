@@ -61,6 +61,10 @@
       {
         "regex": "^\\.morphmap/grill-questions\\.json$",
         "note": "typed ambiguity records"
+      },
+      {
+        "regex": "^\\.morphmap/decisions\\.md$",
+        "note": "decision log (compact table)"
       }
     ],
     "morphmap_artifacts": [
