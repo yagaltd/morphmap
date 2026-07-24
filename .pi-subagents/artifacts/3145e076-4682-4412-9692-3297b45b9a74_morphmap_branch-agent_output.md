@@ -1,1 +1,0 @@
-Now I have full context. Let me check the ExtensionAPI type for `registerTool` signature.

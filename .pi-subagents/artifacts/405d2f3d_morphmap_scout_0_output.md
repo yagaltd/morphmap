@@ -1,1 +1,0 @@
-The file is complete and correct. Let me now produce the acceptance report.

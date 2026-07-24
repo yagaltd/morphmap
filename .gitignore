@@ -20,3 +20,4 @@ cover-v*.png
 docs/
 examples/
 AGENTS.md
+.pi-subagents/artifacts/

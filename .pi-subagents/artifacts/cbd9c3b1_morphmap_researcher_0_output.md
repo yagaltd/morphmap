@@ -1,1 +1,0 @@
-Analysis complete. All six architectural decisions hold. Two residual risks identified.
