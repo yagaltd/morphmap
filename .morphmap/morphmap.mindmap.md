@@ -73,4 +73,5 @@ resource: index.md
 ## decisions ⬜ [log]
 
 → .morphmap/decisions.md (115 entries: 4 ✅ recent, 111 📦 archived)
+  Latest: gap undo/experiment flexibility · review in tree-walker mode · jj adopted across 12 files
 → types: 42 decision, 37 implemented, 18 learn, 6 spec, 6 fix, 3 risk, 2 violation, 1 gap
