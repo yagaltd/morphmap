@@ -29,5 +29,21 @@
     "test-e2e":            { "provider": "zai",      "model": "glm-5.2",          "thinking": "high" },
     "test-property":       { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
     "test-snapshot":       { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" }
+  },
+  "escalation": {
+    "standard": [
+      { "failures": 1, "thinking": "high" },
+      { "failures": 3, "provider": "deepseek", "model": "deepseek-v4-pro", "thinking": "high" },
+      { "failures": 5, "provider": "anthropic", "model": "claude-sonnet-4", "thinking": "max" }
+    ],
+    "risky": [
+      { "failures": 2, "provider": "anthropic", "model": "claude-sonnet-4", "thinking": "max" }
+    ],
+    "time": [
+      { "failures": 2, "provider": "deepseek", "model": "deepseek-v4-pro", "thinking": "max" }
+    ],
+    "verify": [
+      { "failures": 3, "provider": "anthropic", "model": "claude-sonnet-4", "thinking": "max" }
+    ]
   }
 }

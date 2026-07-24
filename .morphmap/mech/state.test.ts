@@ -13,6 +13,7 @@ import {
   assignModel,
   assignTools,
   applyPosture,
+  escalateModel,
   canStartLeaf,
   emptyEvidence,
   evidenceHash,
@@ -504,6 +505,67 @@ describe("assignModel", () => {
     const m = assignModel("standard", "review", ["e2e"]);
     expect(m.provider).toBe("zai");
     expect(m.model).toBe("glm-5.2");
+  });
+});
+
+// ── config: escalateModel ────────────────────────────────────
+describe("escalateModel", () => {
+  const base = { provider: "deepseek", model: "deepseek-v4-flash", thinking: "off" as const };
+  const config = {
+    standard: [
+      { failures: 1, thinking: "high" },
+      { failures: 3, provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
+      { failures: 5, provider: "anthropic", model: "claude-sonnet-4", thinking: "max" },
+    ],
+  };
+
+  test("no escalation → null (go to human)", () => {
+    expect(escalateModel(base, 0, config, "standard")).toBeNull();
+  });
+
+  test("first rung: thinking upgrade only", () => {
+    const r = escalateModel(base, 1, config, "standard");
+    expect(r).not.toBeNull();
+    expect(r!.model).toBe("deepseek-v4-flash");
+    expect(r!.thinking).toBe("high");
+  });
+
+  test("second rung: model + provider upgrade", () => {
+    const r = escalateModel(base, 3, config, "standard");
+    expect(r).not.toBeNull();
+    expect(r!.model).toBe("deepseek-v4-pro");
+    expect(r!.provider).toBe("deepseek");
+  });
+
+  test("top rung: claude-sonnet-4", () => {
+    const r = escalateModel(base, 5, config, "standard");
+    expect(r).not.toBeNull();
+    expect(r!.model).toBe("claude-sonnet-4");
+    expect(r!.provider).toBe("anthropic");
+    expect(r!.thinking).toBe("max");
+  });
+
+  test("beyond top rung → still returns top rung", () => {
+    const r = escalateModel(base, 10, config, "standard");
+    expect(r).not.toBeNull();
+    expect(r!.model).toBe("claude-sonnet-4");
+  });
+
+  test("unknown bottleneck → null", () => {
+    expect(escalateModel(base, 3, config, "risky")).toBeNull();
+  });
+
+  test("no config → null", () => {
+    expect(escalateModel(base, 3, undefined, "standard")).toBeNull();
+  });
+
+  test("partial rung: only model override, keep provider + thinking", () => {
+    const c = { standard: [{ failures: 1, model: "deepseek-v4-pro" }] };
+    const r = escalateModel(base, 1, c, "standard");
+    expect(r).not.toBeNull();
+    expect(r!.model).toBe("deepseek-v4-pro");
+    expect(r!.provider).toBe("deepseek"); // unchanged
+    expect(r!.thinking).toBe("off"); // unchanged
   });
 });
 

@@ -211,6 +211,41 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
 
 6. **On WORKER_BLOCKER** → resolvable? → update spec/tree → retry. Cross-cutting? → escalate to Root.
 
+   **Model escalation:** If the leaf failed on a previous spawn (submit gate rejected, leaf
+   moved back to in_progress), escalate the model before re-spawning:
+   ```bash
+   # Read current escalation count from leaf metadata (mindmap)
+   # Load escalation config
+   ESCALATION_JSON=$(python3 -c "
+   import json
+   with open('.morphmap/config.json') as f:
+       cfg = json.load(f)
+   print(json.dumps(cfg.get('escalation', {})))
+   ")
+   # Find next rung for this leaf's bottleneck tag
+   NEXT_MODEL=$(python3 -c "
+   import json, sys
+   escalation = json.loads('''$ESCALATION_JSON''')
+   ladder = escalation.get('<bottleneck>', [])
+   count = <current escalationCount or 0>
+   current = {'provider': '$MODEL', 'model': '${MODEL##*/}', 'thinking': '$THINKING'}
+   # Find highest rung triggered by count
+   for rung in ladder:
+       if count >= rung['failures']:
+           current['provider'] = rung.get('provider', current['provider'])
+           current['model'] = rung.get('model', current['model'])
+           current['thinking'] = rung.get('thinking', current['thinking'])
+   print(json.dumps(current))
+   ")
+   NEW_PROVIDER=$(echo "$NEXT_MODEL" | python3 -c "import json,sys; print(json.load(sys.stdin)['provider'])")
+   NEW_MODEL=$(echo "$NEXT_MODEL" | python3 -c "import json,sys; print(json.load(sys.stdin)['model'])")
+   NEW_THINKING=$(echo "$NEXT_MODEL" | python3 -c "import json,sys; print(json.load(sys.stdin)['thinking'])")
+   ```
+   If NEXT_MODEL differs from current → update MODEL/NEW_THINKING, increment escalationCount
+   in leaf metadata, re-spawn. Log: `- <today>: [escalation] <leaf> escalated to <model>/<thinking> (attempt #<N>)`.
+   If no rung matches (ladder exhausted) → mark leaf 🔴 blocked, notify human via intercom.
+   If bottleneck is "blocking" → no ladder (already strongest). Go straight to 🔴 blocked.
+
 7. **On leaf ✅:**
    a. Update map (status ✅, cost, duration)
    b. Signal dependents via intercom

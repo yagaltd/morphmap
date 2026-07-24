@@ -14,6 +14,7 @@
 
 import type {
   Bottleneck,
+  EscalationConfig,
   ModelAssignment,
   Posture,
   QALevel,
@@ -79,6 +80,36 @@ function fallbackModel(bottleneck: Bottleneck): ModelAssignment {
     verify: { provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
   };
   return { ...FALLBACK[bottleneck] };
+}
+
+// ── Model Escalation ──────────────────────────────────────────
+
+/**
+ * Given the current model + failure count + escalation config, return the
+ * next model to try. If no rung matches → null (escalate to human).
+ */
+export function escalateModel(
+  current: ModelAssignment,
+  escalationCount: number,
+  escalationConfig?: EscalationConfig,
+  bottleneck?: Bottleneck,
+): ModelAssignment | null {
+  if (!escalationConfig || !bottleneck) return null;
+  const ladder = escalationConfig[bottleneck];
+  if (!ladder || ladder.length === 0) return null;
+
+  // Find the highest rung triggered by current failure count
+  let next: ModelAssignment | null = null;
+  for (const rung of ladder) {
+    if (escalationCount >= rung.failures) {
+      next = {
+        provider: rung.provider ?? current.provider,
+        model: rung.model ?? current.model,
+        thinking: (rung.thinking ?? current.thinking) as ModelAssignment["thinking"],
+      };
+    }
+  }
+  return next;
 }
 
 // ── assignTools ───────────────────────────────────────────────

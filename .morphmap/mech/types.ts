@@ -138,6 +138,19 @@ export interface GrillQuestion {
   resolvedAt: string | null; // ISO-8601
 }
 
+// ── Model Escalation ──────────────────────────────────────────
+
+/** One rung in the escalation ladder. After N failures, upgrade model. */
+export interface EscalationRung {
+  failures: number; // cumulative failures to trigger this rung
+  provider?: string; // override provider (default: keep current)
+  model?: string; // override model (default: keep current)
+  thinking?: string; // override thinking level (default: keep current)
+}
+
+/** Per-bottleneck escalation chain. Empty = no escalation (go straight to human). */
+export type EscalationConfig = Record<string, EscalationRung[]>;
+
 export function emptyEvidence(): LeafEvidence {
   return {
     specExists: false,
@@ -174,6 +187,7 @@ export interface Leaf {
   trace: string; // branchId/leafId linkage (§6.3)
   estLoc?: number; // optional override for [est-loc: N] tag
   abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
+  escalationCount?: number; // how many times model has been escalated (0 = first attempt)
 }
 
 export interface IntegrationStatus {

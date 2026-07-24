@@ -27,6 +27,7 @@ export interface MorphmapConfig {
   leafProfiles: Record<string, ProfileEntry>;
   taskProfiles: Record<string, ProfileEntry>;
   testProfiles?: Record<string, ProfileEntry>;
+  escalation?: Record<string, Array<{ failures: number; provider?: string; model?: string; thinking?: string }>>;
 }
 
 // ── Load & validate ───────────────────────────────────────────
