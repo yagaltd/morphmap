@@ -20,6 +20,7 @@ resource: index.md
 - Domain glossary → .morphmap/CONTEXT.md
 - Coding standards → .morphmap/standards.md (6 rules for all agents)
 - 6 Thinking Hats → .morphmap/hats-*.md (structured reasoning outputs)
+- Branch tags: [module] [feature] → branch-agent | [research] [brainstorm] → human-led → /morphmap-promote
 - improv-map: quality + recursion + context improvements → .morphmap/improv-map.md
 - one-map architecture (reference doc for new implementation) → docs/one-map.md
 - mech-mindmap state machine spec → docs/mech-mindmap.md
@@ -73,5 +74,5 @@ resource: index.md
 ## decisions ⬜ [log]
 
 → .morphmap/decisions.md (115 entries: 4 ✅ recent, 111 📦 archived)
-  Latest: gap undo/experiment flexibility · review in tree-walker mode · jj adopted across 12 files
+  Latest: promote mechanism added · gap undo/experiment flexibility · review in tree-walker mode
 → types: 42 decision, 37 implemented, 18 learn, 6 spec, 6 fix, 3 risk, 2 violation, 1 gap
