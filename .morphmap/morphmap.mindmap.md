@@ -72,173 +72,190 @@ resource: index.md
   state machine + deterministic gates · 5/5 leaves
 ## decisions ⬜ [log]
 
-### 2026-07-24
+Organized by topic branch. Auto-compacted by render-pipeline hook (7-day window).
+
+### mech (state machine, gates, config)
+#### 2026-07-24
 - [gap] undo/experiment flexibility: no mechanical rollback at leaf or sub-branch level
-  - Evidence.filesChanged tracks modified files but no undo mechanism uses it
-  - Sub-branch rollback needs git stash restore point (see branch-agent step 6)
-  - Leaf-level undo: 5 lines to add. Sub-branch: ~15 lines. Worktrees: deferred.
-  - Not yet implemented — logged as known gap, pending prioritization
-- [violation] wrote docs/undo-flexibility.md instead of ## decisions
-  - Write Guard rule #3 strengthened: analysis/learning/brainstorm → ## decisions, not documents
-  - Document deleted, content moved here
-- [implemented] /morphmap-review: enhanced SKILL.md with git-timestamp stale detection (48h threshold), WORKER_BLOCKER intercom check, --handoff file output. Prompt updated per spec.
+- Evidence.filesChanged tracks modified files but no undo mechanism uses it
 - [skill] morphmap/review used in tree-walker mode for review command · outcome: implemented
 
-### 2026-07-22
-#### /morphmap-amend implemented
-- [implemented] /morphmap-amend: skills/amend/SKILL.md + prompts/morphmap-amend.md written · 3-tier classification (exact/partial/no-match) · PR linkage support · force-decision, no confidence scores
+#### 2026-07-23
+- [finding] branch-agent.md IS autonomous: writes .spec (step 3), spawns sub-branches recursively (step 0a), loops (step 11), uses /goal (step 0b/13). Does NOT use mech scripts — they are not wired in.
+- [finding] delegate SKILL.md is one-shot: spawns branch agents, reports, exits. Does NOT loop or re-spawn. Branch agent loops internally, but delegate requires manual re-trigger.
+- [finding] mech scripts (Phases A-C) fully implemented + tested (115 tests green) but NOT wired into execution. morphmap-hooks.ts does not call any mech functions, does not register transition tools, does not read/write state.json. Phase D (hooks integration) is "Soon" per docs/mech-mindmap.md §7.1.
+- [finding] Fractal loop exists at branch-agent level (steps 0-13 with repeat) but is NOT fully autonomous like Fractal (PREPARE→PLAN→EXECUTE→REVIEW→COMMIT). Delegate is one-shot, Root is trigger-based, leaf worker is one-shot.
+- [risk] CRITICAL: mech state machine is dead code — 115 tests pass but gates never run during execution. Completion is still trust-based.
+- [risk] HIGH: delegate skill does not auto-loop. No autonomous re-trigger after branch completion.
+- [action] Phase D (hooks integration) is the highest priority gap. Wire mech into morphmap-hooks.ts, register transition tools, create state.json.
+- [decision] docs/one-map.md promoted to reference doc for all new implementation. Replaces mech-mindmap.md as the primary architecture doc. mech-mindmap.md remains as the state machine spec (§2-§8).
+- [decision] Phase structure clarified: Phases A-F = pure state machine core (180 tests green). Phase D = impure wiring (NOT wired — highest priority gap). one-map phases = Phase D (wire mech) → Phase one-map (unify entities, add /morphmap-run, add compiler hook).
+- [decision] herdr removed from one-map.md. pi-subagents retained for context isolation. herdr deferred to Phase 3 (future).
+- [decision] `--loop` flag on `/morphmap-delegate`: re-check for newly-ready branches after completions, re-spawn, repeat.
+- [decision] Compiler hook: parse agent JSONL on tool_result events, extract evidence (test/build exit codes, files changed), call mech state machine. Replaces agent self-summarization.
+- [implemented] docs/one-map.md v2 patched: removed herdr, added phase structure, added implementation plan (§9), added /morphmap-run design, added compiler hook design, added Node metadata schema.
+- [action] Phase D: restore mech-pi/ wiring layer, register 3 transition tools in hooks, bootstrap state.json from mindmap, implement md↔json sync hook, update agent prompts to use mech tools.
+
+#### 2026-07-22
 - [skill] morphmap-amend used for own implementation · outcome: ✅
 - [implemented] mech Phase A: pure state machine core → .morphmap/mech/{types,state,config,index}.ts + state.test.ts · 707 LOC pure + 492 LOC test · 49 tests passing · tsc clean
-- [decision] LeafStatus canonicalized to machine strings (pending/in_progress/submitted/in_review/blocked/done) with emoji as display-only map — §2.3 mixed emoji+strings, JSON (§6.1) authoritative so chose machine-native
 - [decision] idempotency = (leaf, to, evidenceHash) exists in transitions[] AND current status === to → no-op pass (crash-recovery safe, §8.1). Avoids duplicate log entries on replay.
-- [decision] [needs-contract:] build unblocks at "in_review" (contract reviewed), integrate at "done" (§3.6). canStartLeaf() returns {buildBlocked, integrateBlocked}. [corrected from "submitted" — quality-review caught spec divergence, see review block]
 - [decision] reviewRounds increments ONLY on in_review → in_progress (CHANGES_REQUESTED loop), not on every transition
 - [note] Phase A actual 707 LOC vs plan est. 200 — confirms finding J (estimates optimistic). state.ts alone 337 (StateMachine + idempotency + dep-resolution). Total mech est. holds at ~2100-2800.
-
-#### mech Phase A quality review (morphmap/quality-reviewer + tdd-guard)
 - [skill] morphmap/quality-reviewer used for mech Phase A · outcome: CHANGES_REQUESTED (1×P1, 1×P2, 2×P3) · tdd-guard lint: 6/6 pass · handoff: .morphmap/quality-review-001-20260722-mech-phaseA.md
-- [implemented] P1 fix: needs-contract build unblock `submitted`→`in_review` (spec §3.6 conformance — build against a REVIEWED contract, not a claimed one)
 - [implemented] P2 fix: `done` made terminal (done→done rejected) — prevents silent evidence mutation of approved proof. Idempotency reordered BEFORE legality so crash-recovery replay stays a safe no-op.
 - [implemented] P3 fix: transitionLeaf reuses runGates (single gate runner — was divergent duplicate that dropped warnings); warnings now surface in outcome
 - [implemented] P3 fix: +8 tests covering gaps (done terminal, done-mutation rejection, done idempotent replay, blocked/unblock via transitionLeaf, mixed needs+needs-contract edges, ghost target, warning surfacing) → 57 tests, 131 expects, all green
 - [implemented] non-blocking: tsconfig.mech.json → tsconfig.json (conventional name, bare `tsc` works)
 - [learning] logged decision #3 diverged from spec §3.6 without amending the spec — process violation caught by review. Lesson: decisions must cite & reconcile the spec, not override silently. This is the mech thesis working: review turned a self-claimed ✅ into verified ✅.
-
-#### mech Phase B implemented
 - [implemented] Phase B gates → .morphmap/mech/gates/{pre-spawn,submit,review,integration}.ts + .morphmap/mech/lattice.ts · preSpawn (7) + submit (6) + review (6) + integration (4) = 22 gates · lattice maps transitions→chains
 - [decision] gates are PURE — they validate already-populated LeafEvidence; impure layer (Phase D) gathers evidence (runs CLI, reads files). Keeps gates unit-testable, no I/O.
 - [decision] tool-absent pattern: null evidence field → gate skips (pass). tdd-guard/bombadil/lonkero/healthCheck may be absent (finding A). Optional-result gate factory.
-- [decision] QA-tier conditional: p1CountZeroIfFull enforces P1=0 only at [qa: full|strict], skips at review/none (§4.1).
 - [decision] Phase A TransitionGateCtx widened (optional graph/allLeaves/allowedChanges) so cross-leaf/dependency gates get data. Backward-compatible.
 - [learning] integration test caught crossLeafNoConflict reading stale leaf.evidence instead of incoming evidence — unit test missed it (fixture put files on leaf). Lesson: integration tests through transitionLeaf are essential, not optional.
-
-#### mech Phase C implemented
 - [implemented] Phase C tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate · pure handlers (Phase D wraps with pi.registerTool + state.json I/O)
 - [decision] Phase C = pure tool handlers; Phase D = impure wiring. Tools select gates via lattice (agents don't pick gates), call transitionLeaf/runIntegrationGates, return agent-facing {accepted/passed, failures}. Keeps C testable.
 - [decision] request_revision (§4.2 escape hatch) deferred to Phase D — not in §2.5 tool list. Scope tight to plan.
 - [decision] integrationGate marks branch status=done on pass (branch-level transition); returns unchanged state on fail.
 - [decision] reviewFile param ⇒ evidence.qualityReviewExists=true (impure layer confirms path exists; pure tool trusts the flag).
-
-#### mech Phase B+C quality review (morphmap/quality-reviewer)
 - [skill] morphmap/quality-reviewer used for mech Phase B+C (batched) · outcome: APPROVED WITH FINDINGS (0 blocking, 1×P2, 3×P3) · handoff: .morphmap/quality-review-002-20260722-mech-phaseBC.md
 - [implemented] P2 fix: added runtimeDependenciesMet gate to reviewGates — enforces integrateBlocked===false at in_review→done. Closes the [needs-contract:] gap (leaf could reach done while runtime dep not done, false "done=proof"). approveLeaf now passes graph/allLeaves into ctx.
-- [implemented] P3 fix: allLeavesSubmitted → allLeavesComplete, tightened check from "submitted" to "done". Branch-done now requires leaf-done (spec §2.4 naming reconciled — a submitted-but-unreviewed leaf no longer completes a branch).
 - [implemented] P3 fix: removed unused LeafEvidence import in submit.ts
 - [implemented] P3 fix: +2 tests (pre-spawn chain via transitionLeaf; runtime-dep blocks approve) → 115 tests, 276 expects, all green
 - [learning] P2 was a real enforcement gap invisible to self-verification (all 113 tests passed before) — the needs-contract build/integrate split has two gates (buildBlocked at spawn, integrateBlocked at approve) and only the first existed. Review caught the missing half.
 
-### 2026-07-21
-#### implemented (15)
-- [implemented] new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]
-- [implemented] recursive branch agent spawning: same agent at any depth (L1-L3), 5-dimension context injection
-- [implemented] quality architecture: skills loaded before .spec via available-skills.md cache, constraints extracted into Boundaries
+#### 2026-07-21
 - [implemented] mechanical reviewer wired into execution loop (was defined but never spawned)
-- [implemented] per-leaf [qa:] override — branch agent assigns tag, not blind posture inheritance
 - [implemented] goal completion gate: 6 mechanical checks before update_goal complete
 - [implemented] available-skills.md cache: generated at init/delegate, read by all branch agents
-- [implemented] agent freezing: .morphmap/agents/ copy during init, agentPaths in pi-subagents config
-- [implemented] --update-agents flag: refresh frozen agents with git diff review
-- [implemented] improve skill: agent edit targets .morphmap/agents/ (user project) or .pi/agents/ (dogfooding), never global install
+- [implemented] delegate skill: depth-agnostic spawning for all heading levels
+- [spec] bug-hunter added as posture-gated step: quality=strict + 🔴/🟡 leaves only (step 7f)
+- [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → bug-hunter (adversarial, optional) → integration-review → branch-agent
+- [learn] pi extension hooks: morphmap-hooks.ts for semi-mechanical enforcement (spec guard, goal gate warning, auto-render, telemetry)
+- [learn] worktree isolation trap: agents wrote code to worktrees but never committed/merged. 13 orphaned worktrees on MorphShell. Fixed: delegate no longer uses worktree:true.
+- [learn] MorphShell dogfooding complete: plan (budget estimate + 4 scouts), delegate (3 rounds, 15 branches), recover (13 worktrees), testProfiles, tool scanning, model enforcement, telemetry. 5 e2e verified, 5 remaining.
+
+#### 2026-07-20
+- [learn] .spec template: add Verifiable by Human + Delegated to Implementer
+
+### commands (skills, prompts)
+#### 2026-07-24
+- [implemented] /morphmap-review: enhanced SKILL.md with git-timestamp stale detection (48h threshold), WORKER_BLOCKER intercom check, --handoff file output. Prompt updated per spec.
+
+#### 2026-07-23
+- [decision] New `/morphmap-run` command: spawn all ready branches in parallel, monitor via intercom + state.json, loop until all done. Addresses "auto-run for all branches when plans approved."
+- [implemented] /morphmap-triage command: skills/triage/SKILL.md + prompts/morphmap-triage.md · gh CLI integration for GitHub issues/PRs · 4-tier classification (very-good/good/bad/very-bad) against branch scope · auto-route + flag-for-human routing · PR exact-match detection · decision logging
+
+#### 2026-07-22
+- [implemented] /morphmap-amend: skills/amend/SKILL.md + prompts/morphmap-amend.md written · 3-tier classification (exact/partial/no-match) · PR linkage support · force-decision, no confidence scores
+
+#### 2026-07-21
+- [implemented] /morphmap-recover: detects orphaned worktrees, merges uncommitted work, prunes branches
+
+#### 2026-07-20
+- [fix] skill usage logging: [skill] entries feed /morphmap-improve Phase 2
+- [discuss] OpenSpace: quality tracking covered by /morphmap-improve
+
+### agents
+#### 2026-07-24
+- Sub-branch rollback needs git stash restore point (see branch-agent step 6)
+
+#### 2026-07-23
+- [verify] scout-002 design verification complete → .morphmap/scout-002-20260723-design-verification.md
+- [finding] Branch agent writes .spec files itself (step 3). Does NOT read plan.md from agent-spec. agent-spec CLI used for verification only.
+- [finding] Missing planned files: state.json, plans/*.plan.md, codebase-graph/, specs/ directory. Missing planned agents: spec-reviewer.md, refactor-worker.md.
+
+#### 2026-07-21
+- [implemented] recursive branch agent spawning: same agent at any depth (L1-L3), 5-dimension context injection
+- [implemented] per-leaf [qa:] override — branch agent assigns tag, not blind posture inheritance
 - [implemented] leaf worker: [test:] tag awareness, [human] tag skip
 - [implemented] quality reviewer: boundaries compliance check against .spec
-- [implemented] delegate skill: depth-agnostic spawning for all heading levels
-- [implemented] init skill: available-skills.md generation at scaffold
-- [implemented] execution flow doc: updated quality loop with per-leaf [qa:] gating
-
-#### specifications (6)
-- [spec] OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
 - [spec] All handoff agents (scout, researcher, quality-reviewer, reviewer) write versioned OKF files
 - [spec] quality reviewer now spawned by branch agent in execution loop step 7d
 - [spec] integration reviewer spawned by branch agent after sub-branch completes (step 8, quality=strict)
-- [spec] bug-hunter added as posture-gated step: quality=strict + 🔴/🟡 leaves only (step 7f)
-- [spec] quality pipeline: leaf-worker → reviewer (mechanical) → quality-reviewer (judgment) → bug-hunter (adversarial, optional) → integration-review → branch-agent
-
-#### learnings (8)
 - [learn] quality-reviewer vs bug-hunter: complementary. quality-reviewer=static code review (cheap, every leaf). bug-hunter=adversarial pipeline (expensive, 🔴/🟡 only). Not redundant.
 - [learn] /goal underutilized: only used for 5-why failure analysis. Now wired into branch-agent loop start + plan phase.
-- [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
 - [learn] quality-reviewer was defined but unwired — now in execution loop
 - [learn] researcher agent had no OKF frontmatter at all — now has unified format
-- [learn] skill discovery: Option C (available-skills.md cache) chosen over hardcoded mapping. §10 in improv-map.
-- [learn] dogfooding surfaced gap: ">5 → sub-branch" rule existed but didn't apply to [log] branches. Rule now universal. Map write protocol added: commit + render HTML after every map edit.
-- [learn] pi extension hooks: morphmap-hooks.ts for semi-mechanical enforcement (spec guard, goal gate warning, auto-render, telemetry)
-- [learn] dogfooding: pi-interview format bug — recommended for single-select must be string, not object. Fixed in plan Phase 3 with explicit format rules.
-- [learn] ADR support: new [adr] branch tag, ADR template in format spec, hook verifies referenced ADR files exist. Captures decision rationale that survives compaction.
-- [learn] worktree isolation trap: agents wrote code to worktrees but never committed/merged. 13 orphaned worktrees on MorphShell. Fixed: delegate no longer uses worktree:true.
-- [learn] agent hallucination: reports claim ✅ with test counts + diffs but code not on disk. Hook checks .spec existence but not code existence. Need post-subagent code verification.
-- [implemented] /morphmap-recover: detects orphaned worktrees, merges uncommitted work, prunes branches
 - [implemented] orphan detection: branch-agent checks parent via intercom at startup, self-merges if orphaned
 - [learn] integration gap found during MorphShell testing: reviewer integration mode was CODE-ONLY — never ran the app. Phase 3 skipped on quality=fast. Now: quality=fast runs lite (health check), quality=strict runs full (bombadil + lonkero). Only quality=none skips.
-- [learn] MorphShell dogfooding complete: plan (budget estimate + 4 scouts), delegate (3 rounds, 15 branches), recover (13 worktrees), testProfiles, tool scanning, model enforcement, telemetry. 5 e2e verified, 5 remaining.
 
-### 2026-07-23
-#### design verification — fractal autonomous loop
-- [verify] scout-002 design verification complete → .morphmap/scout-002-20260723-design-verification.md
-- [finding] branch-agent.md IS autonomous: writes .spec (step 3), spawns sub-branches recursively (step 0a), loops (step 11), uses /goal (step 0b/13). Does NOT use mech scripts — they are not wired in.
-- [finding] delegate SKILL.md is one-shot: spawns branch agents, reports, exits. Does NOT loop or re-spawn. Branch agent loops internally, but delegate requires manual re-trigger.
-- [finding] mech scripts (Phases A-C) fully implemented + tested (115 tests green) but NOT wired into execution. morphmap-hooks.ts does not call any mech functions, does not register transition tools, does not read/write state.json. Phase D (hooks integration) is "Soon" per docs/mech-mindmap.md §7.1.
+#### 2026-07-20
+- [learn] reviewer: added tdd-guard layer for test trustworthiness
+
+#### 2026-07-19
+- [discuss] branch-agent needs config-read step for leafProfiles
+
+### vcs (version control — jj)
+#### 2026-07-24
+- Leaf-level undo: 5 lines to add. Sub-branch: ~15 lines. Worktrees: deferred.
+- [violation] wrote docs/undo-flexibility.md instead of ## decisions
+
+### violations
+#### 2026-07-20
+- [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
+- [fix] Write Guard added "Discussed?" check + violation logging
+
+### design decisions
+#### 2026-07-21
+- [implemented] quality architecture: skills loaded before .spec via available-skills.md cache, constraints extracted into Boundaries
+
+#### 2026-07-19
+- v1 design decisions finalized
+
+### cross-cutting
+#### 2026-07-24
+- Not yet implemented — logged as known gap, pending prioritization
+- Write Guard rule #3 strengthened: analysis/learning/brainstorm → ## decisions, not documents
+- Document deleted, content moved here
+
+#### 2026-07-23
 - [finding] Root Orchestrator (AGENTS.md) routes user intent to skills via routing table. Trigger-based, not autonomous. No re-spawn loop.
-- [finding] Fractal loop exists at branch-agent level (steps 0-13 with repeat) but is NOT fully autonomous like Fractal (PREPARE→PLAN→EXECUTE→REVIEW→COMMIT). Delegate is one-shot, Root is trigger-based, leaf worker is one-shot.
-- [finding] Branch agent writes .spec files itself (step 3). Does NOT read plan.md from agent-spec. agent-spec CLI used for verification only.
-- [finding] Missing planned files: state.json, plans/*.plan.md, codebase-graph/, specs/ directory. Missing planned agents: spec-reviewer.md, refactor-worker.md.
-- [risk] CRITICAL: mech state machine is dead code — 115 tests pass but gates never run during execution. Completion is still trust-based.
-- [risk] HIGH: delegate skill does not auto-loop. No autonomous re-trigger after branch completion.
 - [risk] HIGH: double-commit bug in morphmap-hooks.ts (~L230-245) — git commit runs twice. Telemetry pollutes mindmap via echo >>.
-- [action] Phase D (hooks integration) is the highest priority gap. Wire mech into morphmap-hooks.ts, register transition tools, create state.json.
-
-#### one-map reference doc
-- [decision] docs/one-map.md promoted to reference doc for all new implementation. Replaces mech-mindmap.md as the primary architecture doc. mech-mindmap.md remains as the state machine spec (§2-§8).
-- [decision] Phase structure clarified: Phases A-F = pure state machine core (180 tests green). Phase D = impure wiring (NOT wired — highest priority gap). one-map phases = Phase D (wire mech) → Phase one-map (unify entities, add /morphmap-run, add compiler hook).
-- [decision] herdr removed from one-map.md. pi-subagents retained for context isolation. herdr deferred to Phase 3 (future).
-- [decision] New `/morphmap-run` command: spawn all ready branches in parallel, monitor via intercom + state.json, loop until all done. Addresses "auto-run for all branches when plans approved."
-- [decision] `--loop` flag on `/morphmap-delegate`: re-check for newly-ready branches after completions, re-spawn, repeat.
-- [decision] Compiler hook: parse agent JSONL on tool_result events, extract evidence (test/build exit codes, files changed), call mech state machine. Replaces agent self-summarization.
 - [decision] Map = session tree: pi subagent session IDs stored in node metadata. Map shows running/paused/done sessions.
-- [implemented] docs/one-map.md v2 patched: removed herdr, added phase structure, added implementation plan (§9), added /morphmap-run design, added compiler hook design, added Node metadata schema.
-- [action] Phase D: restore mech-pi/ wiring layer, register 3 transition tools in hooks, bootstrap state.json from mindmap, implement md↔json sync hook, update agent prompts to use mech tools.
-
-#### triage command implemented
-- [implemented] /morphmap-triage command: skills/triage/SKILL.md + prompts/morphmap-triage.md · gh CLI integration for GitHub issues/PRs · 4-tier classification (very-good/good/bad/very-bad) against branch scope · auto-route + flag-for-human routing · PR exact-match detection · decision logging
 - [decision] triage SKILL.md uses gh CLI (gh issue view, gh pr view, gh issue list, gh pr list) for v1 GitHub integration. Email/chat are text-only classification. Batch mode supports --repo flag for scanning open issues/PRs.
 - [decision] 4-tier naming kept as very-good/good/bad/very-bad per docs/triage-flow.md (canonical). Spec's exact/high/partial/no-match are equivalent — very-good=exact, good=high, bad=partial, very-bad=no-match.
 
-### 2026-07-20
-#### fixes (5)
-- [violation] Root Orchestrator context at 40%+ caused drift — edited config unilaterally
+#### 2026-07-22
+- [decision] LeafStatus canonicalized to machine strings (pending/in_progress/submitted/in_review/blocked/done) with emoji as display-only map — §2.3 mixed emoji+strings, JSON (§6.1) authoritative so chose machine-native
+- [decision] [needs-contract:] build unblocks at "in_review" (contract reviewed), integrate at "done" (§3.6). canStartLeaf() returns {buildBlocked, integrateBlocked}. [corrected from "submitted" — quality-review caught spec divergence, see review block]
+- [implemented] P1 fix: needs-contract build unblock `submitted`→`in_review` (spec §3.6 conformance — build against a REVIEWED contract, not a claimed one)
+- [decision] QA-tier conditional: p1CountZeroIfFull enforces P1=0 only at [qa: full|strict], skips at review/none (§4.1).
+- [implemented] P3 fix: allLeavesSubmitted → allLeavesComplete, tightened check from "submitted" to "done". Branch-done now requires leaf-done (spec §2.4 naming reconciled — a submitted-but-unreviewed leaf no longer completes a branch).
+
+#### 2026-07-21
+- [implemented] new leaf tags: [qa: none|review|full], [test: unit|property-based|snapshot|integration|e2e], [skill: <name>], [human]
+- [implemented] agent freezing: .morphmap/agents/ copy during init, agentPaths in pi-subagents config
+- [implemented] --update-agents flag: refresh frozen agents with git diff review
+- [implemented] improve skill: agent edit targets .morphmap/agents/ (user project) or .pi/agents/ (dogfooding), never global install
+- [implemented] init skill: available-skills.md generation at scaffold
+- [implemented] execution flow doc: updated quality loop with per-leaf [qa:] gating
+- [spec] OKF handoff format unified: type=handoff, +version field, +status lifecycle (raw→distilled→stale)
+- [learn] tokei already in brownfield init path — confirmed installed (v14.0.0, JSON support)
+- [learn] skill discovery: Option C (available-skills.md cache) chosen over hardcoded mapping. §10 in improv-map.
+- [learn] dogfooding surfaced gap: ">5 → sub-branch" rule existed but didn't apply to [log] branches. Rule now universal. Map write protocol added: commit + render HTML after every map edit.
+- [learn] dogfooding: pi-interview format bug — recommended for single-select must be string, not object. Fixed in plan Phase 3 with explicit format rules.
+- [learn] ADR support: new [adr] branch tag, ADR template in format spec, hook verifies referenced ADR files exist. Captures decision rationale that survives compaction.
+- [learn] agent hallucination: reports claim ✅ with test counts + diffs but code not on disk. Hook checks .spec existence but not code existence. Need post-subagent code verification.
+
+#### 2026-07-20
 - [fix] Pre-Action Refresh: ctx_search + ctx_execute_file before map/config edits
 - [fix] Context Budget: check ctx_stats every 10 turns, compact if >40%
-- [fix] Write Guard added "Discussed?" check + violation logging
 - [fix] ## skills branch added to map — documents each skill's phases
-- [fix] skill usage logging: [skill] entries feed /morphmap-improve Phase 2
 - [fix] map write protocol: commit + render HTML after every map edit — agent rule + git hook
-
-#### learnings (3)
-- [learn] reviewer: added tdd-guard layer for test trustworthiness
 - [learn] plan Phase 3: use grill-for-unknowns skill
-- [learn] .spec template: add Verifiable by Human + Delegated to Implementer
-
-#### discussions (4)
 - [discuss] Cortex conflicts with context-mode. Not needed. v3 with CognitiveOS.
-- [discuss] OpenSpace: quality tracking covered by /morphmap-improve
 - [discuss] taskProfiles: deferred to v2
 - [discuss] roadmap: v2=brownfield+multi-repo, v3=CognitiveOS+cross-project telemetry
 
-### 2026-07-19
-#### decisions (3)
-- v1 design decisions finalized
+#### 2026-07-19
 - adopted OKF format for all knowledge documents
 - verified stack: pi-workflows NOT installed, pi-dynamic-wf removed
-
-#### project (3)
 - renamed project to MorphMap
 - git init, first commit
 - 4-tier forced choice replaces fake confidence numbers
-
-#### learnings (1)
 - end-to-end test: all 5 agents spawned + executed
-
-#### discussions (4)
 - [discuss] grill = plan Phase 3 with xhigh thinking, not separate agent
 - [discuss] MorphEditor dogfooding: pick one small feature
-- [discuss] branch-agent needs config-read step for leafProfiles
 - [discuss] model assignment: subagent() inline overrides
+
