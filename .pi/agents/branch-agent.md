@@ -21,6 +21,18 @@ Injected at task start: your subtree from `.morphmap/morphmap.mindmap.md`.
 Starts at your heading, ends before next heading at the same or higher level.
 You write the map. Updates after every leaf completion. Map is always current.
 
+### Draft vs Fresh
+
+**Draft tree (from `/morphmap-plan --project`):** Your branch has ⬜ leaves with descriptive
+names but NO .spec files. Your job is to REFINE the draft — deepen decomposition, split
+large leaves, merge trivial ones, add .spec paths, grill the user for clarification.
+
+**Fresh tree (branch-agent spawned on existing branch):** Your branch already has leaves
+with .spec paths. Your job is to EXECUTE — pull leaves, spawn workers, verify, repeat.
+
+In draft mode, you do NOT implement. You reshape the tree structure until it's ready for
+execution. Then update leaves to point to .spec files. Then execution begins.
+
 ## Available Skills (read once at startup)
 
 Read `.morphmap/available-skills.md` to discover installed skills grouped by domain.

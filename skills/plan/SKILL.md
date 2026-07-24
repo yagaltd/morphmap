@@ -9,6 +9,117 @@ argument-hint: "<directive, repo paths, URLs, or constraints>"
 
 Productize a directive into a morphmap tree. Evidence → decisions → tree → approve. Do not implement.
 
+## MODE SELECTION
+
+Two modes. Choose based on scope.
+
+### `--project` (top-down decomposition)
+
+Use when: greenfield project, vague requirements, or "build me X that does Y and Z."
+Generates the FULL high-level mindmap tree. Draft branches + leaves (all ⬜).
+Branch agents refine each branch later during delegate.
+
+### `--branch` (deep single-branch planning, DEFAULT)
+
+Use when: one specific branch needs detailed planning.
+Scout evidence, grill decisions, build detailed tree with .spec links.
+
+**If the user says `/morphmap-plan @requirements.md` with a file → auto-detect `--project`.**
+**If the user says `/morphmap-plan "add auth to the API"` → default to `--branch`.**
+
+---
+
+## --project MODE
+
+### Phase P0: INTERVIEW (deep-project style)
+
+Read the requirements file or directive. DO NOT spawn scouts or researchers — this is high-level decomposition, not deep analysis.
+
+Ask the human a structured interview to understand project scope. Use `interview()` with these questions:
+
+1. **What is the one-sentence purpose of this project?**
+2. **Who uses it?** (single user, team, public, internal)
+3. **What are the 3-5 major functional areas?** (e.g., auth, billing, dashboard, API, admin)
+4. **Are any of these areas cross-cutting?** (shared by multiple features)
+5. **What is the deployment target?** (web, CLI, mobile, library, extension)
+6. **Any known constraints?** (existing codebase, compliance, performance requirements)
+
+After interview, classify each functional area:
+- **Simple (1-3 leaves)** → keep as `##` branch, leaves directly under it
+- **Medium (4-7 leaves)** → `##` branch + `###` sub-branches
+- **Complex (8+ leaves)** → `##` branch + multiple `###` sub-branches, may need `####` sub-sub-branches
+
+### Phase P1: DEPENDENCY DISCOVERY
+
+For each pair of branches, ask: "Does X depend on Y to work?" Mark with `[needs: branch/leaf]`.
+
+Dependency rules:
+- Auth is always a dependency of everything that needs users
+- Data layer is a dependency of everything that reads/writes
+- Frontend depends on API, not vice versa
+- Shared/utility branches have no dependencies
+
+### Phase P2: BUILD DRAFT TREE
+
+Write `.morphmap/morphmap.mindmap.md` with:
+- YAML frontmatter (posture, project, tags)
+- `## context` branch with requirements reference
+- `##` branches (one per functional area) — all `⬜`
+- `###` sub-branches where needed
+- `- ⬜` draft leaves with descriptive names and estimated bottleneck tags
+- `[needs:]` cross-branch deps
+- `## staging` + `## production` lifecycle branches (⬜)
+- `## decisions` log branch
+
+**Draft leaf format:**
+```
+- ⬜ brief leaf description [🔴|🟡|🔵|🟠|⚪] [needs: other/leaf]
+```
+
+**DO NOT write .spec file paths on draft leaves.** Branch agents add those during refinement.
+**DO NOT spawn scouts or researchers.** This is high-level only.
+
+### Phase P3: HUMAN APPROVAL
+
+Present the full tree as a summary:
+
+```
+## Plan: <project name>
+## <N> branches, <M> draft leaves, <P> cross-branch deps
+
+### Branches:
+- ⬜ auth — user registration, login, password reset · 4 leaves
+- ⬜ api — REST endpoints, middleware, rate limiting · 7 leaves
+- ⬜ frontend — pages, components, state management · 9 leaves
+  - ⬜ dashboard (sub-branch) · 3 leaves
+  - ⬜ settings (sub-branch) · 2 leaves
+- ...
+
+Approve to start delegation. Branch agents will refine each branch and write .spec files.
+Next: /morphmap-delegate
+```
+
+Human can:
+- "approve" — tree is locked, delegate can start
+- "move X to Y" — restructure
+- "split X" or "merge X and Y" — refine structure
+- "add X" — missing area
+
+Loop until approved.
+
+### Phase P4: COMMIT + STOP
+
+Commit the approved tree. Do NOT start delegate. The human runs `/morphmap-delegate` when ready.
+
+```bash
+git add .morphmap/morphmap.mindmap.md
+git commit -m "plan: project-level tree from requirements"
+```
+
+---
+
+## --branch MODE (DEFAULT)
+
 ## Phase 0: ESTIMATE BUDGET
 
 Check if tokei stats exist (brownfield project). If yes, compute token budget automatically.

@@ -11,6 +11,24 @@ Spawn branch agents via pi-subagents for autonomous leaf execution.
 Uses pi's `subagent()` tool with `agent: "morphmap/branch-agent"`.
 NOT the pi-subagents `delegate` builtin — that's a different, generic agent.
 
+## Execution Modes
+
+### After `/morphmap-plan --project` (draft tree)
+All branches are ⬜, leaves have NO .spec paths. Branch agents enter REFINE mode:
+- Deepen decomposition (split large leaves, add sub-branches)
+- Grill user for unresolved questions
+- Add .spec paths to leaves when ready
+- Once reshaped, transition leaves to execution
+
+### After `/morphmap-plan --branch` (detailed tree)
+Branches have leaves with .spec paths. Branch agents enter EXECUTE mode:
+- Pull leaves in risk-priority order
+- Spawn leaf workers
+- Verify, submit, approve
+
+### Normal delegate (existing branches)
+Standard pull-based execution. Branch agents read the map, find ready leaves, execute.
+
 ## Phase 0: CRASH RECOVERY
 
 Before spawning agents, check if previous delegate was interrupted:
