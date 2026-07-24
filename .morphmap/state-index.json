@@ -1,6 +1,0 @@
-{
-  "commands": "plans/commands/state.json",
-  "agents": "plans/agents/state.json",
-  "extension": "plans/extension/state.json",
-  "mech-mindmap": "plans/mech-mindmap/state.json"
-}

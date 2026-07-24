@@ -73,14 +73,14 @@ export function registerRenderPipeline(pi: ExtensionAPI) {
             const seedResult = seedFromMap(path, ".morphmap");
             if (seedResult.branches > 0) {
               pi.ui?.notify({
-                title: "MorphMap: state.json synced",
+                title: "MorphMap: state.db synced",
                 body: `Seeded ${seedResult.branches} branches, ${seedResult.leaves} leaves from map.`,
                 style: "success",
               });
             }
           } catch (syncErr) {
             pi.ui?.notify({
-              title: "MorphMap: state.json sync failed",
+              title: "MorphMap: state.db sync failed",
               body: `Parse error: ${(syncErr as Error).message}. Commit blocked.`,
               style: "error",
             });
@@ -89,17 +89,17 @@ export function registerRenderPipeline(pi: ExtensionAPI) {
 
           // Stage + commit
           execSync(
-            "git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html .morphmap/state.json .morphmap/state-index.json CHANGELOG.md",
+            "git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html .morphmap/state.db .morphmap/state-index.json CHANGELOG.md",
             { stdio: "pipe" }
           );
           execSync(
-            `git commit -m "map: auto-render + changelog + state.json after edit" --allow-empty`,
+            `git commit -m "map: auto-render + changelog + state.db after edit" --allow-empty`,
             { stdio: "pipe" }
           );
 
           pi.ui?.notify({
             title: "MorphMap: map rendered",
-            body: "HTML + CHANGELOG + state.json regenerated and committed.",
+            body: "HTML + CHANGELOG + state.db regenerated and committed.",
             style: "success",
           });
         } catch {

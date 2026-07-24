@@ -1,38 +1,25 @@
 /**
- * morphmap-state.ts — state.json I/O (impure bridge).
+ * morphmap-state.ts — state.db I/O (impure bridge, SQLite-backed).
  *
- * Pure module (mech/) stays zero-I/O. This layer funnels ALL fs for the
- * deterministic layer: loadState/saveState/clearState.
+ * Pure module (mech/) stays zero-I/O. This layer funnels ALL persistence.
+ * Replaces the old state.json with SQLite for concurrent write safety.
  *
- * Spec: docs/mech-mindmap.md §2.7 Step E (atomic write).
+ * Spec: docs/mech-mindmap.md §2.7 Step E.
  */
-import { randomBytes } from "node:crypto";
-import { renameSync, writeFileSync, readFileSync, unlinkSync, existsSync } from "node:fs";
 import type { BranchState } from "../mech";
+import { loadState as dbLoad, saveState as dbSave, clearState as dbClear } from "./morphmap-db";
 
-/** Load state.json. Returns null if file doesn't exist. Throws on corrupt JSON/invalid shape. */
-export function loadState(statePath: string): BranchState | null {
-  if (!existsSync(statePath)) return null;
-  const raw = readFileSync(statePath, "utf8");
-  try {
-    return JSON.parse(raw) as BranchState;
-  } catch (e) {
-    throw new Error(`state.json corrupt: ${(e as Error).message}`);
-  }
+/** Load state from SQLite. Returns null if DB doesn't exist. */
+export function loadState(dbPath: string): BranchState | null {
+  return dbLoad(dbPath);
 }
 
-/** Save state.json atomically: write to tmp → fsync → rename. §2.7 Step E. */
-export function saveState(statePath: string, state: BranchState): void {
-  const tmpPath = `${statePath}.${randomBytes(8).toString("hex")}.tmp`;
-  const data = JSON.stringify(state, null, 2) + "\n";
-  writeFileSync(tmpPath, data, "utf8");
-  // fsync is implicit in writeFileSync on most platforms; rename is atomic
-  renameSync(tmpPath, statePath);
+/** Save state to SQLite atomically (WAL mode handles concurrency). */
+export function saveState(dbPath: string, state: BranchState): void {
+  dbSave(dbPath, state);
 }
 
-/** Clear state.json (idempotent — no error if file doesn't exist). */
-export function clearState(statePath: string): void {
-  if (existsSync(statePath)) {
-    unlinkSync(statePath);
-  }
+/** Clear all state (idempotent). */
+export function clearState(dbPath: string): void {
+  dbClear(dbPath);
 }

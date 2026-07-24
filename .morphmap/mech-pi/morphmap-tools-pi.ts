@@ -13,7 +13,7 @@ import { Type, type Static } from "typebox";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { applyApproveLeaf, applyIntegrationGate, applySubmitLeaf } from "./morphmap-tools";
 
-const STATE_PATH = ".morphmap/state.json";
+const STATE_PATH = ".morphmap/state.db";
 
 // ── TypeBox parameter schemas (mirror morphmap-tools input interfaces) ───────
 const SubmitLeafParams = Type.Object({

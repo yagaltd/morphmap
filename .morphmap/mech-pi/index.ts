@@ -25,3 +25,4 @@ export { registerMechTools } from "./morphmap-tools-pi";
 export { seedFromMap, type SeedResult } from "./morphmap-seed";
 export { loadConfig, leafProfileToModel, taskProfileToModel } from "./config-loader";
 export type { MorphmapConfig, OrchestratorProfile, ProfileEntry } from "./config-loader";
+export { loadState as dbLoad, saveState as dbSave, clearState as dbClear } from "./morphmap-db";

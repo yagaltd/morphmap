@@ -80,7 +80,7 @@ export function registerTelemetry(pi: ExtensionAPI) {
             const jsonl = readFileSync(sessionPath, "utf8");
             const evidence = compileEvidence(jsonl);
 
-            const statePath = ".morphmap/state.json";
+            const statePath = ".morphmap/state.db";
             const branchState = loadState(statePath);
             if (branchState && branchState.leaves) {
               const leafName = extractLeafName(result?.output || "");

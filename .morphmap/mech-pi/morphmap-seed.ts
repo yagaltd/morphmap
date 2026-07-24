@@ -1,8 +1,8 @@
 /**
- * morphmap-seed.ts — bootstrap state.json from mindmap.
+ * morphmap-seed.ts — bootstrap state.db from mindmap.
  *
  * IMPURE WRAPPER — reads mindmap from disk, delegates to mech/seed.ts (pure parser),
- * writes state.json + state-index.json via morphmap-state.ts.
+ * writes state.db + state-index.json via morphmap-state.ts.
  *
  * The pure parser lives in ../mech/seed.ts.
  *
@@ -21,8 +21,8 @@ export interface SeedResult {
 }
 
 /**
- * Bootstrap state.json from the mindmap.
- * Writes plans/<slug>/state.json per [module]/[feature] branch + .morphmap/state-index.json.
+ * Bootstrap state.db from the mindmap.
+ * Writes plans/<slug>/state.db per [module]/[feature] branch + .morphmap/state.db.
  */
 export function seedFromMap(
   mapPath: string,
@@ -38,15 +38,15 @@ export function seedFromMap(
     const state = buildBranchState(parsed);
     const branchDir = join(morphmapDir, "plans", parsed.branchId);
     mkdirSync(branchDir, { recursive: true });
-    const statePath = join(branchDir, "state.json");
+    const statePath = join(branchDir, "state.db");
     saveState(statePath, state);
     paths.push(statePath);
     totalLeaves += Object.keys(state.leaves).length;
   }
 
-  // Write root state.json (aggregates all branches)
+  // Write root state.db (aggregates all branches)
   const rootState = buildRootState(parsedBranches);
-  const rootPath = join(morphmapDir, "state.json");
+  const rootPath = join(morphmapDir, "state.db");
   saveState(rootPath, rootState);
   paths.push(rootPath);
 

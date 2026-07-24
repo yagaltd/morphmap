@@ -44,8 +44,8 @@ export interface OrchestratedResult {
 function noState(): OrchestratedResult {
   return {
     ok: false,
-    summary: "❌ no .morphmap/state.json — mech not seeded. Run /morphmap-init first.",
-    failures: ["state.json missing"],
+    summary: "❌ no .morphmap/state.db — mech not seeded. Run /morphmap-init first.",
+    failures: ["state.db missing"],
     changed: false,
   };
 }
@@ -53,8 +53,8 @@ function noState(): OrchestratedResult {
 function corruptState(detail: string): OrchestratedResult {
   return {
     ok: false,
-    summary: `❌ state.json corrupt — ${detail}. Restore from git or re-seed.`,
-    failures: ["state.json corrupt"],
+    summary: `❌ state.db corrupt — ${detail}. Restore from git or re-seed.`,
+    failures: ["state.db corrupt"],
     changed: false,
   };
 }

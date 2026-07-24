@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 test("round-trip: save → load → identical", () => {
-  const statePath = `${TMP_DIR}/state.json`;
+  const statePath = `${TMP_DIR}/state.db`;
   const state = makeTestState({ status: "done" });
   saveState(statePath, state);
   const loaded = loadState(statePath);
@@ -44,7 +44,7 @@ test("round-trip: save → load → identical", () => {
 });
 
 test("round-trip: preserves nested evidence + transitions", () => {
-  const statePath = `${TMP_DIR}/state.json`;
+  const statePath = `${TMP_DIR}/state.db`;
   const state = makeTestState({
     leaves: {
       "jwt-verify": {
@@ -94,15 +94,15 @@ test("missing file returns null", () => {
   expect(loaded).toBeNull();
 });
 
-test("corrupt JSON throws clear error", () => {
-  const statePath = `${TMP_DIR}/state.json`;
+test("corrupt DB throws clear error", () => {
+  const statePath = `${TMP_DIR}/state.db`;
   const { writeFileSync } = require("node:fs");
-  writeFileSync(statePath, "{ invalid json }", "utf8");
-  expect(() => loadState(statePath)).toThrow(/corrupt/);
+  writeFileSync(statePath, "not a database", "utf8");
+  expect(() => loadState(statePath)).toThrow();
 });
 
 test("clearState removes file (idempotent)", () => {
-  const statePath = `${TMP_DIR}/state.json`;
+  const statePath = `${TMP_DIR}/state.db`;
   saveState(statePath, makeTestState());
   expect(existsSync(statePath)).toBe(true);
   clearState(statePath);

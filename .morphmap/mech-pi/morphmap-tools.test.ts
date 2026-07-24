@@ -7,7 +7,7 @@ import { emptyEvidence } from "../mech";
 import type { BranchState, Leaf } from "../mech";
 
 const TMP_DIR = `/tmp/morphmap-tools-test-${randomBytes(4).toString("hex")}`;
-const STATE_PATH = `${TMP_DIR}/state.json`;
+const STATE_PATH = `${TMP_DIR}/state.db`;
 
 function makeLeaf(id: string, status: Leaf["status"] = "in_progress"): Leaf {
   return {
@@ -126,13 +126,13 @@ test("submit_leaf: idempotent re-submit is accepted (crash recovery)", async () 
   expect(r.summary).toContain("submitted");
 });
 
-test("submit_leaf: no state.json → ok=false", async () => {
+test("submit_leaf: no state.db → ok=false", async () => {
   const r = await applySubmitLeaf(STATE_PATH, {
     leafId: "jwt-verify",
     evidence: { agentSpecPassed: true, npmTestPassed: true, npmBuildPassed: true, boundariesClean: true, filesChanged: [], testsRun: [] },
   });
   expect(r.ok).toBe(false);
-  expect(r.summary).toContain("no .morphmap/state.json");
+  expect(r.summary).toContain("no .morphmap/state.db");
 });
 
 // ── applyApproveLeaf ─────────────────────────────────────────
