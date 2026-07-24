@@ -39,18 +39,18 @@ resource: index.md
 - ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
 - ✅ OKF conformance: all reference docs valid, executables follow own conventions
 
-## commands 🔄 [module] — scope: slash commands · 12/12 prompts + 10/10 skills · e2e tested: 5/12
+## commands 🔄 [module] — scope: slash commands · 12/12 prompts + 10/10 skills · e2e tested: 6/12
 - ✅ /morphmap-init — scaffold + brownfield scan (MorphShell)
 - ✅ /morphmap-plan — budget estimate + grill + tree (MorphShell 4 scouts parallel)
 - ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery · ⚠️ one-shot, needs --loop flag
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
 - ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
-- ⬜ /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
-- ⬜ /morphmap-amend → .morphmap/specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
-- ⬜ /morphmap-triage → .morphmap/specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
-- ⬜ /morphmap → .morphmap/specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
-- ⬜ /morphmap-status → .morphmap/specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
+- 🔄 /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
+- ✅ /morphmap-amend → .morphmap/specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
+- ✅ /morphmap-triage → .morphmap/specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
+- ✅ /morphmap → .morphmap/specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
+- ✅ /morphmap-status → .morphmap/specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
 - ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
 - ✅ Phase D: mech state machine wired into execution loop (143 tests, 0 failures)
 
@@ -66,7 +66,7 @@ resource: index.md
 - ✅ branch-agent: agent-spec→bash (CLI needs shell, not tool name)
 - ✅ agent install: ~/.pi/agent/agents/morphmap/ for pi-subagents discovery
 
-## extension 🔄 [module] — scope: pi extension package · 3/3 leaves
+## extension ✅ [module] — scope: pi extension package · 3/3 leaves
 - ✅ package.json + install from GitHub (pi install works)
 - ✅ agent discovery fixed (.pi/agents/ → ~/.pi/agent/agents/morphmap/)
 - ✅ npm packaging (not needed — GitHub install works)
@@ -199,7 +199,9 @@ resource: index.md
 ## decisions ⬜ [log]
 
 ### 2026-07-22
-#### mech Phase A implemented
+#### /morphmap-amend implemented
+- [implemented] /morphmap-amend: skills/amend/SKILL.md + prompts/morphmap-amend.md written · 3-tier classification (exact/partial/no-match) · PR linkage support · force-decision, no confidence scores
+- [skill] morphmap-amend used for own implementation · outcome: ✅
 - [implemented] mech Phase A: pure state machine core → .morphmap/mech/{types,state,config,index}.ts + state.test.ts · 707 LOC pure + 492 LOC test · 49 tests passing · tsc clean
 - [decision] LeafStatus canonicalized to machine strings (pending/in_progress/submitted/in_review/blocked/done) with emoji as display-only map — §2.3 mixed emoji+strings, JSON (§6.1) authoritative so chose machine-native
 - [decision] idempotency = (leaf, to, evidenceHash) exists in transitions[] AND current status === to → no-op pass (crash-recovery safe, §8.1). Avoids duplicate log entries on replay.
