@@ -71,6 +71,22 @@ export const dependenciesResolvable: Gate<TransitionGateCtx> = {
   },
 };
 
+// Blocks spawn if material ambiguities remain unresolved (ARIA-inspired).
+export const ambiguitiesResolved: Gate<TransitionGateCtx> = {
+  name: "ambiguitiesResolved",
+  run: ({ grillQuestions }) => {
+    if (!grillQuestions || grillQuestions.length === 0) return pass(); // no grill file → skip
+    const unresolved = grillQuestions.filter(
+      (q) => q.severity === "material" && q.resolution === null,
+    );
+    return unresolved.length === 0
+      ? pass()
+      : fail(
+          `unresolved material ambiguities: ${unresolved.map((q) => q.id).join(", ")}`,
+        );
+  },
+};
+
 export const preSpawnGates: Gate<TransitionGateCtx>[] = [
   specFileExists,
   specScenarioCount,
@@ -79,4 +95,5 @@ export const preSpawnGates: Gate<TransitionGateCtx>[] = [
   modelAssigned,
   toolsAssigned,
   dependenciesResolvable,
+  ambiguitiesResolved,
 ];

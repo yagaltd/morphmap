@@ -14,6 +14,7 @@ import {
   agentSpecLifecycle,
   allGateNames,
   allLeavesComplete,
+  ambiguitiesResolved,
   bombadilPassed,
   boundariesClean,
   crossLeafConflictsResolved,
@@ -30,6 +31,7 @@ import {
   lonkeroPassed,
   modelAssigned,
   npmTestAndBuild,
+  outcomesSatisfied,
   p0CountZero,
   p1CountZeroIfFull,
   preSpawnGates,
@@ -163,6 +165,31 @@ describe("pre-spawn gates", () => {
     expect(dependenciesResolvable.run(ctx()).pass).toBe(true); // no graph → skip
   });
 
+  test("ambiguitiesResolved: no questions→skip, resolved→pass, unresolved material→fail", () => {
+    // No grill file → skip
+    expect(ambiguitiesResolved.run(ctx()).pass).toBe(true);
+    // All resolved
+    const resolved = [
+      { id: "q1", question: "?", severity: "material" as const, discoveredBy: "a", resolution: "done", resolvedBy: "h", resolvedAt: "now" },
+    ];
+    expect(ambiguitiesResolved.run(ctx({ grillQuestions: resolved })).pass).toBe(true);
+    // Unresolved material
+    const unresolved = [
+      { id: "q1", question: "?", severity: "material" as const, discoveredBy: "a", resolution: null, resolvedBy: null, resolvedAt: null },
+    ];
+    const r = ambiguitiesResolved.run(ctx({ grillQuestions: unresolved }));
+    expect(r.pass).toBe(false);
+    expect(r.reason).toContain("q1");
+  });
+
+  test("ambiguitiesResolved: minor unresolved→pass (only material blocks)", () => {
+    const questions = [
+      { id: "q1", question: "?", severity: "minor" as const, discoveredBy: "a", resolution: null, resolvedBy: null, resolvedAt: null },
+      { id: "q2", question: "?", severity: "clarification" as const, discoveredBy: "a", resolution: null, resolvedBy: null, resolvedAt: null },
+    ];
+    expect(ambiguitiesResolved.run(ctx({ grillQuestions: questions })).pass).toBe(true);
+  });
+
   test("preSpawnGates chain: bad leaf fails at first block", () => {
     // spec missing → first gate blocks
     const results = preSpawnGates.map((g) => g.run(ctx({ evidence: ev({ specExists: false }) })));
@@ -210,6 +237,27 @@ describe("submit gates", () => {
     expect(filesMatchSpec.run(ctx({ evidence: e, allowedChanges: ["src/a.ts"] })).pass).toBe(false);
     expect(filesMatchSpec.run(ctx({ evidence: e, allowedChanges: ["src/a.ts", "src/b.ts"] })).pass).toBe(true);
     expect(filesMatchSpec.run(ctx({ evidence: e })).pass).toBe(true); // no allowedChanges
+  });
+
+  test("outcomesSatisfied: undefined→skip, all pass→pass, any fail→fail", () => {
+    // No outcomes declared → skip
+    expect(outcomesSatisfied.run(ctx()).pass).toBe(true);
+    // All pass
+    expect(outcomesSatisfied.run(ctx({ evidence: ev({ outcomeResults: { "tests.pass": { passed: true }, "build.pass": { passed: true } } }) })).pass).toBe(true);
+    // One fails
+    const r = outcomesSatisfied.run(ctx({ evidence: ev({ outcomeResults: { "tests.pass": { passed: false }, "build.pass": { passed: true } } }) }));
+    expect(r.pass).toBe(false);
+    expect(r.reason).toContain("tests.pass");
+    expect(r.reason).toContain("not satisfied");
+  });
+
+  test("outcomesSatisfied: empty object→skip", () => {
+    expect(outcomesSatisfied.run(ctx({ evidence: ev({ outcomeResults: {} }) })).pass).toBe(true);
+  });
+
+  test("outcomesSatisfied: with digest still checks passed field", () => {
+    const r = outcomesSatisfied.run(ctx({ evidence: ev({ outcomeResults: { "tests.pass": { passed: false, digest: "sha256:abc" } } }) }));
+    expect(r.pass).toBe(false);
   });
 
   test("submitGates chain: complete-good evidence passes", () => {

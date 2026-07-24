@@ -117,6 +117,25 @@ export interface LeafEvidence {
   qualityReviewExists: boolean;
   qualityReviewP0Count: number;
   qualityReviewP1Count: number;
+  // intent verification (ARIA-inspired): maps .spec outcome IDs → results
+  outcomeResults?: Record<string, OutcomeResult>;
+}
+
+export interface OutcomeResult {
+  passed: boolean;
+  digest?: string; // optional evidence hash (e.g., test report SHA)
+}
+
+// ── Grill / Ambiguity Records (ARIA-inspired) ──────────────────
+
+export interface GrillQuestion {
+  id: string; // kebab-case, e.g. "error-format"
+  question: string;
+  severity: "material" | "minor" | "clarification";
+  discoveredBy: string; // "agent:branch-agent" | "agent:critic" | "human:operator"
+  resolution: string | null;
+  resolvedBy: string | null;
+  resolvedAt: string | null; // ISO-8601
 }
 
 export function emptyEvidence(): LeafEvidence {
@@ -137,6 +156,7 @@ export function emptyEvidence(): LeafEvidence {
     qualityReviewExists: false,
     qualityReviewP0Count: 0,
     qualityReviewP1Count: 0,
+    outcomeResults: undefined,
   };
 }
 
@@ -239,6 +259,7 @@ export interface TransitionGateCtx {
   graph?: DependencyGraph; // for dependenciesResolvable
   allLeaves?: Record<string, Leaf>; // for crossLeafNoConflict
   allowedChanges?: string[]; // from .spec Boundaries, for filesMatchSpec
+  grillQuestions?: GrillQuestion[]; // from .morphmap/grill-questions.json, for ambiguitiesResolved
 }
 
 // ── Over-engineering accumulator (§4.3, finding K) ────────────

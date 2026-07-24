@@ -69,6 +69,20 @@ export const filesMatchSpec: Gate<TransitionGateCtx> = {
   },
 };
 
+export const outcomesSatisfied: Gate<TransitionGateCtx> = {
+  name: "outcomesSatisfied",
+  run: ({ evidence }) => {
+    if (!evidence.outcomeResults || Object.keys(evidence.outcomeResults).length === 0)
+      return skip(); // no outcomes declared in .spec → skip
+    const failed = Object.entries(evidence.outcomeResults)
+      .filter(([, r]) => !r.passed)
+      .map(([id]) => id);
+    return failed.length === 0
+      ? pass()
+      : fail(`required outcomes not satisfied: ${failed.join(", ")}`);
+  },
+};
+
 export const submitGates: Gate<TransitionGateCtx>[] = [
   agentSpecLifecycle,
   tddGuardPassed,
@@ -76,4 +90,5 @@ export const submitGates: Gate<TransitionGateCtx>[] = [
   boundariesClean,
   crossLeafNoConflict,
   filesMatchSpec,
+  outcomesSatisfied,
 ];

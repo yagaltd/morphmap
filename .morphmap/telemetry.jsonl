@@ -31,3 +31,5 @@
 {"ts":"2026-07-24T02:20:39.694Z","category":"tool-failure","tool":"bash","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
 {"ts":"2026-07-24T02:21:02.297Z","category":"tool-failure","tool":"bash","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
 {"ts":"2026-07-24T02:21:17.576Z","category":"tool-failure","tool":"bash","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
+{"ts":"2026-07-24T02:25:11.131Z","category":"tool-failure","tool":"read","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
+{"ts":"2026-07-24T02:38:31.170Z","category":"tool-failure","tool":"edit","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
