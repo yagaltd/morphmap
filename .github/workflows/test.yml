@@ -9,5 +9,5 @@ jobs:
         with:
           bun-version: latest
       - run: bun install --frozen-lockfile || bun install
-      - run: bun test .morphmap/mech/
-      - run: bun test .morphmap/mech-pi/
+      - run: cd .morphmap/mech && bun test
+      - run: cd .morphmap/mech-pi && bun test
