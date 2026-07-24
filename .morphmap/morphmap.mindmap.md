@@ -46,7 +46,7 @@ resource: index.md
 - ✅ /morphmap-improve — PDSA Study loop written
 - ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
 - ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
-- 🔄 /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
+- ✅ /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
 - ✅ /morphmap-amend → .morphmap/specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
 - ✅ /morphmap-triage → .morphmap/specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
 - ✅ /morphmap → .morphmap/specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
@@ -198,6 +198,10 @@ resource: index.md
 
 ## decisions ⬜ [log]
 
+### 2026-07-24
+- [implemented] /morphmap-review: enhanced SKILL.md with git-timestamp stale detection (48h threshold), WORKER_BLOCKER intercom check, --handoff file output. Prompt updated per spec.
+- [skill] morphmap/review used in tree-walker mode for review command · outcome: implemented
+
 ### 2026-07-22
 #### /morphmap-amend implemented
 - [implemented] /morphmap-amend: skills/amend/SKILL.md + prompts/morphmap-amend.md written · 3-tier classification (exact/partial/no-match) · PR linkage support · force-decision, no confidence scores
@@ -310,6 +314,11 @@ resource: index.md
 - [decision] Map = session tree: pi subagent session IDs stored in node metadata. Map shows running/paused/done sessions.
 - [implemented] docs/one-map.md v2 patched: removed herdr, added phase structure, added implementation plan (§9), added /morphmap-run design, added compiler hook design, added Node metadata schema.
 - [action] Phase D: restore mech-pi/ wiring layer, register 3 transition tools in hooks, bootstrap state.json from mindmap, implement md↔json sync hook, update agent prompts to use mech tools.
+
+#### triage command implemented
+- [implemented] /morphmap-triage command: skills/triage/SKILL.md + prompts/morphmap-triage.md · gh CLI integration for GitHub issues/PRs · 4-tier classification (very-good/good/bad/very-bad) against branch scope · auto-route + flag-for-human routing · PR exact-match detection · decision logging
+- [decision] triage SKILL.md uses gh CLI (gh issue view, gh pr view, gh issue list, gh pr list) for v1 GitHub integration. Email/chat are text-only classification. Batch mode supports --repo flag for scanning open issues/PRs.
+- [decision] 4-tier naming kept as very-good/good/bad/very-bad per docs/triage-flow.md (canonical). Spec's exact/high/partial/no-match are equivalent — very-good=exact, good=high, bad=partial, very-bad=no-match.
 
 ### 2026-07-20
 #### fixes (5)
