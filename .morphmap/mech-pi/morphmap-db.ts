@@ -313,6 +313,154 @@ export function clearState(dbPath: string): void {
   }
 }
 
+// ── Multi-Branch Queries (orchestrator) ───────────────────────
+
+/** Load ALL branches from the DB. Returns empty object if DB doesn't exist. */
+export function loadAllBranches(dbPath: string): Record<string, BranchState> {
+  const db = openDb(dbPath);
+  const branchRows = db.query("SELECT branch_id FROM branches").all() as any[];
+  const result: Record<string, BranchState> = {};
+
+  for (const br of branchRows) {
+    // Create a fake single-branch state and call loadState-like logic inline
+    const branchId = br.branch_id;
+    const branchRow = db.query("SELECT * FROM branches WHERE branch_id = ?").get(branchId) as any;
+    if (!branchRow) continue;
+
+    const leaves: Record<string, any> = {};
+    const leafRows = db.query("SELECT * FROM leaves WHERE branch_id = ?").all(branchId) as any[];
+    for (const lr of leafRows) {
+      const ev = db.query("SELECT * FROM evidence WHERE leaf_id = ? AND branch_id = ?")
+        .get(lr.leaf_id, lr.branch_id) as any;
+      leaves[lr.leaf_id] = {
+        id: lr.leaf_id, status: lr.status, bottleneck: lr.bottleneck, qa: lr.qa,
+        test: JSON.parse(lr.test_strategies),
+        model: { provider: lr.model_provider || "deepseek", model: lr.model_name || "deepseek-v4-flash", thinking: lr.model_thinking || "off" },
+        tools: JSON.parse(lr.tools_json),
+        evidence: ev ? rowToEvidence(ev) : emptyEvidence(),
+        reviewRounds: lr.review_rounds, trace: lr.trace,
+        estLoc: lr.est_loc ?? undefined,
+        escalationCount: lr.escalation_count ?? undefined,
+      };
+    }
+
+    const transitions = db.query("SELECT * FROM transitions WHERE leaf_id IN (SELECT leaf_id FROM leaves WHERE branch_id = ?)")
+      .all(branchId) as any[];
+
+    const subBranches = db.query("SELECT branch_id FROM branches WHERE branch_id != ?")
+      .all(branchId).map((r: any) => r.branch_id);
+
+    const childStatus: Record<string, any> = {};
+    for (const sb of subBranches) {
+      const s = db.query("SELECT status FROM branches WHERE branch_id = ?").get(sb) as any;
+      if (s) childStatus[sb] = s.status;
+    }
+
+    result[branchId] = {
+      branchId,
+      status: branchRow.status,
+      quality: branchRow.quality,
+      posture: branchRow.posture_json ? JSON.parse(branchRow.posture_json) : undefined,
+      sessionId: branchRow.session_id ?? undefined,
+      leaves,
+      subBranches,
+      childBranchStatus: childStatus,
+      transitions: transitions.map((t: any) => ({
+        leaf: t.leaf_id, from: t.from_status, to: t.to_status,
+        timestamp: t.timestamp, evidenceHash: t.evidence_hash || "",
+      })),
+      integrationStatus: {
+        reviewFileExists: branchRow.review_file_exists === 1,
+        healthCheckPassed: null, bombadilPassed: null, lonkeroPassed: null,
+        allLeavesComplete: branchRow.all_leaves_complete === 1,
+        crossLeafConflicts: [],
+      },
+    };
+  }
+
+  db.close();
+  return result;
+}
+
+// ── Session Recording ─────────────────────────────────────────
+
+export interface SessionRecord {
+  branchId: string;
+  sessionUuid: string;
+  agentType: string;
+  model?: string;
+  thinking?: string;
+  tokensIn?: number;
+  tokensOut?: number;
+  cost?: number;
+  status: string;
+}
+
+export function recordSession(dbPath: string, session: SessionRecord): void {
+  const db = openDb(dbPath);
+  db.run(
+    `INSERT INTO sessions (branch_id, session_uuid, agent_type, model, thinking, tokens_in, tokens_out, cost, status, started_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
+    [
+      session.branchId, session.sessionUuid, session.agentType,
+      session.model ?? null, session.thinking ?? null,
+      session.tokensIn ?? 0, session.tokensOut ?? 0,
+      session.cost ?? 0, session.status,
+    ]
+  );
+  db.close();
+}
+
+export function updateSessionStatus(dbPath: string, sessionUuid: string, status: string, endedAt?: string): void {
+  const db = openDb(dbPath);
+  db.run(
+    `UPDATE sessions SET status = ?, ended_at = ? WHERE session_uuid = ?`,
+    [status, endedAt ?? new Date().toISOString(), sessionUuid]
+  );
+  db.close();
+}
+
+// ── SQL-Based Stuck Leaf Detection ────────────────────────────
+
+/** Find stuck leaves using SQL query (no file I/O). Returns leaf IDs idle longer than threshold. */
+export function findStuckLeavesSQL(dbPath: string, idleThresholdMinutes: number = 30): string[] {
+  const db = openDb(dbPath);
+  const threshold = new Date(Date.now() - idleThresholdMinutes * 60 * 1000).toISOString();
+
+  // Stuck = status is in_progress or submitted, AND no transition in threshold window
+  const rows = db.query(`
+    SELECT l.leaf_id FROM leaves l
+    WHERE l.status IN ('in_progress', 'submitted')
+    AND (
+      SELECT MAX(t.timestamp) FROM transitions t WHERE t.leaf_id = l.leaf_id
+    ) < ?
+    OR (SELECT COUNT(*) FROM transitions t WHERE t.leaf_id = l.leaf_id) = 0
+  `).all(threshold) as any[];
+
+  db.close();
+  return rows.map((r: any) => r.leaf_id);
+}
+
+/** Query sessions for active subagents (not yet ended). */
+export function getActiveSessions(dbPath: string): SessionRecord[] {
+  const db = openDb(dbPath);
+  const rows = db.query(
+    "SELECT * FROM sessions WHERE ended_at IS NULL ORDER BY started_at"
+  ).all() as any[];
+  db.close();
+  return rows.map((r: any) => ({
+    branchId: r.branch_id,
+    sessionUuid: r.session_uuid,
+    agentType: r.agent_type,
+    model: r.model,
+    thinking: r.thinking,
+    tokensIn: r.tokens_in,
+    tokensOut: r.tokens_out,
+    cost: r.cost,
+    status: r.status,
+  }));
+}
+
 // ── Helpers ───────────────────────────────────────────────────
 
 function openDb(dbPath: string): Database {

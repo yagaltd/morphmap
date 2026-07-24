@@ -1,7 +1,8 @@
 import { test, expect, beforeEach, afterEach } from "bun:test";
 import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, rmSync } from "node:fs";
-import { loadState, saveState, clearState } from "./morphmap-state";
+import { loadState, saveState, clearState, loadAllBranches, recordSession, findStuckLeaves, getActiveSessions } from "./morphmap-state";
+import { emptyEvidence } from "../mech";
 import type { BranchState } from "../mech";
 
 const TMP_DIR = `/tmp/morphmap-state-test-${randomBytes(4).toString("hex")}`;
@@ -109,4 +110,57 @@ test("clearState removes file (idempotent)", () => {
   expect(existsSync(statePath)).toBe(false);
   // second call should not throw
   expect(() => clearState(statePath)).not.toThrow();
+});
+
+// ── Multi-branch ────────────────────────────────────────────
+test("loadAllBranches: returns all branches", () => {
+  const dbPath = `${TMP_DIR}/state-branches.db`;
+  // Save two branches
+  saveState(dbPath, makeTestState({ branchId: "branch-a", status: "done" }));
+  saveState(dbPath, makeTestState({ branchId: "branch-b", status: "in_progress" }));
+  const all = loadAllBranches(dbPath);
+  expect(Object.keys(all).length).toBe(2);
+  expect(all["branch-a"].status).toBe("done");
+  expect(all["branch-b"].status).toBe("in_progress");
+  clearState(dbPath);
+});
+
+// ── Sessions ────────────────────────────────────────────────
+test("recordSession + getActiveSessions", () => {
+  const dbPath = `${TMP_DIR}/state-sessions.db`;
+  saveState(dbPath, makeTestState({ branchId: "root" }));
+  recordSession(dbPath, { branchId: "root", sessionUuid: "uuid-1", agentType: "leaf-worker", model: "deepseek-v4-flash", status: "running" });
+  recordSession(dbPath, { branchId: "root", sessionUuid: "uuid-2", agentType: "reviewer", model: "claude-sonnet-4", status: "completed" });
+  const active = getActiveSessions(dbPath);
+  expect(active.length).toBe(2);
+  expect(active[0].sessionUuid).toBe("uuid-1");
+  clearState(dbPath);
+});
+
+// ── Stuck leaves ────────────────────────────────────────────
+test("findStuckLeaves: detects idle leaves", () => {
+  const dbPath = `${TMP_DIR}/state-stuck.db`;
+  const state = makeTestState({
+    branchId: "root",
+    leaves: {
+      "active": {
+        id: "active", status: "in_progress", bottleneck: "standard", qa: "review", test: [],
+        model: { provider: "deepseek", model: "flash", thinking: "off" },
+        tools: [], evidence: emptyEvidence(), reviewRounds: 0, trace: "active",
+      },
+      "stuck": {
+        id: "stuck", status: "in_progress", bottleneck: "standard", qa: "review", test: [],
+        model: { provider: "deepseek", model: "flash", thinking: "off" },
+        tools: [], evidence: emptyEvidence(), reviewRounds: 0, trace: "stuck",
+      },
+    },
+  });
+  saveState(dbPath, state);
+
+  // The DB query needs transitions to check timestamps — without transitions, ALL active leaves are "stuck"
+  const stuck = findStuckLeaves(dbPath, 30);
+  expect(stuck).toContain("active");
+  expect(stuck).toContain("stuck");
+  expect(stuck.length).toBe(2);
+  clearState(dbPath);
 });

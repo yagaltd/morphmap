@@ -50,6 +50,27 @@ export function registerTelemetry(pi: ExtensionAPI) {
           postCost - (state._preSpawnCost || 0)
         ).toFixed(4);
 
+        // Write session to SQLite
+        try {
+          const { recordSession } = await import(
+            "../../../../.morphmap/mech-pi/morphmap-state"
+          );
+          const sessionUuid = result?.session || result?.asyncId || `unknown-${Date.now()}`;
+          recordSession(".morphmap/state.db", {
+            branchId: "root",
+            sessionUuid,
+            agentType: agentName,
+            model,
+            thinking,
+            tokensIn: deltaIn,
+            tokensOut: deltaOut,
+            cost: parseFloat(deltaCost),
+            status: "completed",
+          });
+        } catch {
+          // DB not seeded yet — skip
+        }
+
         try {
           const { execSync } = await import("node:child_process");
           const entry = `- ${today()}: [telemetry] agent-result: agent=morphmap/${agentName} task=${taskLabel} model=${model} thinking=${thinking} tokens-in=${deltaIn} tokens-out=${deltaOut} cost=$${deltaCost} result=✅`;

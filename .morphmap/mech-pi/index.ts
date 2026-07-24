@@ -11,7 +11,7 @@
  *   morphmap-compiler.ts   — JSONL session log → evidence extraction (impure: fs, bun-testable)
  *   seed-runner.ts         — CLI entry: bun run .morphmap/mech-pi/seed-runner.ts
  */
-export { loadState, saveState, clearState } from "./morphmap-state";
+export { loadState, saveState, clearState, loadAllBranches, recordSession, updateSessionStatus, findStuckLeaves, getActiveSessions } from "./morphmap-state";
 export {
   applySubmitLeaf,
   applyApproveLeaf,
