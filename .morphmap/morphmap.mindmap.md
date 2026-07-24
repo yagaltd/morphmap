@@ -33,11 +33,11 @@ resource: index.md
 ## examples ✅ → .morphmap/archive/2026-07-24-examples.md
   MorphEditor mindmap, OKF conformance · 2/2 leaves
 ## commands ✅ → .morphmap/archive/2026-07-24-commands.md
-  slash commands ·  leaves
+  /morphmap-plan, delegate, review, amend, init, render, status, improve, hats, recover, archive, promote, run, explore, expand, collapse · 16 commands
 ## agents ✅ → .morphmap/archive/2026-07-24-agents.md
-  agent definitions · 5/5 leaves
+  branch-agent, leaf-worker, reviewer, scout, researcher, quality-reviewer, context-builder · 7 agents
 ## extension ✅ → .morphmap/archive/2026-07-24-extension.md
-  pi extension package · 3/3 leaves
+  hooks, CLI, context-mode, pi-subagents integration · 3/3 leaves
 ## staging 🔄 [phase]
 ### e2e-test
 - ✅ init + plan + delegate flow verified on E2ETest project
@@ -68,7 +68,7 @@ resource: index.md
 - CHANGELOG.md auto-generated from decisions log by morphmap-hooks extension
 
 ## skills ✅ → .morphmap/archive/2026-07-24-skills.md
-   ·  leaves
+  plan, delegate, review, amend, init, render, status, improve, hats, recover, archive, promote, explore, expand, collapse, grill · 18 skills
 ## mech-mindmap ✅ → .morphmap/archive/2026-07-24-mech.md
   state machine + deterministic gates · 5/5 leaves
 ## decisions ⬜ [log]
