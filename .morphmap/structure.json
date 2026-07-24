@@ -44,7 +44,6 @@
       { "regex": "^docs/.+", "note": "documentation" },
       { "regex": "^docs/adr/.+", "note": "ADR (architecture decision record)" },
       { "regex": "^examples/.+", "note": "examples" },
-      { "regex": "^\\.github/workflows/.+\\.yml$", "note": "CI workflow" },
       { "regex": "^CHANGELOG\\.md$", "note": "changelog (auto-generated)" },
       { "regex": "^package\\.json$", "note": "package manifest" },
       { "regex": "^tsconfig\\.json$", "note": "TypeScript config" },
