@@ -28,32 +28,45 @@ subagent({
 
 If branch specified, review only that subtree.
 
-### Stale Detection Methodology
+### Stale Detection Methodology (jj-native)
 
 For each 🔄 leaf:
 ```bash
-# Get files associated with the leaf (from its .spec Boundaries > Allowed Changes, or git log)
-FILES=$(grep -A5 "## Boundaries" <spec-path> 2>/dev/null | grep '^- ' | sed 's/^- //' || echo "")
-if [ -n "$FILES" ]; then
-  for f in $FILES; do
-    LAST_MOD=$(git log -1 --format="%aI" -- "$f" 2>/dev/null || echo "never")
-    echo "$f: $LAST_MOD"
-  done
+# If leaf has jjChangeId stored, check that change's timestamp
+CHANGE_ID="<leaf.jjChangeId>"
+if [ -n "$CHANGE_ID" ]; then
+  # Get change timestamp from jj log
+  LAST_TS=$(jj log -r "$CHANGE_ID" --no-graph --template 'separate(" ", timestamp)' 2>/dev/null | head -1)
 else
-  # Fallback: check last commit touching the .spec itself
-  LAST_MOD=$(git log -1 --format="%aI" -- "<spec-path>" 2>/dev/null || echo "never")
-  echo "<spec>: $LAST_MOD"
+  # Fallback: check last jj commit touching the .spec or associated files
+  SPEC_PATH="<spec-path>"
+  LAST_TS=$(jj log --limit 1 -r "::$SPEC_PATH" --no-graph --template 'separate(" ", timestamp)' 2>/dev/null | head -1)
+fi
+
+if [ -z "$LAST_TS" ]; then
+  echo "no changes found — never started"
+  # Treat as STALE (leaf was created but no work done)
+else
+  # Compare against 48h ago
+  CUTOFF=$(date -Iseconds -d '48 hours ago')
+  if [[ "$LAST_TS" < "$CUTOFF" ]]; then
+    echo "STALE: $LAST_TS (cutoff: $CUTOFF)"
+  else
+    echo "ACTIVE: $LAST_TS"
+  fi
 fi
 ```
 
-Compare against `date -Iseconds -d '48 hours ago'`. If all files modified before cutoff → STALE.
+Jj change model: each jj commit tracks the change timestamp, not file modification time.
+Use `jj log -r <change-id>` for leaf-owned changes, or `jj log --limit 1 -r '::<file>'`
+for file-level queries. The 48h window is checked against the change timestamp.
 
 ## Phase 2: TRIAGE
 
 For each branch:
 - **🔴 leaves**: what's blocked? Deps unmet? Decision needed? WORKER_BLOCKER signal active?
 - **🔴 escalated decisions**: what does human need to decide? Options available?
-- **🔄 leaves STALE (>48h)**: which branch agent stalled? Last git activity timestamp? Recovery action?
+- **🔄 leaves STALE (>48h)**: which branch agent stalled? Last jj activity timestamp? Recovery action?
 - **🔄 leaves ACTIVE (<48h)**: ETA drifting >20%? Budget over? Note as in-progress.
 - **🟡 inter-branch flags**: any cross-branch decisions pending? Dep chains blocked mid-tree?
 - **✅ branches**: any integration test results to review? Quality review handoffs unread?

@@ -90,4 +90,4 @@ jj commit -m "archive: moved <branch-name> to .morphmap/archive/"
 - Summary in main map is searchable via ctx_search
 - Archive files are markmap-compatible (can be opened directly)
 - One archive per branch — if re-archiving same area, supersede old archive with `supersedes:` in frontmatter
-- Git IS the history — archives are committed, not deleted
+- Jj IS the history — archives are committed, not deleted

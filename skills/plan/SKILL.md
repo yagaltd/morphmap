@@ -220,7 +220,7 @@ Gather evidence before asking questions. Use pi-subagents for parallel recon:
    ], concurrency: 2 })
    ```
 6. After agents complete, update map's `## context` branch with their file references
-7. Check git log for recent related changes
+7. Check jj log for recent related changes
 8. For small/simple projects (<50 files), you may do scouting directly with find/grep/read instead of spawning scout
 
 **Rule:** If a question can be answered from evidence, answer it. Do not ask the human.

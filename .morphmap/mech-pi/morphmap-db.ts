@@ -349,6 +349,7 @@ export function loadAllBranches(dbPath: string): Record<string, BranchState> {
         reviewRounds: lr.review_rounds, trace: lr.trace,
         estLoc: lr.est_loc ?? undefined,
         escalationCount: lr.escalation_count ?? undefined,
+        jjChangeId: lr.jj_change_id ?? undefined,
       };
     }
 
@@ -370,6 +371,7 @@ export function loadAllBranches(dbPath: string): Record<string, BranchState> {
       quality: branchRow.quality,
       posture: branchRow.posture_json ? JSON.parse(branchRow.posture_json) : undefined,
       sessionId: branchRow.session_id ?? undefined,
+      jjChangeId: branchRow.jj_change_id ?? undefined,
       leaves,
       subBranches,
       childBranchStatus: childStatus,

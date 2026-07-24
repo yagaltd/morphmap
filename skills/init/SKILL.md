@@ -194,7 +194,7 @@ fi
 behavior without any git-visible diff. Freezing ensures reproducibility.
 
 **Upgrade later:** `/morphmap-init --update-agents` copies fresh agents from
-global install. Git shows the diff. You review before committing.
+global install. Jj shows the diff. You review before committing.
 
 ## Phase 3: Create mindmap and domain context
 
@@ -334,7 +334,7 @@ Shared domain language for this project. Keep meaningful to domain experts; avoi
 - Unresolved domain question, owner, and why it matters.
 ```
 
-## Phase 5: Git init
+## Phase 5: Jj init
 
 If no jj/git repo exists: `jj git init`.
 
