@@ -37,7 +37,7 @@ subagent({
       task: "Analyze architecture for: <question>.
 
 Map structure, identify entry points, trust boundaries, state transitions.
-Read key source files. Check recent git history.
+Read key source files. Check recent jj log history.
 Output: architecture summary, risk map (CRITICAL/HIGH/MEDIUM), file-level findings.",
       context: "fresh",
       progress: true

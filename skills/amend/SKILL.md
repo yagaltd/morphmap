@@ -88,7 +88,7 @@ Update the mindmap to add the new leaf if branch-agent confirms, or mark as pend
 If branch-agent confirms leaf added:
 - Add the leaf to the appropriate branch in `.morphmap/morphmap.mindmap.md`
 - Run `npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open`
-- Commit: `git add -A && git commit -m "amend: <addition summary> → <branch>"`
+- Commit: `jj commit -m "amend: <addition summary> → <branch>"`
 
 ## Rules
 

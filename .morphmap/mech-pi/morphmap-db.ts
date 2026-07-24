@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS branches (
   posture_json         TEXT,
   session_id           TEXT,
   all_leaves_complete  INTEGER NOT NULL DEFAULT 0,
-  review_file_exists   INTEGER NOT NULL DEFAULT 0
+  review_file_exists   INTEGER NOT NULL DEFAULT 0,
+  jj_change_id         TEXT
 );
 
 CREATE TABLE IF NOT EXISTS leaves (
@@ -45,6 +46,7 @@ CREATE TABLE IF NOT EXISTS leaves (
   trace           TEXT NOT NULL,
   est_loc         INTEGER,
   escalation_count INTEGER DEFAULT 0,
+  jj_change_id    TEXT,
   PRIMARY KEY (leaf_id, branch_id),
   FOREIGN KEY (branch_id) REFERENCES branches(branch_id)
 );
@@ -137,6 +139,7 @@ export function loadState(dbPath: string): BranchState | null {
       trace: lr.trace,
       estLoc: lr.est_loc ?? undefined,
       escalationCount: lr.escalation_count ?? undefined,
+      jjChangeId: lr.jj_change_id ?? undefined,
     };
   }
 
@@ -161,6 +164,7 @@ export function loadState(dbPath: string): BranchState | null {
     quality: branchRow.quality,
     posture: branchRow.posture_json ? JSON.parse(branchRow.posture_json) : undefined,
     sessionId: branchRow.session_id ?? undefined,
+    jjChangeId: branchRow.jj_change_id ?? undefined,
     leaves,
     subBranches,
     childBranchStatus: childStatus,
@@ -188,13 +192,14 @@ export function saveState(dbPath: string, state: BranchState): void {
   db.transaction(() => {
     // Upsert branch
     db.run(
-      `INSERT INTO branches (branch_id, status, quality, posture_json, session_id, all_leaves_complete, review_file_exists)
-       VALUES (?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO branches (branch_id, status, quality, posture_json, session_id, all_leaves_complete, review_file_exists, jj_change_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(branch_id) DO UPDATE SET
          status=excluded.status, quality=excluded.quality,
          posture_json=excluded.posture_json, session_id=excluded.session_id,
          all_leaves_complete=excluded.all_leaves_complete,
-         review_file_exists=excluded.review_file_exists`,
+         review_file_exists=excluded.review_file_exists,
+         jj_change_id=excluded.jj_change_id`,
       [
         state.branchId,
         state.status,
@@ -203,6 +208,7 @@ export function saveState(dbPath: string, state: BranchState): void {
         state.sessionId ?? null,
         boolToInt(state.integrationStatus.allLeavesComplete),
         boolToInt(state.integrationStatus.reviewFileExists),
+        state.jjChangeId ?? null,
       ]
     );
 
@@ -211,21 +217,23 @@ export function saveState(dbPath: string, state: BranchState): void {
       db.run(
         `INSERT INTO leaves (leaf_id, branch_id, status, bottleneck, qa, test_strategies,
            model_provider, model_name, model_thinking, tools_json, review_rounds,
-           trace, est_loc, escalation_count)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           trace, est_loc, escalation_count, jj_change_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
          ON CONFLICT(leaf_id, branch_id) DO UPDATE SET
            status=excluded.status, bottleneck=excluded.bottleneck, qa=excluded.qa,
            test_strategies=excluded.test_strategies,
            model_provider=excluded.model_provider, model_name=excluded.model_name,
            model_thinking=excluded.model_thinking, tools_json=excluded.tools_json,
            review_rounds=excluded.review_rounds, trace=excluded.trace,
-           est_loc=excluded.est_loc, escalation_count=excluded.escalation_count`,
+           est_loc=excluded.est_loc, escalation_count=excluded.escalation_count,
+           jj_change_id=excluded.jj_change_id`,
         [
           leafId, state.branchId, leaf.status, leaf.bottleneck, leaf.qa,
           JSON.stringify(leaf.test),
           leaf.model.provider, leaf.model.model, leaf.model.thinking,
           JSON.stringify(leaf.tools), leaf.reviewRounds,
           leaf.trace, leaf.estLoc ?? null, leaf.escalationCount ?? null,
+          leaf.jjChangeId ?? null,
         ]
       );
 

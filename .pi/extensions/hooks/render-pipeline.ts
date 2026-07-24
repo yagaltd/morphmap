@@ -89,11 +89,7 @@ export function registerRenderPipeline(pi: ExtensionAPI) {
 
           // Stage + commit
           execSync(
-            "git add .morphmap/morphmap.mindmap.md .morphmap/morphmap.mindmap.html .morphmap/state.db .morphmap/state-index.json CHANGELOG.md",
-            { stdio: "pipe" }
-          );
-          execSync(
-            `git commit -m "map: auto-render + changelog + state.db after edit" --allow-empty`,
+            "jj commit -m 'map: auto-render + changelog + state.db after edit'",
             { stdio: "pipe" }
           );
 

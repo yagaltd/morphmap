@@ -45,9 +45,9 @@ Before beginning work, verify you have a parent orchestrator:
 intercom({ action: "list" })
 ```
 If your parent session is NOT in the list (you were spawned by a session that no longer exists), you are orphaned:
-1. Commit all uncommitted work in this worktree: `git add -A && git commit -m "recover: orphaned branch agent self-merge"`
-2. Merge your branch to master: `git checkout master && git merge <branch> && git branch -D <branch>`
-3. Clean up: `git worktree prune`
+1. Commit all changes to the main change: `jj commit -m "recover: orphaned branch agent self-merge"`
+2. Rebase your changes onto main: `jj rebase -d main && jj squash`
+3. Jj auto-tracks changes — no worktree cleanup needed after rebase.
 4. Log recovery to map: append `- <today>: [recover] orphaned branch agent self-merged <branch>` to `## decisions`
 5. Exit: report "Orphaned branch agent recovered. Work committed + merged + cleaned. Restart /morphmap-delegate to continue."
 
@@ -382,7 +382,7 @@ Only process branches tagged `[module]` or `[feature]`. Skip `[phase]`, `[log]`,
   If `## decisions` has >5 entries under one date, group by tag into `####` sub-branches.
 - **Map write protocol:** After EVERY write to .morphmap/morphmap.mindmap.md:
   1. Run `npx markmap-cli .morphmap/morphmap.mindmap.md -o .morphmap/morphmap.mindmap.html --no-open`
-  2. Run `git add -A && git commit -m "<what changed and why>"`
+  2. Run `jj commit -m "<what changed and why>"`
   Map edits are always meaningful. Git IS the history. HTML must stay in sync with markdown.
 - Never hallucinate tools — use only tools in available list.
 - Log skill usage: after spawning leaf-worker, quality-reviewer, reviewer, or sub-branch agent, add to `## decisions`:

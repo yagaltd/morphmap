@@ -116,6 +116,6 @@ tags: [review, triage, morphmap]
 - Spawn reviewer subagent via pi-subagents. Fresh context, no pollution.
 - Read only branch headers + leaf status markers. Don't read leaf details unless triaging a specific blocker.
 - Present options, not decisions. Human decides.
-- Stale threshold: 48 hours from last git commit touching the leaf's files.
+- Stale threshold: 48 hours from last jj commit touching the leaf's files.
 - WORKER_BLOCKER detection via intercom, not mindmap (agents signal it dynamically).
 - If no 🔄 leaves and no 🔴 blockers: report "All clear. N branches healthy."

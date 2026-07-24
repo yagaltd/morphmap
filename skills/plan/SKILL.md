@@ -112,8 +112,7 @@ Loop until approved.
 Commit the approved tree. Do NOT start delegate. The human runs `/morphmap-delegate` when ready.
 
 ```bash
-git add .morphmap/morphmap.mindmap.md
-git commit -m "plan: project-level tree from requirements"
+jj commit -m "plan: project-level tree from requirements"
 ```
 
 ---

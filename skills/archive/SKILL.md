@@ -79,8 +79,7 @@ Update `## context` to reference the archive:
 ## Phase 5: COMMIT
 
 ```bash
-git add -A
-git commit -m "archive: moved <branch-name> to .morphmap/archive/"
+jj commit -m "archive: moved <branch-name> to .morphmap/archive/"
 ```
 
 ## Rules

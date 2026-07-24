@@ -19,7 +19,7 @@ Scaffold a new MorphMap project structure.
 If `--update-agents` flag present:
 - Skip all other phases
 - Run only Phase 2d (copy agents from global install to `.morphmap/agents/`)
-- Show git diff of agent changes
+- Show jj diff of agent changes
 - Exit with: "Agents updated. Review diff and commit if satisfied."
 
 If `--update-agents` absent: proceed with full scaffold below.
@@ -336,7 +336,7 @@ Shared domain language for this project. Keep meaningful to domain experts; avoi
 
 ## Phase 5: Git init
 
-If no git repo exists: `git init`.
+If no jj/git repo exists: `jj git init`.
 
 Install pre-commit hook for automatic mindmap HTML rendering:
 
@@ -358,7 +358,7 @@ additional runtime hooks:
 - Auto-logs telemetry on tool failures
 - Warns on update_goal complete before gate check
 
-Both the git hook (human edits) and pi extension hook (agent edits) ensure
+Both the jj hook (human edits) and pi extension hook (agent edits) ensure
 `.morphmap/morphmap.mindmap.html` stays in sync with `.md`.
 
 The pi extension hook also bootstraps `state.json` from the mindmap via

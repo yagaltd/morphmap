@@ -188,6 +188,7 @@ export interface Leaf {
   estLoc?: number; // optional override for [est-loc: N] tag
   abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
   escalationCount?: number; // how many times model has been escalated (0 = first attempt)
+  jjChangeId?: string; // jj change ID tracking this leaf's work (for undo/rollback)
 }
 
 export interface IntegrationStatus {
@@ -219,6 +220,7 @@ export interface BranchState {
   integrationStatus: IntegrationStatus;
   abandonedReason?: AbandonedReason; // set when status === "abandoned" (§8.5)
   sessionId?: string; // pi subagent session ID (one-map §2: map = session tree)
+  jjChangeId?: string; // jj change ID for this branch (for undo/rollback)
 }
 
 export interface Posture {
