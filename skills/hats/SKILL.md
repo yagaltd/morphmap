@@ -9,7 +9,10 @@ argument-hint: "--context eval|rca|brownfield|review [subject]"
 
 Containerize brainstorming into five agent hats + one human hat.
 Each hat is a distinct mode of thinking. Hats are sequential — no mixing.
-Output: `.morphmap/hats-<context>-<YYYYMMDD>-<HHMMSS>.md` with OKF frontmatter.
+
+**Output goes to `## decisions` in the mindmap.** The map IS the record.
+Optional `--file` flag writes a separate `.morphmap/hats-<context>-<date>.md`
+for audit or handoff — but the default is a structured decision-log entry.
 
 ## Hat Definitions
 
@@ -192,14 +195,34 @@ Blue:   "Verdict: approve / changes requested / reject."
 
 ### With mindmap
 
-After hats session completes:
-```bash
-# Add to decisions log
-echo "- <today>: [hats] <context> on <subject> · verdict: <PROCEED/REVISE/REJECT>" >> .morphmap/morphmap.mindmap.md
+After hats session completes, write a structured entry to `## decisions`.
+This is the DEFAULT output — no separate file unless `--file` is passed.
 
-# Link output file
-echo "  → .morphmap/hats-<context>-<date>.md" >> .morphmap/morphmap.mindmap.md
+```markdown
+### YYYY-MM-DD
+- [hats:eval] <subject> · verdict: PROCEED
+  - White: <N facts gathered — scout/researcher refs>
+  - Yellow: <top benefit>
+  - Black: <top risk, mitigated by X>
+  - Green: <chosen approach> over <alternatives considered>
+  - Red: <human gut verbatim>
+  - .spec boundaries updated: <list>
 ```
+
+Example:
+```markdown
+### 2026-07-24
+- [hats:eval] JWT refresh token feature · verdict: PROCEED
+  - White: 37 TS files, auth uses JWT 15-min expiry (scout-003-20260724-auth.md)
+  - Yellow: 3x better session UX for mobile users
+  - Black: mobile client breakage if JWT format changes — mitigated by versioned API
+  - Green: adapter pattern over rewrite — simpler, 400 LOC saved
+  - Red: "feels right but check mobile clients"
+  - .spec boundaries updated: mobile API versioning, rollback plan
+```
+
+If `--file` flag: also write `.morphmap/hats-<context>-<YYYYMMDD>-<HHMMSS>.md`.
+Link from decision entry: `→ .morphmap/hats-eval-20260724-150000.md`.
 
 ### With .spec files
 
