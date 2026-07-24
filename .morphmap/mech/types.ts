@@ -18,7 +18,7 @@ export type LeafStatus =
   | "submitted" //    ⏳  worker called submit_leaf, submitGates passed
   | "in_review" //    ⏳  branch agent / reviewer owns it
   | "blocked" //      🔴  WORKER_BLOCKER or unresolved dependency
-  | "abandoned" //    💤  consciously set aside (§8.5) — frozen, rediscoverable
+  | "abandoned" //    💤  consciously set aside — frozen, collapsed, or deferred (§8.5)
   | "done"; //        ✅  approve_leaf passed, reviewGates passed
 
 export type BranchStatus =
@@ -26,7 +26,7 @@ export type BranchStatus =
   | "in_progress" // 🔄
   | "done" // ✅
   | "blocked" // 🔴
-  | "abandoned"; // 💤 (§8.5)
+  | "abandoned"; // 💤  set aside, collapsed to brainstorm, or deferred (§8.5)
 
 // Why a branch/leaf was set aside (§8.5). State machine treats all three
 // identically (frozen, gates skip). Difference is an agent/human signal:

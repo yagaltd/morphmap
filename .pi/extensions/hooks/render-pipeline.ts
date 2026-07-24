@@ -63,6 +63,17 @@ export function registerRenderPipeline(pi: ExtensionAPI) {
             });
           }
 
+          // 4.5 Decision log compaction: archive entries older than 7 days
+          const compacted = compactDecisions(mapContent);
+          if (compacted.changed) {
+            await fs.writeFile(path, compacted.content, "utf8");
+            pi.ui?.notify({
+              title: "MorphMap: decisions compacted",
+              body: `Archived ${compacted.archivedCount} entries older than 7 days to ${compacted.archivePath}`,
+              style: "info",
+            });
+          }
+
           // 5. md→json sync
           try {
             const {
@@ -255,4 +266,92 @@ function checkAdrFiles(mapContent: string): string[] {
     }
   }
   return missing;
+}
+
+// ── DECISION COMPACTION ──────────────────────────────────────
+
+interface CompactResult {
+  changed: boolean;
+  content: string;
+  archivedCount: number;
+  archivePath: string;
+}
+
+function compactDecisions(mapContent: string): CompactResult {
+  const lines = mapContent.split("\n");
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffStr = cutoff.toISOString().split("T")[0]; // YYYY-MM-DD
+
+  // Find decisions section boundaries
+  let decisionsStart = -1;
+  let decisionsEnd = -1;
+  for (let i = 0; i < lines.length; i++) {
+    if (lines[i].startsWith("## decisions")) {
+      decisionsStart = i;
+      // Find next ## heading (end of decisions section)
+      for (let j = i + 1; j < lines.length; j++) {
+        if (lines[j].match(/^## /)) { decisionsEnd = j; break; }
+      }
+      if (decisionsEnd === -1) decisionsEnd = lines.length;
+      break;
+    }
+  }
+
+  if (decisionsStart === -1) return { changed: false, content: mapContent, archivedCount: 0, archivePath: "" };
+
+  // Extract old entries (older than cutoff) and keep recent ones
+  const oldEntries: string[] = [];
+  const recent: string[] = [lines[decisionsStart]]; // Keep "## decisions" header
+  let currentDate = "";
+  let collecting = false;
+  const archiveDates: string[] = [];
+
+  for (let i = decisionsStart + 1; i < decisionsEnd; i++) {
+    const line = lines[i];
+    const dateMatch = line.match(/^###\s+(\d{4}-\d{2}-\d{2})/);
+    if (dateMatch) {
+      currentDate = dateMatch[1];
+      collecting = currentDate < cutoffStr;
+      if (collecting) archiveDates.push(currentDate);
+    }
+    if (collecting) {
+      oldEntries.push(line);
+    } else {
+      recent.push(line);
+    }
+  }
+
+  if (oldEntries.length === 0) return { changed: false, content: mapContent, archivedCount: 0, archivePath: "" };
+
+  // Generate archive path
+  const oldest = archiveDates[archiveDates.length - 1] || cutoffStr;
+  const newest = archiveDates[0] || cutoffStr;
+  const archivePath = `.morphmap/archive/decisions-${oldest}-${newest}.md`;
+
+  // Append to archive file
+  try {
+    const fs = require("node:fs");
+    fs.mkdirSync(".morphmap/archive", { recursive: true });
+    const archiveContent = `# Decisions Archive (${oldest} to ${newest})\n\n${oldEntries.join("\n")}\n`;
+    fs.appendFileSync(archivePath, archiveContent, "utf8");
+  } catch {
+    return { changed: false, content: mapContent, archivedCount: 0, archivePath: "" };
+  }
+
+  // Add link line to decisions
+  const linkLine = `\n→ older entries: ${archivePath}\n`;
+  recent.push(linkLine);
+
+  // Rebuild map: prefix (before decisions) + compacted decisions + suffix (after decisions)
+  const prefix = lines.slice(0, decisionsStart).join("\n");
+  const suffix = decisionsEnd < lines.length ? "\n" + lines.slice(decisionsEnd).join("\n") : "";
+  const newContent = prefix + "\n" + recent.join("\n") + suffix;
+
+  return {
+    changed: true,
+    content: newContent,
+    archivedCount: oldEntries.length,
+    archivePath,
+  };
 }
