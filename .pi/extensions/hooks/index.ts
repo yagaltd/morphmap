@@ -8,5 +8,6 @@ export { registerSpecGuards } from "./spec-guard";
 export { registerRenderPipeline } from "./render-pipeline";
 export { registerTelemetry } from "./telemetry";
 export { registerFailureRecovery } from "./failure-recovery";
+export { registerFileStructureGuard } from "./file-structure-guard";
 export { getState, isMindmapFile, today } from "./helpers";
 export type { SessionState } from "./helpers";

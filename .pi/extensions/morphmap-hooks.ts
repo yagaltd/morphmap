@@ -23,6 +23,7 @@ import {
   registerRenderPipeline,
   registerTelemetry,
   registerFailureRecovery,
+  registerFileStructureGuard,
 } from "./hooks";
 
 export default function (pi: ExtensionAPI) {
@@ -35,6 +36,7 @@ export default function (pi: ExtensionAPI) {
   // Layer 1+2: Post-tool automation
   registerRenderPipeline(pi);
   registerTelemetry(pi);
+  registerFileStructureGuard(pi);
 
   // Layer 3: Failure recovery + improve loop
   registerFailureRecovery(pi);
