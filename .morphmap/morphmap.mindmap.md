@@ -201,6 +201,14 @@ resource: index.md
 ## decisions ⬜ [log]
 
 ### 2026-07-24
+- [gap] undo/experiment flexibility: no mechanical rollback at leaf or sub-branch level
+  - Evidence.filesChanged tracks modified files but no undo mechanism uses it
+  - Sub-branch rollback needs git stash restore point (see branch-agent step 6)
+  - Leaf-level undo: 5 lines to add. Sub-branch: ~15 lines. Worktrees: deferred.
+  - Not yet implemented — logged as known gap, pending prioritization
+- [violation] wrote docs/undo-flexibility.md instead of ## decisions
+  - Write Guard rule #3 strengthened: analysis/learning/brainstorm → ## decisions, not documents
+  - Document deleted, content moved here
 - [implemented] /morphmap-review: enhanced SKILL.md with git-timestamp stale detection (48h threshold), WORKER_BLOCKER intercom check, --handoff file output. Prompt updated per spec.
 - [skill] morphmap/review used in tree-walker mode for review command · outcome: implemented
 
