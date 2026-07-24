@@ -52,3 +52,4 @@
 {"ts":"2026-07-24T05:11:46.063Z","category":"tool-failure","tool":"bash","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
 {"ts":"2026-07-24T05:13:43.133Z","category":"tool-failure","tool":"edit","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
 {"ts":"2026-07-24T05:14:34.137Z","category":"tool-failure","tool":"edit","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}
+{"ts":"2026-07-24T05:17:04.254Z","category":"tool-failure","tool":"bash","attempt":1,"pattern":"unclassified","error":"unknown error (no result)"}

@@ -17,7 +17,6 @@
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { registerMechTools } from "../../.morphmap/mech-pi/morphmap-tools-pi";
 import {
   registerSpecGuards,
   registerRenderPipeline,
@@ -26,9 +25,29 @@ import {
   registerFileStructureGuard,
 } from "./hooks";
 
+let _mechRegistered = false;
+
 export default function (pi: ExtensionAPI) {
-  // Register the three deterministic transition tools (§2.5).
-  registerMechTools(pi);
+  // Lazy-register mech tools to avoid bun:sqlite dependency at extension load time.
+  // The static import chain (morphmap-tools-pi → morphmap-tools → morphmap-state →
+  // morphmap-db → bun:sqlite) breaks when pi loads the extension in contexts
+  // without bun's SQLite (e.g., reviewer subagent). Deferred to first tool call.
+  if (!_mechRegistered) {
+    pi.on("tool_call", async () => {
+      if (_mechRegistered) return;
+      try {
+        const { registerMechTools } = await import(
+          "../../.morphmap/mech-pi/morphmap-tools-pi"
+        );
+        registerMechTools(pi);
+        _mechRegistered = true;
+      } catch {
+        // SQLite not available in this runtime — mech tools unavailable.
+        // The extension continues without them (hooks still work).
+        _mechRegistered = true;
+      }
+    });
+  }
 
   // Layer 1+2: Pre-tool enforcement
   registerSpecGuards(pi);
