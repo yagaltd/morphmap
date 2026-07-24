@@ -2,9 +2,11 @@
   "version": "0.3",
   "description": "Known project structure patterns. Single source of truth for both the file-structure guard hook and agent self-checking. Add new patterns here when project structure evolves — both the hook and AGENTS.md agents read from this file.",
   "rules": [
-    "Before creating a file, check its path against these patterns.",
-    "If no pattern matches, either: (a) use an existing directory, (b) use ## decisions log instead, or (c) add a new pattern here and to AGENTS.md Project Structure.",
-    "Patterns are regex. Order matters — first match wins."
+    "Before creating a file, check its path against the patterns below.",
+    "If no pattern matches, either: (a) use an existing directory, (b) use ## decisions log instead, or (c) add a new pattern here BEFORE writing the file.",
+    "To add a pattern: find the correct group, add { \"regex\": \"...\", \"note\": \"...\" }. Commit. Then write the file.",
+    "Patterns are regex. Use .+ for 'any file in this dir', use \\d+ for numeric counters, use \\w+ for slug names, use \\.ext$ for specific extensions.",
+    "The file-structure guard hook reads this file at runtime — no restart needed."
   ],
   "patterns": {
     "morphmap_core": [
