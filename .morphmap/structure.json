@@ -1,0 +1,64 @@
+{
+  "version": "0.3",
+  "description": "Known project structure patterns. Single source of truth for both the file-structure guard hook and agent self-checking. Add new patterns here when project structure evolves — both the hook and AGENTS.md agents read from this file.",
+  "rules": [
+    "Before creating a file, check its path against these patterns.",
+    "If no pattern matches, either: (a) use an existing directory, (b) use ## decisions log instead, or (c) add a new pattern here and to AGENTS.md Project Structure.",
+    "Patterns are regex. Order matters — first match wins."
+  ],
+  "patterns": {
+    "morphmap_core": [
+      { "regex": "^\\.morphmap/morphmap\\.mindmap\\.md$", "note": "kanban board" },
+      { "regex": "^\\.morphmap/morphmap\\.mindmap\\.html$", "note": "rendered (auto-generated)" },
+      { "regex": "^\\.morphmap/config\\.json$", "note": "model config" },
+      { "regex": "^\\.morphmap/config$", "note": "legacy config (reference only)" },
+      { "regex": "^\\.morphmap/standards\\.md$", "note": "coding standards" },
+      { "regex": "^\\.morphmap/structure\\.json$", "note": "THIS FILE" },
+      { "regex": "^\\.morphmap/CONTEXT\\.md$", "note": "domain glossary" },
+      { "regex": "^\\.morphmap/improv-map\\.md$", "note": "improvement map" },
+      { "regex": "^\\.morphmap/index\\.md$", "note": "resource index" },
+      { "regex": "^\\.morphmap/markmap-collapse\\.js$", "note": "collapse script" },
+      { "regex": "^\\.morphmap/state\\.db$", "note": "SQLite state" },
+      { "regex": "^\\.morphmap/state-index\\.json$", "note": "state index (legacy)" },
+      { "regex": "^\\.morphmap/grill-questions\\.json$", "note": "typed ambiguity records" }
+    ],
+    "morphmap_artifacts": [
+      { "regex": "^\\.morphmap/specs/.+", "note": "spec files" },
+      { "regex": "^\\.morphmap/mech/.+\\.ts$", "note": "pure mech module" },
+      { "regex": "^\\.morphmap/mech-pi/.+\\.ts$", "note": "impure mech-pi module" },
+      { "regex": "^\\.morphmap/scout-\\d+-\\d{8}-.+\\.md$", "note": "scout handoff" },
+      { "regex": "^\\.morphmap/researcher-\\d+-\\d{8}-.+\\.md$", "note": "research brief" },
+      { "regex": "^\\.morphmap/review-\\d{8}-\\d{6}\\.md$", "note": "review handoff" },
+      { "regex": "^\\.morphmap/quality-review-\\d+-\\d{8}-.+\\.md$", "note": "quality review" },
+      { "regex": "^\\.morphmap/hats-\\w+-\\d{8}-\\d{6}\\.md$", "note": "hats session (--file flag only)" }
+    ],
+    "agents_and_hooks": [
+      { "regex": "^\\.pi/agents/.+\\.md$", "note": "agent definition" },
+      { "regex": "^\\.pi/extensions/.+\\.ts$", "note": "extension/hook" }
+    ],
+    "project_files": [
+      { "regex": "^skills/\\w+/SKILL\\.md$", "note": "skill file" },
+      { "regex": "^prompts/morphmap-\\w+\\.md$", "note": "prompt template" },
+      { "regex": "^docs/.+", "note": "documentation" },
+      { "regex": "^docs/adr/.+", "note": "ADR (architecture decision record)" },
+      { "regex": "^examples/.+", "note": "examples" },
+      { "regex": "^\\.github/workflows/.+\\.yml$", "note": "CI workflow" },
+      { "regex": "^CHANGELOG\\.md$", "note": "changelog (auto-generated)" },
+      { "regex": "^package\\.json$", "note": "package manifest" },
+      { "regex": "^tsconfig\\.json$", "note": "TypeScript config" },
+      { "regex": "^index\\.ts$", "note": "extension entry" },
+      { "regex": "^AGENTS\\.md$", "note": "orchestrator instructions" },
+      { "regex": "^README\\.md$", "note": "project readme" },
+      { "regex": "^\\.gitignore$", "note": "git ignore" }
+    ],
+    "temp_and_artifacts": [
+      { "regex": "^\\.pi-subagents/.+", "note": "subagent artifact (temporary)" },
+      { "regex": "^/tmp/.+", "note": "temp file outside project" }
+    ]
+  },
+  "suspicious": [
+    { "regex": "^\\.morphmap/(?!morphmap|config|standards|structure|CONTEXT|improv|index|markmap|state|grill|specs|mech|scout|researcher|review|quality|hats).+", "reason": "unknown file in .morphmap/ — use specs/, mech/, or decisions log" },
+    { "regex": "^skills/.+(?<!/SKILL)\\.md$", "reason": "file in skills/ not SKILL.md — skills must be skills/<name>/SKILL.md" },
+    { "regex": "^(?!\\.morphmap/|\\.pi/|skills/|prompts/|docs/|examples/|CHANGELOG|package|tsconfig|index|AGENTS|\\.git|\\.github|README).+", "reason": "top-level file outside project structure — use docs/, .morphmap/, or existing dirs" }
+  ]
+}
