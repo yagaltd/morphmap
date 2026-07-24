@@ -27,53 +27,16 @@ resource: index.md
 
 # MorphMap — AI-Native Project Management
 
-## docs ✅ [log] — scope: format spec, agent architecture, protocols, execution, triage, state machine, one-map · 8/8 leaves
-- ✅ format specification → docs/format-spec.md
-- ✅ agent architecture + system prompts + hallucination prevention → docs/agent-architecture.md
-- ✅ intercom protocol specification → docs/intercom-protocol.md
-- ✅ execution flow + full diagram → docs/execution-flow.md
-- ✅ triage flow + classification logic → docs/triage-flow.md
-- ✅ design decisions audit trail → docs/design-decisions.md
-- ✅ mech-mindmap state machine spec → docs/mech-mindmap.md
-- ✅ one-map unified architecture (reference doc) → docs/one-map.md
-
-## examples ✅ [log] — scope: MorphEditor mindmap, OKF conformance · 2/2 leaves
-- ✅ MorphEditor full mindmap → examples/morpheditor.mindmap.md
-- ✅ OKF conformance: all reference docs valid, executables follow own conventions
-
-## commands ✅ [module] — scope: slash commands · 12/12 prompts + 12/12 skills · e2e tested: 11/12
-- ✅ /morphmap-init — scaffold + brownfield scan (MorphShell)
-- ✅ /morphmap-plan — budget estimate + grill + tree (MorphShell 4 scouts parallel)
-- ✅ /morphmap-delegate — 3 rounds on MorphShell, crash recovery · ⚠️ one-shot, needs --loop flag
-- ✅ /morphmap-improve — PDSA Study loop written
-- ✅ /morphmap-recover — orphan detection + worktree merge (MorphShell)
-- ✅ /morphmap-run — NEW: spawn all ready branches in parallel, loop until all done (one-map.md §9)
-- ✅ /morphmap-review → .morphmap/specs/commands/morphmap-review.spec.md [qa: review] [test: e2e] [skill: morphmap-review]
-- ✅ /morphmap-amend → .morphmap/specs/commands/morphmap-amend.spec.md [qa: review] [test: e2e] [skill: morphmap-amend]
-- ✅ /morphmap-triage → .morphmap/specs/commands/morphmap-triage.spec.md [qa: review] [test: e2e] [skill: morphmap-triage]
-- ✅ /morphmap → .morphmap/specs/commands/morphmap-render.spec.md [qa: review] [test: e2e] [skill: morphmap-render]
-- ✅ /morphmap-status → .morphmap/specs/commands/morphmap-status.spec.md [qa: review] [test: e2e] [skill: morphmap-status]
-- ✅ e2e: scout + researcher + branch-agent + leaf-worker all spawned + executed
-- ✅ Phase D: mech state machine wired into execution loop (143 tests, 0 failures)
-
-## agents ✅ [module] — scope: agent definitions · 5/5 leaves · all spawn-verified
-- ✅ branch-agent → .pi/agents/branch-agent.md · spawned + executed
-- ✅ leaf-worker → .pi/agents/leaf-worker.md · spawned + implemented
-- ✅ reviewer → .pi/agents/reviewer.md (two modes)
-- ✅ scout → .pi/agents/scout.md · spawned + recon completed
-- ✅ researcher → .pi/agents/researcher.md · spawned + research completed
-
-### fixes from e2e
-- ✅ researcher: web_search→bash+curl (tools available in subagent context)
-- ✅ branch-agent: agent-spec→bash (CLI needs shell, not tool name)
-- ✅ agent install: ~/.pi/agent/agents/morphmap/ for pi-subagents discovery
-
-## extension ✅ [module] — scope: pi extension package · 3/3 leaves
-- ✅ package.json + install from GitHub (pi install works)
-- ✅ agent discovery fixed (.pi/agents/ → ~/.pi/agent/agents/morphmap/)
-- ✅ npm packaging (not needed — GitHub install works)
-- ✅ mech tools wired: registerMechTools in hooks, state.json bootstrapped, md↔json sync active
-
+## docs ✅ → .morphmap/archive/2026-07-24-docs.md
+  format spec, agent architecture, protocols, execution, triage, state machine, one-map · 8/8 leaves
+## examples ✅ → .morphmap/archive/2026-07-24-examples.md
+  MorphEditor mindmap, OKF conformance · 2/2 leaves
+## commands ✅ → .morphmap/archive/2026-07-24-commands.md
+  slash commands ·  leaves
+## agents ✅ → .morphmap/archive/2026-07-24-agents.md
+  agent definitions · 5/5 leaves
+## extension ✅ → .morphmap/archive/2026-07-24-extension.md
+  pi extension package · 3/3 leaves
 ## staging 🔄 [phase]
 ### e2e-test
 - ✅ init + plan + delegate flow verified on E2ETest project
@@ -103,101 +66,10 @@ resource: index.md
 - releases branch updated on every push/publish
 - CHANGELOG.md auto-generated from decisions log by morphmap-hooks extension
 
-## skills ✅ [log] — what each skill does + format tags
-- morphmap-plan: scout+research (parallel) → decision tree → grill unresolved → build tree → approve → contracts
-- morphmap-delegate: read map → find ready branches → spawn branch-agent via subagent() · ⚠️ one-shot, needs --loop flag
-- morphmap-run: spawn ALL ready branches in parallel → monitor via intercom + state.json → loop until all done (NEW, one-map.md §9)
-- morphmap-review: spawn reviewer subagent → walk tree → flag blockers → report
-- morphmap-amend: classify addition (4-tier) → route to branch-agent or flag human
-- morphmap-triage: read external (GitHub/email/chat) → classify (4-tier) → route or flag
-- morphmap-improve: gather (git+decisions+vcc_recall) → study patterns → propose → approve → apply
-- morphmap-init: scaffold .morphmap/ + .morphmap/morphmap.mindmap.md + index.md + git init
-- morphmap-render: npx markmap-cli → HTML
-- morphmap-status: read branch headers → text summary
-- morphmap-recover: detect orphaned worktrees → merge uncommitted work → prune branches
-- morphmap-archive: extract ✅ branches to archive files → replace with summary link in main map
-
-### quality pipeline (per leaf, gated by [qa:] tag)
-- [qa: none]: leaf-worker self-verify → ✅
-- [qa: review]: leaf-worker → reviewer (mechanical) → ✅
-- [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
-- [qa:] set by branch agent per leaf; defaults from posture.quality if absent
-
-## mech-mindmap ✅ [module] — scope: state machine + deterministic gates · 6/6 phases (all phases done)
-- Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
-- Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
-- ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
-- ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
-- ✅ Phase C: transition tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate (pure handlers) · select gates via lattice, call transitionLeaf/runIntegrationGates · return {accepted/passed, failures} · 18 new tests · full suite 113/113 green · tsc exit 0 · tdd-guard 6/6 · end-to-end lifecycle tests (submit→approve→integrate, cannot-skip-review) · request_revision deferred to Phase D
-- ✅ Phase D: hooks integration — register transition tools in morphmap-hooks.ts, state.json I/O, md↔json sync · ALL WIRED (registerMechTools in hooks, seedFromMap in init/delegate, md→json sync on map write, double-commit bug fixed) · 128 tests green
-- ✅ Phase E: tool failure recovery — classifyFailure (15 tests), findStuckLeaves (5 tests), recoveryReport (5 tests) · implemented (recovery.ts)
-- ✅ Phase F: sub-map session lifecycle — syncChildStatuses (7 tests), detectSubmapOrphans (5 tests) · implemented (sub-map.ts)
-
-### phase-d-wiring ✅ [module] — scope: wire mech state machine into execution loop · 5/5 leaves
-- ✅ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
-- ✅ register transition tools in hooks → .morphmap/specs/mech/phase-d/register-transition-tools.spec.md [qa: full] [test: unit]
-- ✅ bootstrap state.json from mindmap → .morphmap/specs/mech/phase-d/bootstrap-state-json.spec.md [qa: full] [test: integration]
-- ✅ md↔json sync hook → .morphmap/specs/mech/phase-d/md-json-sync-hook.spec.md [qa: full] [test: integration]
-- ✅ update agent prompts → .morphmap/specs/mech/phase-d/update-agent-prompts.spec.md [qa: review] [test: unit]
-
-### one-map ✅ [module] — scope: unify entities, add compiler hook, map=session tree · 3/3 leaves
-- ✅ compiler hook (JSONL evidence extraction) → .morphmap/specs/mech/one-map/compiler-hook.spec.md [qa: full] [test: integration]
-- ✅ unify Leaf/Branch → Node type → .morphmap/specs/mech/one-map/unify-node-type.spec.md [qa: full] [test: unit]
-- ✅ map = session tree (session IDs in metadata) → .morphmap/specs/mech/one-map/map-session-tree.spec.md [qa: review] [test: unit]
-
-### mech-mindmap (deterministic state machine)
-- Pure gates (pre-spawn, submit, review, integration) — zero pi imports
-- Transition tools (submit_leaf, approve_leaf, integration_gate)
-- Tool failure recovery (classify, retry, reroute)
-- Sub-map session lifecycle (heartbeat, orphan, status sync)
-- Design: pure/impure split → direct Rust + Rhai port
-- quality-reviewer: static code review (one agent, cheap). Checks simplicity, error patterns, domain fit, surgical scope.
-- bug-hunter: adversarial pipeline (4 agents, expensive). Finds runtime bugs, race conditions, auth bypasses. Can auto-fix.
-- Quality reviewer runs on every leaf (standard/strict). Bug hunter runs on 🔴/🟡 leaves only (strict).
-
-### handoff file types (all OKF frontmatter)
-- scout-NNN: recon findings → .morphmap/scout-NNN-YYYYMMDD-slug.md
-- researcher-NNN: research brief → .morphmap/researcher-NNN-YYYYMMDD-slug.md
-- quality-review-NNN: quality verdict → .morphmap/quality-review-NNN-YYYYMMDD-slug.md
-- integration-review-NNN: integration verdict → .morphmap/integration-review-NNN-YYYYMMDD-slug.md
-- context-builder-NNN: domain glossary → .morphmap/CONTEXT.md (persistent, not versioned)
-- agents/: frozen agent definitions → .morphmap/agents/ (copied at init, updated via --update-agents)
-
-### leaf format tags (for markmap rendering)
-- [link] → leaf points to a file (spec, doc, ADR)
-- [table] → leaf produces tabular data
-- [code] → leaf is a code block
-- [checkbox] → leaf is a task/checklist
-- [core] → always visible in rendered view
-- [rich] → collapsible detail
-
-### branch tags (for agent routing)
-- [module] → code module — branch-agent manages
-- [feature] → feature concern — branch-agent manages
-- [phase] → lifecycle (staging, production) — human-managed
-- [log] → documentation (decisions, skills, releases) — human-managed, agent-read-only. Mark ✅ when accurate and current.
-- [adr] → architecture decision records — human-managed, read-only, linked to docs/adr/
-- unknown tag → default to human-managed
-
-### telemetry (for cross-project improvement)
-- [telemetry] entries in ## decisions are machine-readable, anonymized
-- Categories: agent-result (all agents), tool-failure, improve-trigger
-- Format: `[telemetry] agent-result: agent=morphmap/<name> task=<label> model=<model> thinking=<level> tokens-in=<N> tokens-out=<N> cost=$<amount> result=✅`
-- All morphmap agents tracked: leaf-worker, quality-reviewer, reviewer, branch-agent, scout, researcher
-- Token/cost captured from pi runtime env vars (PI_RUN_TOKENS_IN, PI_RUN_TOKENS_OUT, PI_RUN_ESTIMATED_COST)
-- Delta-calculated: pre-spawn baseline subtracted from post-completion total
-- Feeds /morphmap-improve cross-project analysis
-
-### tool + model assignment (per task type)
-- Config has `taskProfiles` for general tasks and `testProfiles` for test-specific model assignment
-- `testProfiles` separate from `taskProfiles` because testing often needs different models:
-  - UI/E2E tests need vision-capable models (zai/glm-5.2) + browser tools (playwriter, agent-browser)
-  - Unit tests work with text models (deepseek-v4-flash) + vitest/jsdom
-  - Integration tests need stronger reasoning (deepseek-v4-pro)
-- Available CLI tools scanned at init/delegate into `.morphmap/available-skills.md` `## tools` section
-- Branch agent step 3a: for test leaves, match `[test:]` tag against available tools, assign appropriate tool + model
-- Leaf worker uses assigned tool — doesn't guess
-
+## skills ✅ → .morphmap/archive/2026-07-24-skills.md
+   ·  leaves
+## mech-mindmap ✅ → .morphmap/archive/2026-07-24-mech.md
+  state machine + deterministic gates · 5/5 leaves
 ## decisions ⬜ [log]
 
 ### 2026-07-24
