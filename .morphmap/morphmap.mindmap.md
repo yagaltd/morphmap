@@ -121,15 +121,15 @@ resource: index.md
 - [qa: full]: leaf-worker → reviewer (mech) → quality-reviewer (judgment) → bug-hunter (🔴/🟡) → ✅
 - [qa:] set by branch agent per leaf; defaults from posture.quality if absent
 
-## mech-mindmap ✅ [module] — scope: state machine + deterministic gates · 3/6 phases (A-C+D+one-map done, E-F pending)
+## mech-mindmap ✅ [module] — scope: state machine + deterministic gates · 6/6 phases (all phases done)
 - Plan: docs/mech-mindmap.md · ~2100-2800 LOC TypeScript (est. raised after deep review, finding J)
 - Pure/impure split: gates are pure functions (no pi imports) → direct Rust + Rhai migration
 - ✅ Phase A: types + state + config → .morphmap/mech/{types,state,config,index}.ts · 49 tests green (bun test) · tsc --noEmit exit 0 · tested: legality, idempotency, gate short-circuit, immutability, deps (needs vs needs-contract), rollup, config lookups, posture
 - ✅ Phase B: gate functions → .morphmap/mech/gates/{pre-spawn,submit,review,integration,common}.ts + lattice.ts · 4 chains (preSpawn/submit/review/integration), 22 gates total · pure (validate populated evidence, no I/O) · 38 new tests · full suite 95/95 green · tsc exit 0 · tdd-guard 6/6 · integration tests caught a real crossLeafNoConflict bug (was reading pre-commit leaf.evidence instead of incoming evidence)
 - ✅ Phase C: transition tools → .morphmap/mech/tools.ts · submitLeaf/approveLeaf/integrationGate (pure handlers) · select gates via lattice, call transitionLeaf/runIntegrationGates · return {accepted/passed, failures} · 18 new tests · full suite 113/113 green · tsc exit 0 · tdd-guard 6/6 · end-to-end lifecycle tests (submit→approve→integrate, cannot-skip-review) · request_revision deferred to Phase D
 - ✅ Phase D: hooks integration — register transition tools in morphmap-hooks.ts, state.json I/O, md↔json sync · ALL WIRED (registerMechTools in hooks, seedFromMap in init/delegate, md→json sync on map write, double-commit bug fixed) · 128 tests green
-- ⬜ Phase E: tool failure recovery — classifyFailure, findStuckLeaves, recoveryReport · NOT IMPLEMENTED (recovery.ts does not exist)
-- ⬜ Phase F: sub-map session lifecycle — syncChildStatuses, detectSubmapOrphans · NOT IMPLEMENTED (sub-map.ts does not exist)
+- ✅ Phase E: tool failure recovery — classifyFailure (15 tests), findStuckLeaves (5 tests), recoveryReport (5 tests) · implemented (recovery.ts)
+- ✅ Phase F: sub-map session lifecycle — syncChildStatuses (7 tests), detectSubmapOrphans (5 tests) · implemented (sub-map.ts)
 
 ### phase-d-wiring ✅ [module] — scope: wire mech state machine into execution loop · 5/5 leaves
 - ✅ restore mech-pi wiring layer → .morphmap/specs/mech/phase-d/restore-mech-pi-wiring.spec.md [qa: full] [test: unit]
