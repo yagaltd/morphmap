@@ -12,7 +12,7 @@ posture:
   budget: balanced
 markmap:
   colorFreezeLevel: 2
-  maxWidth: 300
+  maxWidth: 900
 resource: index.md
 ---
 
