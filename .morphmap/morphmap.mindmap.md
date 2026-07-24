@@ -19,6 +19,7 @@ resource: index.md
 ## context ⬜
 - Domain glossary → .morphmap/CONTEXT.md
 - Coding standards → .morphmap/standards.md (6 rules for all agents)
+- 6 Thinking Hats → .morphmap/hats-*.md (structured reasoning outputs)
 - improv-map: quality + recursion + context improvements → .morphmap/improv-map.md
 - one-map architecture (reference doc for new implementation) → docs/one-map.md
 - mech-mindmap state machine spec → docs/mech-mindmap.md
