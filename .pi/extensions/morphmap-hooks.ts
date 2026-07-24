@@ -19,11 +19,19 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
   registerSpecGuards,
+} from "./hooks/spec-guard";
+import {
   registerRenderPipeline,
+} from "./hooks/render-pipeline";
+import {
   registerTelemetry,
+} from "./hooks/telemetry";
+import {
   registerFailureRecovery,
+} from "./hooks/failure-recovery";
+import {
   registerFileStructureGuard,
-} from "./hooks";
+} from "./hooks/file-structure-guard";
 
 let _mechRegistered = false;
 
