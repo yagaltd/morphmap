@@ -7,7 +7,8 @@
   "pi": {
     "skills": ["./skills"],
     "prompts": ["./prompts"],
-    "extensions": ["./.pi/extensions/morphmap-hooks.ts"]
+    "extensions": ["./.pi/extensions/morphmap-hooks.ts"],
+    "entry": "./index.ts"
   },
   "peerDependencies": {
     "pi-subagents": ">=0.17.2",

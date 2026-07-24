@@ -41,36 +41,20 @@ available:
   builtin: [/goal, vcc_recall]
   verified-at: <today>
 
-orchestratorProfile:
-  model: "deepseek/deepseek-v4-pro"
-  thinking: "high"
+Model profiles are defined in `.morphmap/config.json` (single source of truth).
+The init skill reads this file — do NOT duplicate model assignments here.
 
-leafProfiles:
-  standard:    { model: "deepseek/deepseek-v4-flash", thinking: "off" }
-  risky:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  blocking:    { model: "anthropic/claude-sonnet-4",  thinking: "max" }
-  time:        { model: "deepseek/deepseek-v4-flash", thinking: "high" }
-  verify:      { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
+```json
+// .morphmap/config.json — all profiles:
+{
+  "leafProfiles": { standard, risky, blocking, time, verify },
+  "taskProfiles": { plan-scout, plan-grill, ..., research-verify },
+  "orchestratorProfile": { model, thinking }
+}
+```
 
-taskProfiles:
-  plan-scout:          { model: "deepseek/deepseek-v4-flash", thinking: "off" }
-  plan-grill:          { model: "deepseek/deepseek-v4-pro",  thinking: "max" }
-  plan-context:        { model: "deepseek/deepseek-v4-flash", thinking: "high" }
-  build-backend:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  build-frontend:      { model: "zai/glm-5.2",              thinking: "high" }
-  build-generic:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  review-mechanical:   { model: "deepseek/deepseek-v4-flash", thinking: "off" }
-  review-judgment:     { model: "anthropic/claude-sonnet-4",  thinking: "high" }
-  review-frontend:     { model: "zai/glm-5.2",              thinking: "high" }
-  research-pass:       { model: "deepseek/deepseek-v4-flash", thinking: "off" }
-  research-verify:     { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-
-testProfiles:
-  test-unit:           { model: "deepseek/deepseek-v4-flash", thinking: "off" }
-  test-integration:    { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  test-e2e:            { model: "zai/glm-5.2",              thinking: "high" }
-  test-property:       { model: "deepseek/deepseek-v4-pro",  thinking: "high" }
-  test-snapshot:       { model: "deepseek/deepseek-v4-flash", thinking: "off" }
+Branch agents call `bun run .morphmap/mech/model-assign.ts <bottleneck> <qa> <tests>`
+to resolve models. The CLI reads config.json at runtime — no stale copies.
 
 specsDirectory: .morphmap/specs/
 ```

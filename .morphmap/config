@@ -1,4 +1,6 @@
-# MorphMap Project Configuration
+# MorphMap Project Configuration (LEGACY — see config.json)
+# Single source of truth is now .morphmap/config.json.
+# This file is kept for reference; model assignments live in JSON.
 # Human-maintained. Agents read at startup. Do not hallucinate tools not listed here.
 
 available:

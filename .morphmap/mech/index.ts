@@ -11,7 +11,10 @@ export * from "./gates/pre-spawn";
 export * from "./gates/submit";
 export * from "./gates/review";
 export * from "./gates/integration";
+export * from "./gates/common";
 export * from "./lattice";
+export * from "./recovery";
+export * from "./sub-map";
 
 // Re-export Node type helpers for one-map compatibility
 export { isLeaf, isBranch, nodeToLeaf, nodeToBranchState } from "./types";

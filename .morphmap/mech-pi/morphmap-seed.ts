@@ -1,8 +1,10 @@
 /**
- * morphmap-seed.ts — bootstrap state.json from mindmap (impure).
+ * morphmap-seed.ts — bootstrap state.json from mindmap.
  *
- * Reads .morphmap/morphmap.mindmap.md, parses [module]/[feature] branches via
- * the pure seed parser, writes per-branch state.json + state-index.json.
+ * IMPURE WRAPPER — reads mindmap from disk, delegates to mech/seed.ts (pure parser),
+ * writes state.json + state-index.json via morphmap-state.ts.
+ *
+ * The pure parser lives in ../mech/seed.ts.
  *
  * Spec: docs/mech-mindmap.md §2.2, §2.7 Step A.
  */

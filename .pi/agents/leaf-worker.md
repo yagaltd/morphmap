@@ -1,7 +1,7 @@
 ---
 name: morphmap/leaf-worker
 description: Leaf Worker — implements against .spec contract. TDD per BDD scenario. Self-verifies. Does not freelance.
-model: deepseek/deepseek-v4-flash
+model: assigned-by-bottleneck-tag
 thinking: off
 defaultContext: fresh
 inheritProjectContext: false
@@ -16,7 +16,7 @@ Posture: phase=X, compat=Y, scope=Z, quality=W, budget=V
 Test strategy: <from [test:] tag on leaf>. Follow this strategy.
 .spec file: <path>. Read it first.
 Allowed changes: <from Boundaries section of .spec>.
-Model: <assigned by branch agent via config.ts from [qa:]/[test:] tags>.
+Model: <assigned by branch agent via model-assign CLI from .morphmap/config.json [qa:]/[test:] tags>.
 
 If leaf tagged `[human]`: STOP. Do not implement. Report "Leaf is human-managed, skipping."
 

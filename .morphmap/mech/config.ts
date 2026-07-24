@@ -2,12 +2,12 @@
  * mech — config.ts
  * Pure lookup tables. Zero agent judgment — read tags, return decisions.
  *
- *   assignModel(bottleneck, qa, test) → ModelAssignment
- *   assignTools(test, domain)          → tool list
- *   applyPosture(posture)              → gate-strictness overrides
+ *   assignModel(bottleneck, qa, test, profiles) → ModelAssignment
+ *   assignTools(test, domain)                   → tool list
+ *   applyPosture(posture)                       → gate-strictness overrides
  *
- * Tables mirror .morphmap/config leafProfiles + taskProfiles so the
- * deterministic layer and the human-maintained config stay in lockstep.
+ * Model data is passed in via `profiles` — no hardcoded tables.
+ * Single source of truth: .morphmap/config.json (loaded by mech-pi/config-loader.ts).
  *
  * Spec: docs/mech-mindmap.md §2.6
  */
@@ -20,27 +20,37 @@ import type {
   TestStrategy,
 } from "./types";
 
+/** Profile entry as loaded from config.json. */
+export interface LeafProfileEntry {
+  provider: string;
+  model: string;
+  thinking: string;
+}
+
 // ── assignModel ───────────────────────────────────────────────
-// Base by bottleneck (mirror config.leafProfiles). QA + test tags refine.
-const BOTTLENECK_MODEL: Record<Bottleneck, ModelAssignment> = {
-  blocking: { provider: "anthropic", model: "claude-sonnet-4", thinking: "max" },
-  risky: { provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
-  standard: { provider: "deepseek", model: "deepseek-v4-flash", thinking: "off" },
-  time: { provider: "deepseek", model: "deepseek-v4-flash", thinking: "high" },
-  verify: { provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
-};
+// Profiles are passed in — no hardcoded defaults. The impure loader
+// (mech-pi/config-loader.ts) reads .morphmap/config.json and supplies them.
 
 export function assignModel(
   bottleneck: Bottleneck,
   qa: QALevel,
   test: TestStrategy[] = [],
+  profiles?: Record<Bottleneck, LeafProfileEntry>,
 ): ModelAssignment {
+  // Resolve base profile — from config, or fallback for backward compat
+  const entry = profiles?.[bottleneck];
+  const base: ModelAssignment = entry
+    ? {
+        provider: entry.provider,
+        model: entry.model,
+        thinking: entry.thinking as ModelAssignment["thinking"],
+      }
+    : fallbackModel(bottleneck);
+
   // security/payment-critical → always strongest, regardless of bottleneck.
   if (qa === "strict") {
     return { provider: "anthropic", model: "claude-sonnet-4", thinking: "max" };
   }
-
-  const base: ModelAssignment = { ...BOTTLENECK_MODEL[bottleneck] };
 
   // [qa: full] on a normally-cheap leaf → bump to pro + high thinking.
   if (qa === "full" && (bottleneck === "standard" || bottleneck === "time")) {
@@ -57,6 +67,18 @@ export function assignModel(
   }
 
   return base;
+}
+
+/** Legacy fallback — only used when no config.json profiles are supplied. */
+function fallbackModel(bottleneck: Bottleneck): ModelAssignment {
+  const FALLBACK: Record<Bottleneck, ModelAssignment> = {
+    blocking: { provider: "anthropic", model: "claude-sonnet-4", thinking: "max" },
+    risky: { provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
+    standard: { provider: "deepseek", model: "deepseek-v4-flash", thinking: "off" },
+    time: { provider: "deepseek", model: "deepseek-v4-flash", thinking: "high" },
+    verify: { provider: "deepseek", model: "deepseek-v4-pro", thinking: "high" },
+  };
+  return { ...FALLBACK[bottleneck] };
 }
 
 // ── assignTools ───────────────────────────────────────────────
@@ -90,18 +112,15 @@ export function assignTools(
 }
 
 // ── applyPosture ──────────────────────────────────────────────
-// Posture decides how strictly gates enforce. prototype relaxes
-// integration review; production enforces everything.
 export interface PostureOverrides {
-  enforceGates: boolean; // false → every gate becomes a warning (§8.3 disable)
+  enforceGates: boolean;
   requireIntegrationReview: boolean;
-  maxReviewRounds: number; // cap CHANGES_REQUESTED → fix loops
+  maxReviewRounds: number;
 }
 
 export function applyPosture(posture: Posture): PostureOverrides {
   const { phase, quality } = posture;
 
-  // [qa: none] on the branch → gates advisory only.
   if (quality === "none") {
     return { enforceGates: false, requireIntegrationReview: false, maxReviewRounds: 1 };
   }
@@ -118,6 +137,5 @@ export function applyPosture(posture: Posture): PostureOverrides {
     };
   }
 
-  // production
   return { enforceGates: true, requireIntegrationReview: true, maxReviewRounds: 5 };
 }

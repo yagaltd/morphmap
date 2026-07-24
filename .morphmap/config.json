@@ -1,0 +1,33 @@
+{
+  "orchestratorProfile": {
+    "model": "deepseek/deepseek-v4-pro",
+    "thinking": "high"
+  },
+  "leafProfiles": {
+    "standard": { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" },
+    "risky":    { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
+    "blocking": { "provider": "anthropic", "model": "claude-sonnet-4",  "thinking": "max" },
+    "time":     { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "high" },
+    "verify":   { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" }
+  },
+  "taskProfiles": {
+    "plan-scout":          { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" },
+    "plan-grill":          { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "max" },
+    "plan-context":        { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "high" },
+    "build-backend":       { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
+    "build-frontend":      { "provider": "zai",      "model": "glm-5.2",          "thinking": "high" },
+    "build-generic":       { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
+    "review-mechanical":   { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" },
+    "review-judgment":     { "provider": "anthropic", "model": "claude-sonnet-4",  "thinking": "high" },
+    "review-frontend":     { "provider": "zai",      "model": "glm-5.2",          "thinking": "high" },
+    "research-pass":       { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" },
+    "research-verify":     { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" }
+  },
+  "testProfiles": {
+    "test-unit":           { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" },
+    "test-integration":    { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
+    "test-e2e":            { "provider": "zai",      "model": "glm-5.2",          "thinking": "high" },
+    "test-property":       { "provider": "deepseek", "model": "deepseek-v4-pro",  "thinking": "high" },
+    "test-snapshot":       { "provider": "deepseek", "model": "deepseek-v4-flash", "thinking": "off" }
+  }
+}
