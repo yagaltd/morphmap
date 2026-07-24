@@ -16,6 +16,37 @@ export function registerSpecGuards(pi: ExtensionAPI) {
     const state = getState(ctx);
     state.turnCount++;
 
+    // ── Git DEPRECATED: block destructive git, suggest jj ──
+    if (event.toolName === "bash") {
+      const cmd = (event.input?.command as string) || "";
+      const blocked = [
+        { pattern: /git add/, suggestion: "jj commit" },
+        { pattern: /git commit/, suggestion: "jj commit -m '...'" },
+        { pattern: /git merge/, suggestion: "jj rebase -d main && jj squash" },
+        { pattern: /git stash/, suggestion: "(not needed — jj auto-tracks)" },
+        { pattern: /git branch/, suggestion: "jj bookmark" },
+        { pattern: /git checkout --/, suggestion: "jj abandon <change-id>" },
+        { pattern: /git reset/, suggestion: "jj undo" },
+        { pattern: /git worktree/, suggestion: "jj new + jj edit" },
+      ];
+      for (const b of blocked) {
+        if (b.pattern.test(cmd)) {
+          pi.ui?.notify({
+            title: "MorphMap: git is DEPRECATED",
+            body: `Use instead: ${b.suggestion}`,
+            style: "warning",
+          });
+          if (/git commit|git add|git merge/.test(cmd)) {
+            return {
+              block: true,
+              reason: `git is deprecated. Use jj: ${b.suggestion}`,
+            };
+          }
+          break;
+        }
+      }
+    }
+
     // ── Intercom audit: check if previous leaf completion was signaled ──
     if (state.pendingIntercomCheck) {
       if (event.toolName === "intercom" || event.toolName === "subagent_supervisor") {
