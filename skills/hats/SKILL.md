@@ -1,6 +1,6 @@
 ---
 name: morphmap-hats
-description: Structured reasoning via 6 Thinking Hats. Containerize evaluation into facts → risks → benefits → alternatives → decision. Four contexts: eval, rca, brownfield, review.
+description: "Structured reasoning via 6 Thinking Hats. Containerize evaluation into facts → risks → benefits → alternatives → decision. Four contexts: eval, rca, brownfield, review."
 user-invocable: true
 argument-hint: "--context eval|rca|brownfield|review [subject]"
 ---
