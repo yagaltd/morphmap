@@ -3,12 +3,26 @@
  *
  * Reads mode from AGENTS.md frontmatter or session metadata.
  * Blocks tools that are not allowed for the current mode.
- * Uses MODE_TOOL_POLICY from mech types.
+ * Types inlined to avoid static .ts imports (pi uses dynamic import()).
  */
 
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
-import { MODE_TOOL_POLICY } from "../../.morphmap/mech/types";
-import type { AgentMode } from "../../.morphmap/mech/types";
+
+// ── Inlined from .morphmap/mech/types.ts (avoid static cross-module import) ──
+export type AgentMode =
+  | "research"    // 🔍  read/search/web only — no writes, no spawn
+  | "brainstorm"  // 💡  same as research + write allowed
+  | "plan"        // 📋  write specs allowed, no implementation
+  | "implement"   // 🔨  full access — write, bash, commit, delegate
+  | "review";     // 👁️  read/search/talk — subagent(read-only) allowed
+
+const MODE_TOOL_POLICY: Record<AgentMode, string[]> = {
+  research: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate"],
+  brainstorm: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "write"],
+  plan: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "write", "edit"],
+  implement: ["*"],
+  review: ["read", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "subagent"],
+};
 
 /** Known tool names the hook may encounter. */
 const ALL_KNOWN_TOOLS = [
