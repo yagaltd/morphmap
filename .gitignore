@@ -19,5 +19,4 @@ cover-v*.png
 # Extension build docs (not project state)
 docs/
 examples/
-AGENTS.md
 .pi-subagents/artifacts/
