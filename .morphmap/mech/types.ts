@@ -59,6 +59,43 @@ export type ThinkingLevel =
   | "high"
   | "max";
 
+// ── Agent mode (orchestrator posture, §9) ────────────────────
+// Controls which tools the agent may use. Stricter modes block more.
+// Transitions governed by modeGate — some transitions require human approval.
+export type AgentMode =
+  | "research"    // read/search/web only — no writes, no spawn
+  | "brainstorm"  // same as research + talk allowed
+  | "plan"        // write specs allowed, no implementation
+  | "implement"   // full access — write, bash, commit, delegate
+  | "review";     // read/search/talk — subagent(read-only) allowed
+
+export const AGENT_MODE_EMOJI: Record<AgentMode, string> = {
+  research: "🔍",
+  brainstorm: "💡",
+  plan: "📋",
+  implement: "🔨",
+  review: "👁️",
+};
+
+/** Which tools each mode allows. `*` = all. `[]` = none. */
+export const MODE_TOOL_POLICY: Record<AgentMode, string[]> = {
+  research: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate"],
+  brainstorm: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "write"],
+  plan: ["read", "bash", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "write", "edit"],
+  implement: ["*"],
+  review: ["read", "mcp", "vcc_recall", "ctx_execute", "ctx_execute_file", "ctx_search", "ctx_fetch_and_index", "ctx_batch_execute", "ctx_index", "ctx_stats", "interview", "annotate", "subagent"],
+};
+
+/** Mode transition matrix: which source modes can go to which target modes?
+ *  Read as: MODE_TRANSITION[from][to] = allowed? */
+export const MODE_TRANSITION: Record<AgentMode, Record<AgentMode, boolean>> = {
+  research:    { research: true, brainstorm: true, plan: false, implement: false, review: false },
+  brainstorm:  { research: true, brainstorm: true, plan: true,  implement: false, review: false },
+  plan:        { research: true, brainstorm: true, plan: true,  implement: true,  review: true },
+  implement:   { research: true, brainstorm: true, plan: true,  implement: true,  review: true },
+  review:      { research: true, brainstorm: true, plan: false, implement: false, review: true },
+};
+
 export interface ModelAssignment {
   provider: string; // "anthropic" | "deepseek" | "zai" …
   model: string; //  "claude-sonnet-4"

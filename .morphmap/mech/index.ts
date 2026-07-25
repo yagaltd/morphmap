@@ -11,6 +11,7 @@ export * from "./gates/pre-spawn";
 export * from "./gates/submit";
 export * from "./gates/review";
 export * from "./gates/integration";
+export * from "./gates/mode";
 export * from "./gates/common";
 export * from "./lattice";
 export * from "./recovery";

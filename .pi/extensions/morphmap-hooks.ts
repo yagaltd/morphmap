@@ -32,6 +32,9 @@ import {
 import {
   registerFileStructureGuard,
 } from "./hooks/file-structure-guard";
+import {
+  registerModeGuard,
+} from "./hooks/mode-guard";
 
 let _mechRegistered = false;
 
@@ -56,6 +59,9 @@ export default function (pi: ExtensionAPI) {
       }
     });
   }
+
+  // Layer 0: Mode enforcement (blocks tools based on agent mode)
+  registerModeGuard(pi);
 
   // Layer 1+2: Pre-tool enforcement
   registerSpecGuards(pi);
