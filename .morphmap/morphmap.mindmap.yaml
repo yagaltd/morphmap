@@ -1,0 +1,104 @@
+# MorphMap mindmap — single source of truth
+# Three consumers: orchestrator (compact context), markmap (HTML render), interactive UI (drag-drop)
+type: mindmap
+project: MorphMap
+status: in-progress
+timestamp: 2026-07-24
+tags: [MorphMap, project-management, ai-agents, pi-extension]
+posture: { phase: prototype, compatibility: break, scope: broad, quality: fast, budget: balanced }
+
+context:
+  - "Branch tags: [module] [feature] → branch-agent | [research] [brainstorm] → human-led → /morphmap-promote"
+  - "Domain glossary → .morphmap/CONTEXT.md"
+  - "Coding standards → .morphmap/standards.md (6 rules)"
+  - "6 Thinking Hats → .morphmap/hats-*.md"
+  - "Architecture → docs/one-map.md"
+  - "State machine → docs/mech-mindmap.md"
+  - "Quality improvement → .morphmap/improv-map.md"
+
+branches:
+  e2e-test:
+    status: in_progress   # ⬜ pending | 🔄 in_progress | ✅ done | ❌ failed | 🔴 blocked
+    tag: phase
+    collapsed: false
+    leaves:
+      - { text: "init + plan + delegate flow verified on E2ETest", status: done }
+      - { text: "scout: recon · researcher: research · agent: pull + spawn + update", status: done }
+      - { text: "leaf-worker: implement server.js + package.json + curl verify", status: done }
+      - { text: "test /morphmap-review", status: pending }
+      - { text: "test /morphmap-triage on GitHub issue", status: pending }
+
+  real-project-test:
+    status: pending
+    tag: phase
+    collapsed: false
+    leaves:
+      - { text: "init MorphEditor as MorphMap project", status: pending }
+      - { text: "plan from real MorphEditor features", status: pending }
+
+  production:
+    status: blocked
+    tag: phase
+    blocked_reason: "MorphEditor dogfooding not done"
+    collapsed: false
+    leaves:
+      - { text: "publish pi extension → https://github.com/yagaltd/morphmap", status: blocked, note: "published, needs dogfood verification" }
+      - { text: "MorphEditor dogfooding: manage own development with MorphMap", status: blocked }
+
+  releases:
+    status: done
+    tag: log
+    collapsed: false
+    content:
+      - "0.2.0 (2026-07-20): 5 agents spawn-verified, 9 commands, taskProfiles, PDSA improve, Write Guard"
+      - "0.1.0 (2026-07-19): initial release — format spec, agent architecture, 6 reference docs"
+      - "semver for code, date-based for non-code, CHANGELOG.md auto-generated"
+
+  docs:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-docs.md
+    summary: "format spec, agent architecture, protocols, execution, triage, state machine, one-map · 8 leaves"
+
+  examples:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-examples.md
+    summary: "MorphEditor mindmap, OKF conformance · 2 leaves"
+
+  commands:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-commands.md
+    summary: "/morphmap: plan delegate review amend init render status improve hats recover archive promote run explore expand collapse grill · 17 commands"
+
+  agents:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-agents.md
+    summary: "branch-agent leaf-worker reviewer scout researcher quality-reviewer context-builder · 7 agents"
+
+  extension:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-extension.md
+    summary: "hooks CLI context-mode pi-subagents · 3 leaves"
+
+  skills:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-skills.md
+    summary: "plan delegate review amend init render status improve hats recover archive promote explore expand collapse grill · 18 skills"
+
+  mech-mindmap:
+    status: done
+    tag: module
+    archived: .morphmap/archive/2026-07-24-mech.md
+    summary: "state machine + deterministic gates · 6 phases (all done)"
+
+decisions:
+  file: .morphmap/decisions.md
+  count: 115
+  recent: 4
+  archived: 111
+  latest: [promote mechanism, undo gap, review tree-walker, jj enforced AGENTS.md]
